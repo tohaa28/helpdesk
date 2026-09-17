@@ -1,0 +1,52 @@
+name: Build PrintCheck APK
+
+on:
+  push:
+    branches:
+      - printcheck-build-3.1.0-alpha1
+    paths:
+      - 'printcheck-build/**'
+      - '.github/workflows/printcheck-build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK 35
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Restore source
+        shell: bash
+        run: |
+          mkdir -p /tmp/pc
+          cat printcheck-build/source.b64.part* | base64 -d > /tmp/pc/source.zip
+          unzip -q /tmp/pc/source.zip -d /tmp/pc
+      - name: Build
+        shell: bash
+        run: |
+          cd /tmp/pc/printcheck_slim
+          gradle --no-daemon --stacktrace assembleDebug
+      - name: Collect APK
+        shell: bash
+        run: |
+          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.1.0-alpha1.apk
+          sha256sum PrintCheck_Android_3.1.0-alpha1.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PrintCheck_Android_3.1.0-alpha1_APK
+          path: PrintCheck_Android_3.1.0-alpha1.apk
+          if-no-files-found: error
+          retention-days: 7
