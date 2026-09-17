@@ -43,6 +43,8 @@ jobs:
         run: python3 printcheck-build/patch_alpha3.py /tmp/pc/printcheck_slim
       - name: Apply alpha4 exact-position patch
         run: python3 printcheck-build/patch_alpha4.py /tmp/pc/printcheck_slim
+      - name: Fix alpha4 regex escape
+        run: python3 printcheck-build/fix_alpha4_escape.py /tmp/pc/printcheck_slim
       - name: Verify version
         run: grep -q "versionName '3.1.0-alpha4'" /tmp/pc/printcheck_slim/app/build.gradle
       - name: Build
