@@ -47,14 +47,13 @@ jobs:
         run: python3 printcheck-build/fix_alpha4_escape.py /tmp/pc/printcheck_slim
       - name: Apply alpha5 application-template patch
         run: python3 printcheck-build/patch_alpha5.py /tmp/pc/printcheck_slim
-      - name: Apply 3.2 visual report patch
+      - name: Overlay exact 3.2 visual files
         shell: bash
         run: |
-          cat printcheck-build/visual_3201.b64.part* | tr -d '\n\r' | base64 -d | gzip -d > /tmp/visual.patch
-          sha256sum /tmp/visual.patch
-          test "$(sha256sum /tmp/visual.patch | awk '{print $1}')" = "792b3338117efaa948080a5578d32de8532de1001d65828e37da3b85f9d9ce4a"
-          cd /tmp/pc/printcheck_slim
-          patch -p1 < /tmp/visual.patch
+          cat printcheck-build/visual_overlay_3201.b64.part* | tr -d '\n\r' | base64 -d > /tmp/visual_overlay.tar.gz
+          sha256sum /tmp/visual_overlay.tar.gz
+          test "$(sha256sum /tmp/visual_overlay.tar.gz | awk '{print $1}')" = "f70406d03a0d282ef98cfc9342f20926097bd14a5163548cc90cd42522bbc455"
+          tar -xzf /tmp/visual_overlay.tar.gz -C /tmp/pc/printcheck_slim
       - name: Verify version and visual result
         shell: bash
         run: |
