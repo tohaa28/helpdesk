@@ -50,7 +50,9 @@ jobs:
       - name: Apply 3.2 visual report patch
         shell: bash
         run: |
-          gzip -dc printcheck-build/visual_3201.patch.gz > /tmp/visual.patch
+          cat printcheck-build/visual_3201.b64.part* | tr -d '\n\r' | base64 -d | gzip -d > /tmp/visual.patch
+          sha256sum /tmp/visual.patch
+          test "$(sha256sum /tmp/visual.patch | awk '{print $1}')" = "792b3338117efaa948080a5578d32de8532de1001d65828e37da3b85f9d9ce4a"
           cd /tmp/pc/printcheck_slim
           patch -p1 < /tmp/visual.patch
       - name: Verify version and visual result
