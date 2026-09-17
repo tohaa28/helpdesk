@@ -38,27 +38,24 @@ jobs:
           cat printcheck-build/source.b64.part* | base64 -d > /tmp/pc/source.zip
           unzip -q /tmp/pc/source.zip -d /tmp/pc
       - name: Apply alpha2 network patch
-        shell: bash
         run: python3 printcheck-build/patch_alpha2.py /tmp/pc/printcheck_slim
       - name: Apply alpha3 popup parser patch
-        shell: bash
         run: python3 printcheck-build/patch_alpha3.py /tmp/pc/printcheck_slim
+      - name: Apply alpha4 exact-position patch
+        run: python3 printcheck-build/patch_alpha4.py /tmp/pc/printcheck_slim
       - name: Verify version
-        shell: bash
-        run: grep -q "versionName '3.1.0-alpha3'" /tmp/pc/printcheck_slim/app/build.gradle
+        run: grep -q "versionName '3.1.0-alpha4'" /tmp/pc/printcheck_slim/app/build.gradle
       - name: Build
-        shell: bash
         run: |
           cd /tmp/pc/printcheck_slim
           gradle --no-daemon --stacktrace assembleDebug
       - name: Collect APK
-        shell: bash
         run: |
-          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.1.0-alpha3.apk
-          sha256sum PrintCheck_Android_3.1.0-alpha3.apk
+          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.1.0-alpha4.apk
+          sha256sum PrintCheck_Android_3.1.0-alpha4.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.1.0-alpha3_APK
-          path: PrintCheck_Android_3.1.0-alpha3.apk
+          name: PrintCheck_Android_3.1.0-alpha4_APK
+          path: PrintCheck_Android_3.1.0-alpha4.apk
           if-no-files-found: error
           retention-days: 7
