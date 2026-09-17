@@ -45,19 +45,24 @@ jobs:
         run: python3 printcheck-build/patch_alpha4.py /tmp/pc/printcheck_slim
       - name: Fix alpha4 regex escape
         run: python3 printcheck-build/fix_alpha4_escape.py /tmp/pc/printcheck_slim
-      - name: Verify version
-        run: grep -q "versionName '3.1.0-alpha4'" /tmp/pc/printcheck_slim/app/build.gradle
+      - name: Apply alpha5 application-template patch
+        run: python3 printcheck-build/patch_alpha5.py /tmp/pc/printcheck_slim
+      - name: Verify version and read-only endpoint
+        shell: bash
+        run: |
+          grep -q "versionName '3.1.0-alpha5'" /tmp/pc/printcheck_slim/app/build.gradle
+          grep -q 'getOrderItemPdf' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/Safety.java
       - name: Build
         run: |
           cd /tmp/pc/printcheck_slim
           gradle --no-daemon --stacktrace assembleDebug
       - name: Collect APK
         run: |
-          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.1.0-alpha4.apk
-          sha256sum PrintCheck_Android_3.1.0-alpha4.apk
+          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.1.0-alpha5.apk
+          sha256sum PrintCheck_Android_3.1.0-alpha5.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.1.0-alpha4_APK
-          path: PrintCheck_Android_3.1.0-alpha4.apk
+          name: PrintCheck_Android_3.1.0-alpha5_APK
+          path: PrintCheck_Android_3.1.0-alpha5.apk
           if-no-files-found: error
           retention-days: 7
