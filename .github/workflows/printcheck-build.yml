@@ -3,7 +3,7 @@ name: Build PrintCheck APK
 on:
   push:
     branches:
-      - printcheck-build-3.1.0-alpha1
+      - printcheck-build-3.2.0-alpha1
     paths:
       - 'printcheck-build/**'
       - '.github/workflows/printcheck-build.yml'
@@ -47,22 +47,35 @@ jobs:
         run: python3 printcheck-build/fix_alpha4_escape.py /tmp/pc/printcheck_slim
       - name: Apply alpha5 application-template patch
         run: python3 printcheck-build/patch_alpha5.py /tmp/pc/printcheck_slim
-      - name: Verify version and read-only endpoint
+      - name: Apply 3.2 visual report patch
         shell: bash
         run: |
-          grep -q "versionName '3.1.0-alpha5'" /tmp/pc/printcheck_slim/app/build.gradle
-          grep -q 'getOrderItemPdf' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/Safety.java
+          gzip -dc printcheck-build/visual_3201.patch.gz > /tmp/visual.patch
+          cd /tmp/pc/printcheck_slim
+          patch -p1 < /tmp/visual.patch
+      - name: Verify version and visual result
+        shell: bash
+        run: |
+          grep -q "versionName '3.2.0-alpha1'" /tmp/pc/printcheck_slim/app/build.gradle
+          grep -q 'class ResultView' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/ResultView.java
+          grep -q 'comparisonsDetailed' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'display_name' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/ReadOnlyHttp.java
+      - name: Core tests
+        shell: bash
+        run: |
+          cd /tmp/pc/printcheck_slim
+          bash tests/run_core.sh
       - name: Build
         run: |
           cd /tmp/pc/printcheck_slim
           gradle --no-daemon --stacktrace assembleDebug
       - name: Collect APK
         run: |
-          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.1.0-alpha5.apk
-          sha256sum PrintCheck_Android_3.1.0-alpha5.apk
+          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.2.0-alpha1.apk
+          sha256sum PrintCheck_Android_3.2.0-alpha1.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.1.0-alpha5_APK
-          path: PrintCheck_Android_3.1.0-alpha5.apk
+          name: PrintCheck_Android_3.2.0-alpha1_APK
+          path: PrintCheck_Android_3.2.0-alpha1.apk
           if-no-files-found: error
           retention-days: 7
