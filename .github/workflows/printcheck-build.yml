@@ -1,9 +1,9 @@
-name: Build PrintCheck 3.4.0-alpha4 APK
+name: Build PrintCheck 3.4.0-alpha5 APK
 
 on:
   push:
     branches:
-      - printcheck-build-3.4.0-alpha4
+      - printcheck-build-3.4.0-alpha5
     paths:
       - 'printcheck-build/**'
       - '.github/workflows/printcheck-build.yml'
@@ -105,17 +105,31 @@ jobs:
           test "$(sha256sum /tmp/pc340a4_overlay.tar.gz | awk '{print $1}')" = "637f8fc2a2fb0351f3519d7443746027360cf753297d433d91ddef23144e6a6b"
           tar -xzf /tmp/pc340a4_overlay.tar.gz -C /tmp/pc/printcheck_slim
 
-      - name: Verify 3.4.0-alpha4
+      - name: Apply 3.4.0-alpha5 PDF object preflight
+        shell: bash
+        run: |
+          cat printcheck-build/pc340a5.patch.b64.part* | tr -d '\\n\\r' | base64 -d > /tmp/pc340a5.patch.gz
+          test "$(sha256sum /tmp/pc340a5.patch.gz | awk '{print $1}')" = "91336c1a5d50316cecd3ecf63e6a9747925809ae21b771f9ee00045f2402c8c5"
+          cd /tmp/pc/printcheck_slim
+          gzip -dc /tmp/pc340a5.patch.gz | patch --batch -p1
+          rm -f app/src/main/java/ru/printcheck/android/NativeAuth.java
+          rm -f app/src/main/java/ru/printcheck/android/LoginFormParser.java
+
+      - name: Verify 3.4.0-alpha5
         shell: bash
         run: |
           cd /tmp/pc/printcheck_slim
-          grep -q "versionName '3.4.0-alpha4'" app/build.gradle
-          grep -q "versionCode 340004" app/build.gradle
-          grep -q 'component_circles_v3_high_contrast' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
-          grep -q 'suppressProductionBoundary' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
-          grep -q 'setStrokeWidth(8.0f)' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
-          grep -q 'hidden-web-start' app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'auth_trace.jsonl' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "versionName '3.4.0-alpha5'" app/build.gradle
+          grep -q "versionCode 340005" app/build.gradle
+          test -f app/src/main/java/ru/printcheck/android/PdfObjectInspector.java
+          test ! -f app/src/main/java/ru/printcheck/android/NativeAuth.java
+          test ! -f app/src/main/java/ru/printcheck/android/LoginFormParser.java
+          grep -q 'checkWebSession' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'PdfObjectInspector.inspect' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'Обнаружены шрифты — макет недопустим' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'has_gradients' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'has_transparency' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'МАКЕТ НЕДОПУСТИМ' app/src/main/java/ru/printcheck/android/ResultView.java
 
       - name: Core tests
         shell: bash
@@ -147,12 +161,12 @@ jobs:
       - name: Collect APK
         shell: bash
         run: |
-          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha4.apk
-          sha256sum PrintCheck_Android_3.4.0-alpha4.apk
+          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha5.apk
+          sha256sum PrintCheck_Android_3.4.0-alpha5.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.4.0-alpha4_APK
-          path: PrintCheck_Android_3.4.0-alpha4.apk
+          name: PrintCheck_Android_3.4.0-alpha5_APK
+          path: PrintCheck_Android_3.4.0-alpha5.apk
           if-no-files-found: error
           retention-days: 7
