@@ -1,9 +1,9 @@
-name: Build PrintCheck 3.3 APK
+name: Build PrintCheck 3.3.0-alpha2 APK
 
 on:
   push:
     branches:
-      - printcheck-build-3.3.0-alpha1
+      - printcheck-build-3.3.0-alpha2
     paths:
       - 'printcheck-build/**'
       - '.github/workflows/printcheck-build.yml'
@@ -56,32 +56,43 @@ jobs:
           python3 printcheck-build/patch_alpha3202.py /tmp/pc/printcheck_slim
           grep -q "versionName '3.2.0-alpha2'" /tmp/pc/printcheck_slim/app/build.gradle
 
-      - name: Apply 3.3 preflight patch
+      - name: Apply 3.3.0-alpha1 preflight
         shell: bash
         run: |
           cat printcheck-build/pc330a1.b64.part* | tr -d '\n\r' | base64 -d > /tmp/pc330.patch.gz
-          sha256sum /tmp/pc330.patch.gz
           test "$(sha256sum /tmp/pc330.patch.gz | awk '{print $1}')" = "43329662c53b7e117663da9ef83141110a0c0e1ba9aadfda51d080dea243a6ab"
           cd /tmp/pc/printcheck_slim
           set +e
           gzip -dc /tmp/pc330.patch.gz | patch --batch -p1
+          set -e
+          grep -q "versionName '3.3.0-alpha1'" app/build.gradle
+          grep -q 'partial_v1' app/src/main/java/ru/printcheck/android/MainActivity.java
+
+      - name: Apply 3.3.0-alpha2 surface-only and UI patch
+        shell: bash
+        run: |
+          cat printcheck-build/pc330a2.small* | tr -d '\n\r' | base64 -d > /tmp/pc330a2.patch.gz
+          sha256sum /tmp/pc330a2.patch.gz
+          test "$(sha256sum /tmp/pc330a2.patch.gz | awk '{print $1}')" = "6879ea464c0f337c18d3aa66b776db5334de72dd64138026730c305543173931"
+          cd /tmp/pc/printcheck_slim
+          set +e
+          gzip -dc /tmp/pc330a2.patch.gz | patch --batch -p1
           PATCH_STATUS=$?
           set -e
-          echo "patch exit status: $PATCH_STATUS"
-          # README_RU.md and tests/run_core.sh are absent from the slim base and may be skipped.
-          # The release gate below verifies every runtime file that must have been applied.
+          echo "alpha2 patch exit status: $PATCH_STATUS"
 
-      - name: Verify 3.3.0-alpha1
+      - name: Verify 3.3.0-alpha2
         shell: bash
         run: |
           cd /tmp/pc/printcheck_slim
-          grep -q "versionName '3.3.0-alpha1'" app/build.gradle
-          grep -q "versionCode 330001" app/build.gradle
-          test -f app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
-          test -f app/src/main/java/ru/printcheck/android/PreflightRules.java
-          grep -q 'partial_v1' app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'НАЛОЖЕНИЕ' app/src/main/java/ru/printcheck/android/ResultView.java
-          grep -q 'requirements_source' app/src/main/java/ru/printcheck/android/ReadOnlyHttp.java
+          grep -q "versionName '3.3.0-alpha2'" app/build.gradle
+          grep -q "versionCode 330002" app/build.gradle
+          grep -q 'surface-field-v2' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q 'template_red_dashed_boundary' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q 'Поле нанесения определено' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'Рабочее поле' app/src/main/java/ru/printcheck/android/ResultView.java
+          grep -q 'Сопоставление файлов' app/src/main/java/ru/printcheck/android/ResultView.java
+          grep -q 'inside_print_field' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
 
       - name: Core tests
         shell: bash
@@ -117,12 +128,12 @@ jobs:
       - name: Collect APK
         shell: bash
         run: |
-          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.3.0-alpha1.apk
-          sha256sum PrintCheck_Android_3.3.0-alpha1.apk
+          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.3.0-alpha2.apk
+          sha256sum PrintCheck_Android_3.3.0-alpha2.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.3.0-alpha1_APK
-          path: PrintCheck_Android_3.3.0-alpha1.apk
+          name: PrintCheck_Android_3.3.0-alpha2_APK
+          path: PrintCheck_Android_3.3.0-alpha2.apk
           if-no-files-found: error
           retention-days: 7
