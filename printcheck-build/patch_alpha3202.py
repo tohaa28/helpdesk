@@ -203,7 +203,7 @@ helper = '''    private static String templateNameForItem(String itemId, JSONArr
 
 '''
 marker = '    private static void addComparison(Activity a, LinearLayout card, File runDir, Map<String, JSONObject> fileByName, JSONObject c) {'
-if "templateNameForItem" not in s:
+if "private static String templateNameForItem" not in s:
     s = s.replace(marker, helper + marker)
 p.write_text(s)
 
