@@ -108,7 +108,7 @@ jobs:
       - name: Apply 3.4.0-alpha5 PDF object preflight
         shell: bash
         run: |
-          cat printcheck-build/pc340a5.patch.b64.part* | tr -d '\\n\\r' | base64 -d > /tmp/pc340a5.patch.gz
+          cat printcheck-build/pc340a5.patch.b64.part* | tr -d '\n\r' | base64 -d > /tmp/pc340a5.patch.gz
           test "$(sha256sum /tmp/pc340a5.patch.gz | awk '{print $1}')" = "91336c1a5d50316cecd3ecf63e6a9747925809ae21b771f9ee00045f2402c8c5"
           cd /tmp/pc/printcheck_slim
           gzip -dc /tmp/pc340a5.patch.gz | patch --batch -p1
