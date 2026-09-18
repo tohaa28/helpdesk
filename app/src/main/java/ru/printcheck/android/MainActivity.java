@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
 
     private void configureWeb(){
         WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setUserAgentString(s.getUserAgentString()+" PrintCheckAndroid/"+VERSION);
-        CookieManager.getInstance().setAcceptCookie(true);CookieManager.getInstance().setAcceptThirdPartyCookies(web,true);
+        android.webkit.CookieManager.getInstance().setAcceptCookie(true);android.webkit.CookieManager.getInstance().setAcceptThirdPartyCookies(web,true);
         web.addJavascriptInterface(new Bridge(),"PrintCheckBridge");
         web.setWebViewClient(new WebViewClient(){
             @Override public void onPageFinished(WebView v,String url){
@@ -160,7 +160,7 @@ public class MainActivity extends Activity {
         for(Models.RemotePdf p:all){i++;download(p);stageBg(i*100/Math.max(1,all.size()));statusBg("Скачивание "+i+" / "+all.size()+" · "+p.label,16+(i*16/Math.max(1,all.size())),i*100/Math.max(1,all.size()));}
     }
     private void download(Models.RemotePdf p)throws Exception{
-        String cookie=CookieManager.getInstance().getCookie(p.url);HttpURLConnection c=(HttpURLConnection)new URL(p.url).openConnection();c.setInstanceFollowRedirects(true);c.setConnectTimeout(20000);c.setReadTimeout(60000);c.setRequestProperty("User-Agent",web.getSettings().getUserAgentString());if(cookie!=null)c.setRequestProperty("Cookie",cookie);c.connect();
+        String cookie=android.webkit.CookieManager.getInstance().getCookie(p.url);HttpURLConnection c=(HttpURLConnection)new URL(p.url).openConnection();c.setInstanceFollowRedirects(true);c.setConnectTimeout(20000);c.setReadTimeout(60000);c.setRequestProperty("User-Agent",web.getSettings().getUserAgentString());if(cookie!=null)c.setRequestProperty("Cookie",cookie);c.connect();
         if(c.getResponseCode()/100!=2)throw new IOException("HTTP "+c.getResponseCode()+" для "+p.label);String name=fileName(c,p);File dir=new File(runDir,p.article==null?"layouts":"constructors");dir.mkdirs();p.file=new File(dir,name);
         try(InputStream in=c.getInputStream();OutputStream out=new FileOutputStream(p.file)){byte[] b=new byte[65536];for(int n;(n=in.read(b))>0;)out.write(b,0,n);}trace(new JSONObject().put("event","download").put("file",p.file.getName()).put("bytes",p.file.length()).put("article",p.article).toString());c.disconnect();
     }
