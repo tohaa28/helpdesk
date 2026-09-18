@@ -1,4 +1,4 @@
-name: Build PrintCheck 3.4.0-alpha11 APK
+name: Build PrintCheck 3.4.0-alpha12 APK
 on: [workflow_dispatch, push]
 
 jobs:
@@ -23,37 +23,36 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
-      - name: Prepare canonical alpha11 source
-        run: python3 printcheck-build/prepare_alpha11.py .
-      - name: Verify alpha11
+      - name: Prepare canonical alpha12 source
+        run: python3 printcheck-build/prepare_alpha12.py .
+      - name: Verify alpha12
         shell: bash
         run: |
-          grep -q "versionName '3.4.0-alpha11'" .printcheck-alpha11/app/build.gradle
-          grep -q "versionCode 340011" .printcheck-alpha11/app/build.gradle
-          grep -q "same_page_mask_registration_v1" .printcheck-alpha11/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q "constructor_aux_filter_v1" .printcheck-alpha11/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q "conditional_rules_v1" .printcheck-alpha11/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q "same-page-mask-inclusion" .printcheck-alpha11/app/src/main/java/ru/printcheck/android/RasterMatcher.java
-          grep -q "isAuxiliaryConstructorPdf" .printcheck-alpha11/app/src/main/java/ru/printcheck/android/ReadOnlyHttp.java
+          grep -q "versionName '3.4.0-alpha12'" .printcheck-alpha12/app/build.gradle
+          grep -q "versionCode 340012" .printcheck-alpha12/app/build.gradle
+          grep -q "compact_article_results_v1" .printcheck-alpha12/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "batch_results_screen_v1" .printcheck-alpha12/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "Подробнее  ▾" .printcheck-alpha12/app/src/main/java/ru/printcheck/android/ResultView.java
+          grep -q "renderBatch(" .printcheck-alpha12/app/src/main/java/ru/printcheck/android/ResultView.java
       - name: Core tests
-        run: bash .printcheck-alpha11/tests/run_core.sh
+        run: bash .printcheck-alpha12/tests/run_core.sh
       - name: Build APK
         run: gradle --no-daemon --stacktrace assembleDebug
       - name: Package source
         shell: bash
         run: |
-          cd .printcheck-alpha11
-          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha11_source.zip" . -x '*/build/*' '*.keystore'
+          cd .printcheck-alpha12
+          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha12_source.zip" . -x '*/build/*' '*.keystore'
       - name: Collect APK
         shell: bash
         run: |
-          cp .printcheck-alpha11/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha11.apk
-          sha256sum PrintCheck_Android_3.4.0-alpha11.apk
+          cp .printcheck-alpha12/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha12.apk
+          sha256sum PrintCheck_Android_3.4.0-alpha12.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.4.0-alpha11_BUILD
+          name: PrintCheck_Android_3.4.0-alpha12_BUILD
           path: |
-            PrintCheck_Android_3.4.0-alpha11.apk
-            PrintCheck_Android_3.4.0-alpha11_source.zip
+            PrintCheck_Android_3.4.0-alpha12.apk
+            PrintCheck_Android_3.4.0-alpha12_source.zip
           if-no-files-found: error
           retention-days: 7
