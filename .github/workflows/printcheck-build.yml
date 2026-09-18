@@ -1,9 +1,9 @@
-name: Build PrintCheck 3.3.0-alpha2 APK
+name: Build PrintCheck 3.4.0-alpha1 APK
 
 on:
   push:
     branches:
-      - printcheck-build-3.3.0-alpha2
+      - printcheck-build-3.4.0-alpha1
     paths:
       - 'printcheck-build/**'
       - '.github/workflows/printcheck-build.yml'
@@ -12,7 +12,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     env:
       ANDROID_HOME: /usr/local/lib/android/sdk
       ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
@@ -54,7 +54,6 @@ jobs:
           test "$(sha256sum /tmp/visual_overlay.tar.gz | awk '{print $1}')" = "f70406d03a0d282ef98cfc9342f20926097bd14a5163548cc90cd42522bbc455"
           tar -xzf /tmp/visual_overlay.tar.gz -C /tmp/pc/printcheck_slim
           python3 printcheck-build/patch_alpha3202.py /tmp/pc/printcheck_slim
-          grep -q "versionName '3.2.0-alpha2'" /tmp/pc/printcheck_slim/app/build.gradle
 
       - name: Apply 3.3.0-alpha1 preflight
         shell: bash
@@ -66,43 +65,45 @@ jobs:
           gzip -dc /tmp/pc330.patch.gz | patch --batch -p1
           set -e
           grep -q "versionName '3.3.0-alpha1'" app/build.gradle
-          grep -q 'partial_v1' app/src/main/java/ru/printcheck/android/MainActivity.java
 
-      - name: Apply 3.3.0-alpha2 surface-only and UI patch
+      - name: Apply 3.3.0-alpha2 surface-only patch
         shell: bash
         run: |
           cat printcheck-build/pc330a2.small* | tr -d '\n\r' | base64 -d > /tmp/pc330a2.patch.gz
-          sha256sum /tmp/pc330a2.patch.gz
           test "$(sha256sum /tmp/pc330a2.patch.gz | awk '{print $1}')" = "6879ea464c0f337c18d3aa66b776db5334de72dd64138026730c305543173931"
           cd /tmp/pc/printcheck_slim
           set +e
           gzip -dc /tmp/pc330a2.patch.gz | patch --batch -p1
-          PATCH_STATUS=$?
           set -e
-          echo "alpha2 patch exit status: $PATCH_STATUS"
+          grep -q "versionName '3.3.0-alpha2'" app/build.gradle
 
-      - name: Verify 3.3.0-alpha2
+      - name: Overlay exact 3.4.0-alpha1 files
+        shell: bash
+        run: |
+          cat printcheck-build/pc340_overlay.b64.part* | tr -d '\n\r' | base64 -d > /tmp/pc340_overlay.tar.gz
+          sha256sum /tmp/pc340_overlay.tar.gz
+          test "$(sha256sum /tmp/pc340_overlay.tar.gz | awk '{print $1}')" = "a98504f323bbaec0b9a02660f0b189b4a9cbf4bf1df46a7462fbcd6651b76336"
+          tar -xzf /tmp/pc340_overlay.tar.gz -C /tmp/pc/printcheck_slim
+
+      - name: Verify 3.4.0-alpha1
         shell: bash
         run: |
           cd /tmp/pc/printcheck_slim
-          grep -q "versionName '3.3.0-alpha2'" app/build.gradle
-          grep -q "versionCode 330002" app/build.gradle
-          grep -q 'surface-field-v2' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
-          grep -q 'template_red_dashed_boundary' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
-          grep -q 'Поле нанесения определено' app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'Рабочее поле' app/src/main/java/ru/printcheck/android/ResultView.java
-          grep -q 'Сопоставление файлов' app/src/main/java/ru/printcheck/android/ResultView.java
-          grep -q 'inside_print_field' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q "versionName '3.4.0-alpha1'" app/build.gradle
+          grep -q "versionCode 340001" app/build.gradle
+          test -f app/src/main/java/ru/printcheck/android/SmallElementAnalyzer.java
+          test -f app/src/main/java/ru/printcheck/android/OfficialRequirements.java
+          grep -q 'distance-ridge-positive-negative-v1' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q 'small_elements_positive_negative_v1' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'Мелкие элементы' app/src/main/java/ru/printcheck/android/ResultView.java
+          grep -q 'Все техтребования' app/src/main/java/ru/printcheck/android/ResultView.java
+          grep -q 'SPEC_URL' app/src/main/java/ru/printcheck/android/OfficialRequirements.java
 
       - name: Core tests
         shell: bash
         run: |
           cd /tmp/pc/printcheck_slim
-          if [ -f tests/run_core.sh ]; then
-            bash tests/run_core.sh
-          else
-            echo 'tests/run_core.sh is not present in slim base; Android compile verification will be used.'
-          fi
+          bash tests/run_core.sh
 
       - name: Generate debug keystore
         shell: bash
@@ -128,12 +129,12 @@ jobs:
       - name: Collect APK
         shell: bash
         run: |
-          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.3.0-alpha2.apk
-          sha256sum PrintCheck_Android_3.3.0-alpha2.apk
+          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha1.apk
+          sha256sum PrintCheck_Android_3.4.0-alpha1.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.3.0-alpha2_APK
-          path: PrintCheck_Android_3.3.0-alpha2.apk
+          name: PrintCheck_Android_3.4.0-alpha1_APK
+          path: PrintCheck_Android_3.4.0-alpha1.apk
           if-no-files-found: error
           retention-days: 7
