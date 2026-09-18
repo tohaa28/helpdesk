@@ -97,7 +97,7 @@ s = s.replace(
 )
 marker = ' private static boolean sameItem(Models.RemotePdf a,Models.RemotePdf b){'
 if "emptyNull(String s)" not in s:
-    s = s.replace(marker, ' private static Object emptyNull(String s){return s==null||s.isEmpty()?JSONObject.NULL:s;}\\n' + marker)
+    s = s.replace(marker, ' private static Object emptyNull(String s){return s==null||s.isEmpty()?JSONObject.NULL:s;}\n' + marker)
 p.write_text(s)
 
 # Result UI: show template, application and application size as separate concepts.
