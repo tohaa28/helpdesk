@@ -6,16 +6,19 @@ dependencyResolutionManagement {
     repositories { google(); mavenCentral() }
 }
 
-def prepScript = new File(settingsDir, "printcheck-build/prepare_alpha9.py")
-def prep = new ProcessBuilder("python3", prepScript.absolutePath, settingsDir.absolutePath)
-        .directory(settingsDir)
-        .inheritIO()
-        .start()
-int prepCode = prep.waitFor()
-if (prepCode != 0) {
-    throw new GradleException("PrintCheck alpha9 source preparation failed: " + prepCode)
+def preparedApp = new File(settingsDir, ".printcheck-alpha10/app")
+if (!preparedApp.isDirectory()) {
+    def prepScript = new File(settingsDir, "printcheck-build/prepare_alpha10.py")
+    def prep = new ProcessBuilder("python3", prepScript.absolutePath, settingsDir.absolutePath)
+            .directory(settingsDir)
+            .inheritIO()
+            .start()
+    int prepCode = prep.waitFor()
+    if (prepCode != 0) {
+        throw new GradleException("PrintCheck alpha10 source preparation failed: " + prepCode)
+    }
 }
 
 rootProject.name = "PrintCheckAndroid"
 include ':app'
-project(':app').projectDir = new File(settingsDir, ".printcheck-alpha9/app")
+project(':app').projectDir = preparedApp
