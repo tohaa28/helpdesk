@@ -125,6 +125,9 @@ jobs:
           gzip -dc /tmp/pc340a6.patch.gz | patch --batch -p1
           set -e
           rm -f README_RU.md.rej PROGRESS.md.rej
+          base64 -d printcheck-build/pc340a6_helpers.patch.gz.b64 > /tmp/pc340a6_helpers.patch.gz
+          test "$(sha256sum /tmp/pc340a6_helpers.patch.gz | awk '{print $1}')" = "70af7124114b16b599774ba16d2672e631dbfd4eaa7e0e88f0fa024aa5cb365b"
+          gzip -dc /tmp/pc340a6_helpers.patch.gz | patch --batch -p1
 
       - name: Verify 3.4.0-alpha6
         shell: bash
@@ -136,6 +139,9 @@ jobs:
           test ! -f app/src/main/java/ru/printcheck/android/NativeAuth.java
           test ! -f app/src/main/java/ru/printcheck/android/LoginFormParser.java
           grep -q 'fontsInArtwork' app/src/main/java/ru/printcheck/android/PdfObjectInspector.java
+          grep -q 'private static String preflightOverall' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'private static PreflightRules.RuleSet rulesForItem' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'private static JSONObject rulesJson' app/src/main/java/ru/printcheck/android/MainActivity.java
           grep -q 'has_live_text_global' app/src/main/java/ru/printcheck/android/MainActivity.java
           grep -q 'font_scope' app/src/main/java/ru/printcheck/android/MainActivity.java
           grep -q 'Шрифты вне нанесения проигнорированы' app/src/main/java/ru/printcheck/android/MainActivity.java
