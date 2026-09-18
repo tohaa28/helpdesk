@@ -14,7 +14,7 @@ shutil.copytree(src9, src10)
 
 raw = base64.b64decode((pb / 'pc340a10.patch.gz.b64').read_bytes().replace(b'\n', b'').replace(b'\r', b''))
 digest = hashlib.sha256(raw).hexdigest()
-expected = 'eb58954f942b7c009d00db5ba8a70680d446a8feb5ae01a3479f77aa4a1fd411'
+expected = 'a2b8d0d85ea21a5bdd4c6054b3fb4ad2eb70149bec3249797845a553a9f00843'
 if digest != expected:
     raise RuntimeError(f'alpha10 patch digest mismatch: {digest}')
 patch_data = gzip.decompress(raw)
