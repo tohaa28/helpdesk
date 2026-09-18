@@ -3,7 +3,7 @@ name: Build PrintCheck APK
 on:
   push:
     branches:
-      - printcheck-build-3.2.0-alpha1
+      - printcheck-build-3.2.0-alpha2
     paths:
       - 'printcheck-build/**'
       - '.github/workflows/printcheck-build.yml'
@@ -51,16 +51,23 @@ jobs:
         shell: bash
         run: |
           cat printcheck-build/visual_overlay_3201.b64.part* | tr -d '\n\r' | base64 -d > /tmp/visual_overlay.tar.gz
-          sha256sum /tmp/visual_overlay.tar.gz
           test "$(sha256sum /tmp/visual_overlay.tar.gz | awk '{print $1}')" = "f70406d03a0d282ef98cfc9342f20926097bd14a5163548cc90cd42522bbc455"
           tar -xzf /tmp/visual_overlay.tar.gz -C /tmp/pc/printcheck_slim
-      - name: Verify version and visual result
+      - name: Apply 3.2.0-alpha2 separation patch
         shell: bash
         run: |
-          grep -q "versionName '3.2.0-alpha1'" /tmp/pc/printcheck_slim/app/build.gradle
-          grep -q 'class ResultView' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/ResultView.java
-          grep -q 'comparisonsDetailed' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'display_name' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/ReadOnlyHttp.java
+          base64 -d printcheck-build/patch_3202.diff.gz.b64 | gzip -d > /tmp/patch_3202.diff
+          cd /tmp/pc/printcheck_slim
+          patch -p2 < /tmp/patch_3202.diff
+      - name: Verify 3.2.0-alpha2
+        shell: bash
+        run: |
+          grep -q "versionName '3.2.0-alpha2'" /tmp/pc/printcheck_slim/app/build.gradle
+          grep -q 'versionCode 320002' /tmp/pc/printcheck_slim/app/build.gradle
+          grep -q 'class ApplicationSeparator' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/ApplicationSeparator.java
+          grep -q 'separation_file' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'application_name' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'ВЫДЕЛЕННОЕ НАНЕСЕНИЕ' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/ResultView.java
       - name: Core tests
         shell: bash
         run: |
@@ -68,33 +75,25 @@ jobs:
           if [ -f tests/run_core.sh ]; then
             bash tests/run_core.sh
           else
-            echo 'tests/run_core.sh is not present in the release overlay; compile/build verification will be used.'
+            echo 'tests/run_core.sh is not present in release overlay; compile/build verification will be used.'
           fi
       - name: Generate debug keystore
         shell: bash
         run: |
           cd /tmp/pc/printcheck_slim
           rm -f test-signing.keystore
-          keytool -genkeypair -v \
-            -keystore test-signing.keystore \
-            -storepass android \
-            -alias androiddebugkey \
-            -keypass android \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Android Debug,O=Android,C=US"
+          keytool -genkeypair -v             -keystore test-signing.keystore             -storepass android             -alias androiddebugkey             -keypass android             -keyalg RSA             -keysize 2048             -validity 10000             -dname "CN=Android Debug,O=Android,C=US"
       - name: Build
         run: |
           cd /tmp/pc/printcheck_slim
           gradle --no-daemon --stacktrace assembleDebug
       - name: Collect APK
         run: |
-          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.2.0-alpha1.apk
-          sha256sum PrintCheck_Android_3.2.0-alpha1.apk
+          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.2.0-alpha2.apk
+          sha256sum PrintCheck_Android_3.2.0-alpha2.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.2.0-alpha1_APK
-          path: PrintCheck_Android_3.2.0-alpha1.apk
+          name: PrintCheck_Android_3.2.0-alpha2_APK
+          path: PrintCheck_Android_3.2.0-alpha2.apk
           if-no-files-found: error
           retention-days: 7
