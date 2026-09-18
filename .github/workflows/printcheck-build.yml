@@ -1,9 +1,9 @@
-name: Build PrintCheck 3.4.0-alpha7 APK
+name: Build PrintCheck 3.4.0-alpha8 APK
 
 on:
   push:
     branches:
-      - printcheck-build-3.4.0-alpha7
+      - printcheck-build-3.4.0-alpha8
     paths:
       - 'printcheck-build/**'
       - '.github/workflows/printcheck-build.yml'
@@ -138,12 +138,21 @@ jobs:
           gzip -dc /tmp/pc340a7.patch.gz | patch --batch -p1
           test -z "$(find . -name '*.rej' -print -quit)"
 
-      - name: Verify 3.4.0-alpha7
+      - name: Apply 3.4.0-alpha8 grouped relations and constructor-first matching
+        shell: bash
+        run: |
+          base64 -d printcheck-build/pc340a8.patch.gz.b64 > /tmp/pc340a8.patch.gz
+          test "$(sha256sum /tmp/pc340a8.patch.gz | awk '{print $1}')" = "b02c40821346a6b3ea66e3c17d80c78fab963d27238bad87da43017f602d2f34"
+          cd /tmp/pc/printcheck_slim
+          gzip -dc /tmp/pc340a8.patch.gz | patch --batch -p1
+          test -z "$(find . -name '*.rej' -print -quit)"
+
+      - name: Verify 3.4.0-alpha8
         shell: bash
         run: |
           cd /tmp/pc/printcheck_slim
-          grep -q "versionName '3.4.0-alpha7'" app/build.gradle
-          grep -q "versionCode 340007" app/build.gradle
+          grep -q "versionName '3.4.0-alpha8'" app/build.gradle
+          grep -q "versionCode 340008" app/build.gradle
           test -f app/src/main/java/ru/printcheck/android/PdfObjectInspector.java
           test ! -f app/src/main/java/ru/printcheck/android/NativeAuth.java
           test ! -f app/src/main/java/ru/printcheck/android/LoginFormParser.java
@@ -161,13 +170,23 @@ jobs:
           grep -q 'constructor-url-fallback' app/src/main/java/ru/printcheck/android/ConstructorRelationResolver.java
           grep -q 'relation_conflict' app/src/main/java/ru/printcheck/android/ReadOnlyHttp.java
           grep -q 'item_ids' app/src/main/java/ru/printcheck/android/ReadOnlyHttp.java
-          grep -q 'constructor_relation_from_template_row_v1' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'constructor_relation_group_v2' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'constructor_geometry_primary_v1' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'application_templates_excluded_from_raster_index' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'popup-source-article-base-group' tests/CoreTests.java
+          grep -q 'base-group' app/src/main/java/ru/printcheck/android/ConstructorRelationResolver.java
 
       - name: Core tests
         shell: bash
         run: |
           cd /tmp/pc/printcheck_slim
           bash tests/run_core.sh
+
+      - name: Package alpha8 source
+        shell: bash
+        run: |
+          cd /tmp/pc
+          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha8_source.zip" printcheck_slim -x '*/build/*' '*.keystore'
 
       - name: Generate debug keystore
         shell: bash
@@ -193,12 +212,14 @@ jobs:
       - name: Collect APK
         shell: bash
         run: |
-          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha7.apk
-          sha256sum PrintCheck_Android_3.4.0-alpha7.apk
+          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha8.apk
+          sha256sum PrintCheck_Android_3.4.0-alpha8.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.4.0-alpha7_APK
-          path: PrintCheck_Android_3.4.0-alpha7.apk
+          name: PrintCheck_Android_3.4.0-alpha8_BUILD
+          path: |
+            PrintCheck_Android_3.4.0-alpha8.apk
+            PrintCheck_Android_3.4.0-alpha8_source.zip
           if-no-files-found: error
           retention-days: 7
