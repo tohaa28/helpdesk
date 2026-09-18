@@ -6,16 +6,16 @@ dependencyResolutionManagement {
     repositories { google(); mavenCentral() }
 }
 
-def preparedApp = new File(settingsDir, ".printcheck-alpha11/app")
+def preparedApp = new File(settingsDir, ".printcheck-alpha12/app")
 if (!preparedApp.isDirectory()) {
-    def prepScript = new File(settingsDir, "printcheck-build/prepare_alpha11.py")
+    def prepScript = new File(settingsDir, "printcheck-build/prepare_alpha12.py")
     def prep = new ProcessBuilder("python3", prepScript.absolutePath, settingsDir.absolutePath)
             .directory(settingsDir)
             .inheritIO()
             .start()
     int prepCode = prep.waitFor()
     if (prepCode != 0) {
-        throw new GradleException("PrintCheck alpha11 source preparation failed: " + prepCode)
+        throw new GradleException("PrintCheck alpha12 source preparation failed: " + prepCode)
     }
 }
 
