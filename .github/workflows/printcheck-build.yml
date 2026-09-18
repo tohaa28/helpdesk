@@ -122,7 +122,11 @@ jobs:
           sha256sum /tmp/pc340a6.patch.gz
           test "$(sha256sum /tmp/pc340a6.patch.gz | awk '{print $1}')" = "91eb2113864369c0daa4e61fd100f33af0eba26e16598e5a8d2edca24e92aced"
           cd /tmp/pc/printcheck_slim
+          set +e
           gzip -dc /tmp/pc340a6.patch.gz | patch --batch -p2
+          set -e
+          rm -f PROGRESS.md.rej README_RU.md.rej
+          test -z "$(find . -name '*.rej' -print -quit)"
 
       - name: Verify 3.4.0-alpha6
         shell: bash
