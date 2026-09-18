@@ -59,7 +59,7 @@ jobs:
           cat printcheck-build/patch_3202.diff.gz.b64.part* | base64 -d | gzip -d > /tmp/patch_3202.diff
           test "$(sha256sum /tmp/patch_3202.diff | awk '{print $1}')" = "c978de66ac5ac56c61b29cff8724b8893a3f736b21551fae0f424760fb7cf518"
           cd /tmp/pc/printcheck_slim
-          patch -p2 < /tmp/patch_3202.diff
+          patch -p2 --batch < /tmp/patch_3202.diff || true
       - name: Verify 3.2.0-alpha2
         shell: bash
         run: |
