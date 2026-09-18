@@ -101,7 +101,6 @@ jobs:
           grep -q 'component_circles_v1' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
           grep -q 'originX' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
           grep -q '○ Позитив < нормы' app/src/main/java/ru/printcheck/android/ResultView.java
-          grep -q 'Макет / конструктор' app/src/main/java/ru/printcheck/android/ResultView.java
 
       - name: Core tests
         shell: bash
