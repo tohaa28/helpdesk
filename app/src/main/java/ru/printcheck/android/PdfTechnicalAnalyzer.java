@@ -248,21 +248,21 @@ final class PdfTechnicalAnalyzer {
 
     private static RawFlags inspectRaw(File f)throws Exception{
         String s=new String(readAll(f),StandardCharsets.ISO_8859_1);RawFlags r=new RawFlags();
-        r.shading=Pattern.compile("/Shading(?:Type)?\b").matcher(s).find();
-        r.transparency=Pattern.compile("/SMask\s*(?!/None)|/S\s*/Transparency|/(?:ca|CA)\s+(?:0(?:\.\d+)?|\.\d+)").matcher(s).find();
-        Matcher bm=Pattern.compile("/BM\s*/([A-Za-z]+)").matcher(s);while(bm.find())if(!"Normal".equalsIgnoreCase(bm.group(1))){r.nonNormalBlend=true;break;}
+        r.shading=Pattern.compile("/Shading(?:Type)?\\b").matcher(s).find();
+        r.transparency=Pattern.compile("/SMask\\s*(?!/None)|/S\\s*/Transparency|/(?:ca|CA)\\s+(?:0(?:\\.\\d+)?|\\.\\d+)").matcher(s).find();
+        Matcher bm=Pattern.compile("/BM\\s*/([A-Za-z]+)").matcher(s);while(bm.find())if(!"Normal".equalsIgnoreCase(bm.group(1))){r.nonNormalBlend=true;break;}
         return r;
     }
 
     private static List<TextMark> extractTextMarks(File f,int pageNo){
         try{
             byte[] bytes=readAll(f);String all=new String(bytes,StandardCharsets.ISO_8859_1);
-            LinkedHashMap<Integer,String> objects=new LinkedHashMap<>();Matcher om=Pattern.compile("(?s)(\d+)\s+\d+\s+obj(.*?)endobj").matcher(all);
+            LinkedHashMap<Integer,String> objects=new LinkedHashMap<>();Matcher om=Pattern.compile("(?s)(\\d+)\\s+\\d+\\s+obj(.*?)endobj").matcher(all);
             while(om.find())objects.put(Integer.parseInt(om.group(1)),om.group(2));
-            ArrayList<String> pages=new ArrayList<>();for(String v:objects.values())if(Pattern.compile("/Type\s*/Page\b").matcher(v).find()&&!Pattern.compile("/Type\s*/Pages\b").matcher(v).find())pages.add(v);
+            ArrayList<String> pages=new ArrayList<>();for(String v:objects.values())if(Pattern.compile("/Type\\s*/Page\\b").matcher(v).find()&&!Pattern.compile("/Type\\s*/Pages\\b").matcher(v).find())pages.add(v);
             if(pageNo<0||pageNo>=pages.size())return Collections.emptyList();String p=pages.get(pageNo);ArrayList<Integer> refs=new ArrayList<>();
-            Matcher one=Pattern.compile("/Contents\s+(\d+)\s+\d+\s+R").matcher(p);if(one.find())refs.add(Integer.parseInt(one.group(1)));
-            Matcher arr=Pattern.compile("(?s)/Contents\s*\[(.*?)\]").matcher(p);if(arr.find()){Matcher rm=Pattern.compile("(\d+)\s+\d+\s+R").matcher(arr.group(1));while(rm.find())refs.add(Integer.parseInt(rm.group(1)));}
+            Matcher one=Pattern.compile("/Contents\\s+(\\d+)\\s+\\d+\\s+R").matcher(p);if(one.find())refs.add(Integer.parseInt(one.group(1)));
+            Matcher arr=Pattern.compile("(?s)/Contents\\s*\\[(.*?)\\]").matcher(p);if(arr.find()){Matcher rm=Pattern.compile("(\\d+)\\s+\\d+\\s+R").matcher(arr.group(1));while(rm.find())refs.add(Integer.parseInt(rm.group(1)));}
             ArrayList<TextMark> out=new ArrayList<>();for(Integer ref:refs){String obj=objects.get(ref);if(obj==null)continue;String stream=decodeStream(obj);if(stream!=null)parseTextStream(stream,out);}return out;
         }catch(Exception ignored){return Collections.emptyList();}
     }
@@ -274,7 +274,7 @@ final class PdfTechnicalAnalyzer {
     }
 
     private static void parseTextStream(String s,List<TextMark> out){
-        Matcher blocks=Pattern.compile("(?s)BT(.*?)ET").matcher(s);Pattern op=Pattern.compile("(?s)([-+]?\d*\.?\d+)\s+([-+]?\d*\.?\d+)\s+([-+]?\d*\.?\d+)\s+([-+]?\d*\.?\d+)\s+([-+]?\d*\.?\d+)\s+([-+]?\d*\.?\d+)\s+Tm|([-+]?\d*\.?\d+)\s+([-+]?\d*\.?\d+)\s+T[dD]|/[^\s]+\s+([-+]?\d*\.?\d+)\s+Tf|(\([^\r\n]*?\)|<[^>]*>|\[[^\]]*\])\s*(Tj|TJ|'|\")");
+        Matcher blocks=Pattern.compile("(?s)BT(.*?)ET").matcher(s);Pattern op=Pattern.compile("(?s)([-+]?\\d*\\.?\\d+)\\s+([-+]?\\d*\\.?\\d+)\\s+([-+]?\\d*\\.?\\d+)\\s+([-+]?\\d*\\.?\\d+)\\s+([-+]?\\d*\\.?\\d+)\\s+([-+]?\\d*\\.?\\d+)\\s+Tm|([-+]?\\d*\\.?\\d+)\\s+([-+]?\\d*\\.?\\d+)\\s+T[dD]|/[^\\s]+\\s+([-+]?\\d*\\.?\\d+)\\s+Tf|(\\([^\\r\\n]*?\\)|<[^>]*>|\\[[^\\]]*\\])\\s*(Tj|TJ|'|\\\")");
         while(blocks.find()){
             String b=blocks.group(1);Matcher m=op.matcher(b);float x=Float.NaN,y=Float.NaN,size=0;
             while(m.find()){
