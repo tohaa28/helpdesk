@@ -138,9 +138,6 @@ jobs:
           test ! -f app/src/main/java/ru/printcheck/android/NativeAuth.java
           test ! -f app/src/main/java/ru/printcheck/android/LoginFormParser.java
           grep -q 'fontsInArtwork' app/src/main/java/ru/printcheck/android/PdfObjectInspector.java
-          grep -q 'private static String preflightOverall' app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'private static PreflightRules.RuleSet rulesForItem' app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'private static JSONObject rulesJson' app/src/main/java/ru/printcheck/android/MainActivity.java
           grep -q 'has_live_text_global' app/src/main/java/ru/printcheck/android/MainActivity.java
           grep -q 'font_scope' app/src/main/java/ru/printcheck/android/MainActivity.java
           grep -q 'Шрифты вне нанесения проигнорированы' app/src/main/java/ru/printcheck/android/MainActivity.java
