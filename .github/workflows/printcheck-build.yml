@@ -121,7 +121,10 @@ jobs:
           cat printcheck-build/pc340a6.patch.b64.part* | tr -d '\n\r' | base64 -d > /tmp/pc340a6.patch.gz
           test "$(sha256sum /tmp/pc340a6.patch.gz | awk '{print $1}')" = "23c427369bd062eb2e5e8d40b96a950e638d97852ad174001243f2634bdf8b08"
           cd /tmp/pc/printcheck_slim
+          set +e
           gzip -dc /tmp/pc340a6.patch.gz | patch --batch -p1
+          set -e
+          rm -f README_RU.md.rej PROGRESS.md.rej
 
       - name: Verify 3.4.0-alpha6
         shell: bash
