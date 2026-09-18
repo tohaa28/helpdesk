@@ -1,9 +1,9 @@
-name: Build PrintCheck 3.4.0-alpha3 APK
+name: Build PrintCheck 3.4.0-alpha4 APK
 
 on:
   push:
     branches:
-      - printcheck-build-3.4.0-alpha3
+      - printcheck-build-3.4.0-alpha4
     paths:
       - 'printcheck-build/**'
       - '.github/workflows/printcheck-build.yml'
@@ -97,19 +97,25 @@ jobs:
           test "$(sha256sum /tmp/pc340a3_overlay.tar.gz | awk '{print $1}')" = "ecc424edefd4728b16c5c6a0a4fd1e9555c913201d2ef5226020785a42fd1794"
           tar -xzf /tmp/pc340a3_overlay.tar.gz -C /tmp/pc/printcheck_slim
 
-      - name: Verify 3.4.0-alpha3
+      - name: Overlay exact 3.4.0-alpha4 files
+        shell: bash
+        run: |
+          cat printcheck-build/pc340a4_overlay.b64.part* | tr -d '\\n\\r' | base64 -d > /tmp/pc340a4_overlay.tar.gz
+          sha256sum /tmp/pc340a4_overlay.tar.gz
+          test "$(sha256sum /tmp/pc340a4_overlay.tar.gz | awk '{print $1}')" = "637f8fc2a2fb0351f3519d7443746027360cf753297d433d91ddef23144e6a6b"
+          tar -xzf /tmp/pc340a4_overlay.tar.gz -C /tmp/pc/printcheck_slim
+
+      - name: Verify 3.4.0-alpha4
         shell: bash
         run: |
           cd /tmp/pc/printcheck_slim
-          grep -q "versionName '3.4.0-alpha3'" app/build.gradle
-          grep -q "versionCode 340003" app/build.gradle
-          test -f app/src/main/java/ru/printcheck/android/NativeAuth.java
-          test -f app/src/main/java/ru/printcheck/android/LoginFormParser.java
-          grep -q 'component_circles_v2_large' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
-          grep -q 'Math.max(15f,Math.min(26f' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
-          grep -q 'showNativeLogin' app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'Пароль не сохраняется' app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'https://gifts.ru/' app/src/main/java/ru/printcheck/android/NativeAuth.java
+          grep -q "versionName '3.4.0-alpha4'" app/build.gradle
+          grep -q "versionCode 340004" app/build.gradle
+          grep -q 'component_circles_v3_high_contrast' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q 'suppressProductionBoundary' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q 'setStrokeWidth(8.0f)' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q 'hidden-web-start' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'auth_trace.jsonl' app/src/main/java/ru/printcheck/android/MainActivity.java
 
       - name: Core tests
         shell: bash
@@ -141,12 +147,12 @@ jobs:
       - name: Collect APK
         shell: bash
         run: |
-          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha3.apk
-          sha256sum PrintCheck_Android_3.4.0-alpha3.apk
+          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha4.apk
+          sha256sum PrintCheck_Android_3.4.0-alpha4.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.4.0-alpha3_APK
-          path: PrintCheck_Android_3.4.0-alpha3.apk
+          name: PrintCheck_Android_3.4.0-alpha4_APK
+          path: PrintCheck_Android_3.4.0-alpha4.apk
           if-no-files-found: error
           retention-days: 7
