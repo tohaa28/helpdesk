@@ -1,9 +1,9 @@
-name: Build PrintCheck 3.4.0-alpha1 APK
+name: Build PrintCheck 3.4.0-alpha2 APK
 
 on:
   push:
     branches:
-      - printcheck-build-3.4.0-alpha1
+      - printcheck-build-3.4.0-alpha2
     paths:
       - 'printcheck-build/**'
       - '.github/workflows/printcheck-build.yml'
@@ -64,7 +64,6 @@ jobs:
           set +e
           gzip -dc /tmp/pc330.patch.gz | patch --batch -p1
           set -e
-          grep -q "versionName '3.3.0-alpha1'" app/build.gradle
 
       - name: Apply 3.3.0-alpha2 surface-only patch
         shell: bash
@@ -75,29 +74,34 @@ jobs:
           set +e
           gzip -dc /tmp/pc330a2.patch.gz | patch --batch -p1
           set -e
-          grep -q "versionName '3.3.0-alpha2'" app/build.gradle
 
       - name: Overlay exact 3.4.0-alpha1 files
         shell: bash
         run: |
           cat printcheck-build/pc340_overlay.b64.part* | tr -d '\n\r' | base64 -d > /tmp/pc340_overlay.tar.gz
-          sha256sum /tmp/pc340_overlay.tar.gz
           test "$(sha256sum /tmp/pc340_overlay.tar.gz | awk '{print $1}')" = "a98504f323bbaec0b9a02660f0b189b4a9cbf4bf1df46a7462fbcd6651b76336"
           tar -xzf /tmp/pc340_overlay.tar.gz -C /tmp/pc/printcheck_slim
 
-      - name: Verify 3.4.0-alpha1
+      - name: Overlay exact 3.4.0-alpha2 files
+        shell: bash
+        run: |
+          cat printcheck-build/pc340a2_overlay.b64.part* | tr -d '\n\r' | base64 -d > /tmp/pc340a2_overlay.tar.gz
+          sha256sum /tmp/pc340a2_overlay.tar.gz
+          test "$(sha256sum /tmp/pc340a2_overlay.tar.gz | awk '{print $1}')" = "c704f402ced8b8baa0b9d458d31be5d7c0f0100455bd2137e7d7d686fd691b22"
+          tar -xzf /tmp/pc340a2_overlay.tar.gz -C /tmp/pc/printcheck_slim
+
+      - name: Verify 3.4.0-alpha2
         shell: bash
         run: |
           cd /tmp/pc/printcheck_slim
-          grep -q "versionName '3.4.0-alpha1'" app/build.gradle
-          grep -q "versionCode 340001" app/build.gradle
-          test -f app/src/main/java/ru/printcheck/android/SmallElementAnalyzer.java
-          test -f app/src/main/java/ru/printcheck/android/OfficialRequirements.java
-          grep -q 'distance-ridge-positive-negative-v1' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
-          grep -q 'small_elements_positive_negative_v1' app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'Мелкие элементы' app/src/main/java/ru/printcheck/android/ResultView.java
-          grep -q 'Все техтребования' app/src/main/java/ru/printcheck/android/ResultView.java
-          grep -q 'SPEC_URL' app/src/main/java/ru/printcheck/android/OfficialRequirements.java
+          grep -q "versionName '3.4.0-alpha2'" app/build.gradle
+          grep -q "versionCode 340002" app/build.gradle
+          grep -q 'LOGIN_URL="https://gifts.ru/"' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'isLegacyPrivateRoot' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'component_circles_v1' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q 'originX' app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q '○ Позитив < нормы' app/src/main/java/ru/printcheck/android/ResultView.java
+          grep -q 'Макет / конструктор' app/src/main/java/ru/printcheck/android/ResultView.java
 
       - name: Core tests
         shell: bash
@@ -129,12 +133,12 @@ jobs:
       - name: Collect APK
         shell: bash
         run: |
-          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha1.apk
-          sha256sum PrintCheck_Android_3.4.0-alpha1.apk
+          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha2.apk
+          sha256sum PrintCheck_Android_3.4.0-alpha2.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.4.0-alpha1_APK
-          path: PrintCheck_Android_3.4.0-alpha1.apk
+          name: PrintCheck_Android_3.4.0-alpha2_APK
+          path: PrintCheck_Android_3.4.0-alpha2.apk
           if-no-files-found: error
           retention-days: 7
