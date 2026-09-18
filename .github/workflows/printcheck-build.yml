@@ -1,9 +1,9 @@
-name: Build PrintCheck 3.4.0-alpha5 APK
+name: Build PrintCheck 3.4.0-alpha6 APK
 
 on:
   push:
     branches:
-      - printcheck-build-3.4.0-alpha5
+      - printcheck-build-3.4.0-alpha6
     paths:
       - 'printcheck-build/**'
       - '.github/workflows/printcheck-build.yml'
@@ -115,21 +115,29 @@ jobs:
           rm -f app/src/main/java/ru/printcheck/android/NativeAuth.java
           rm -f app/src/main/java/ru/printcheck/android/LoginFormParser.java
 
-      - name: Verify 3.4.0-alpha5
+      - name: Apply 3.4.0-alpha6 artwork-only font scope
+        shell: bash
+        run: |
+          cat printcheck-build/pc340a6.patch.b64.part* | tr -d '\n\r' | base64 -d > /tmp/pc340a6.patch.gz
+          test "$(sha256sum /tmp/pc340a6.patch.gz | awk '{print $1}')" = "23c427369bd062eb2e5e8d40b96a950e638d97852ad174001243f2634bdf8b08"
+          cd /tmp/pc/printcheck_slim
+          gzip -dc /tmp/pc340a6.patch.gz | patch --batch -p1
+
+      - name: Verify 3.4.0-alpha6
         shell: bash
         run: |
           cd /tmp/pc/printcheck_slim
-          grep -q "versionName '3.4.0-alpha5'" app/build.gradle
-          grep -q "versionCode 340005" app/build.gradle
+          grep -q "versionName '3.4.0-alpha6'" app/build.gradle
+          grep -q "versionCode 340006" app/build.gradle
           test -f app/src/main/java/ru/printcheck/android/PdfObjectInspector.java
           test ! -f app/src/main/java/ru/printcheck/android/NativeAuth.java
           test ! -f app/src/main/java/ru/printcheck/android/LoginFormParser.java
-          grep -q 'checkWebSession' app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'PdfObjectInspector.inspect' app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'Обнаружены шрифты — макет недопустим' app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'has_gradients' app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'has_transparency' app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'МАКЕТ НЕДОПУСТИМ' app/src/main/java/ru/printcheck/android/ResultView.java
+          grep -q 'fontsInArtwork' app/src/main/java/ru/printcheck/android/PdfObjectInspector.java
+          grep -q 'has_live_text_global' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'font_scope' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'Шрифты вне нанесения проигнорированы' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'Живой текст в нанесении — макет недопустим' app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'fonts_scoped_to_artwork_v2' app/src/main/java/ru/printcheck/android/MainActivity.java
 
       - name: Core tests
         shell: bash
@@ -161,12 +169,12 @@ jobs:
       - name: Collect APK
         shell: bash
         run: |
-          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha5.apk
-          sha256sum PrintCheck_Android_3.4.0-alpha5.apk
+          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha6.apk
+          sha256sum PrintCheck_Android_3.4.0-alpha6.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.4.0-alpha5_APK
-          path: PrintCheck_Android_3.4.0-alpha5.apk
+          name: PrintCheck_Android_3.4.0-alpha6_APK
+          path: PrintCheck_Android_3.4.0-alpha6.apk
           if-no-files-found: error
           retention-days: 7
