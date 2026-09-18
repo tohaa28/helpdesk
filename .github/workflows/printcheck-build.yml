@@ -1,9 +1,9 @@
-name: Build PrintCheck 3.4.0-alpha6 APK
+name: Build PrintCheck 3.4.0-alpha7 APK
 
 on:
   push:
     branches:
-      - printcheck-build-3.4.0-alpha6
+      - printcheck-build-3.4.0-alpha7
     paths:
       - 'printcheck-build/**'
       - '.github/workflows/printcheck-build.yml'
@@ -129,12 +129,21 @@ jobs:
           test -z "$(find . -name '*.rej' -print -quit)"
           python3 "$GITHUB_WORKSPACE/printcheck-build/fix_alpha6_helpers.py" /tmp/pc/printcheck_slim
 
-      - name: Verify 3.4.0-alpha6
+      - name: Apply 3.4.0-alpha7 constructor relation
+        shell: bash
+        run: |
+          base64 -d printcheck-build/pc340a7.patch.gz.b64 > /tmp/pc340a7.patch.gz
+          test "$(sha256sum /tmp/pc340a7.patch.gz | awk '{print $1}')" = "c62de88cfd3002d6a4bf58dcae1e85f91b720aba66beb24df7d8ce6007a87df7"
+          cd /tmp/pc/printcheck_slim
+          gzip -dc /tmp/pc340a7.patch.gz | patch --batch -p1
+          test -z "$(find . -name '*.rej' -print -quit)"
+
+      - name: Verify 3.4.0-alpha7
         shell: bash
         run: |
           cd /tmp/pc/printcheck_slim
-          grep -q "versionName '3.4.0-alpha6'" app/build.gradle
-          grep -q "versionCode 340006" app/build.gradle
+          grep -q "versionName '3.4.0-alpha7'" app/build.gradle
+          grep -q "versionCode 340007" app/build.gradle
           test -f app/src/main/java/ru/printcheck/android/PdfObjectInspector.java
           test ! -f app/src/main/java/ru/printcheck/android/NativeAuth.java
           test ! -f app/src/main/java/ru/printcheck/android/LoginFormParser.java
@@ -147,6 +156,12 @@ jobs:
           grep -q 'Шрифты вне нанесения проигнорированы' app/src/main/java/ru/printcheck/android/MainActivity.java
           grep -q 'Живой текст в нанесении — макет недопустим' app/src/main/java/ru/printcheck/android/MainActivity.java
           grep -q 'fonts_scoped_to_artwork_v2' app/src/main/java/ru/printcheck/android/MainActivity.java
+          test -f app/src/main/java/ru/printcheck/android/ConstructorRelationResolver.java
+          grep -q 'template-row-article' app/src/main/java/ru/printcheck/android/ConstructorRelationResolver.java
+          grep -q 'constructor-url-fallback' app/src/main/java/ru/printcheck/android/ConstructorRelationResolver.java
+          grep -q 'relation_conflict' app/src/main/java/ru/printcheck/android/ReadOnlyHttp.java
+          grep -q 'item_ids' app/src/main/java/ru/printcheck/android/ReadOnlyHttp.java
+          grep -q 'constructor_relation_from_template_row_v1' app/src/main/java/ru/printcheck/android/MainActivity.java
 
       - name: Core tests
         shell: bash
@@ -178,12 +193,12 @@ jobs:
       - name: Collect APK
         shell: bash
         run: |
-          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha6.apk
-          sha256sum PrintCheck_Android_3.4.0-alpha6.apk
+          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha7.apk
+          sha256sum PrintCheck_Android_3.4.0-alpha7.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.4.0-alpha6_APK
-          path: PrintCheck_Android_3.4.0-alpha6.apk
+          name: PrintCheck_Android_3.4.0-alpha7_APK
+          path: PrintCheck_Android_3.4.0-alpha7.apk
           if-no-files-found: error
           retention-days: 7
