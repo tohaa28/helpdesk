@@ -25,7 +25,9 @@ final class RasterPdfIndexer {
                     Bitmap bmp = Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);
                     bmp.eraseColor(Color.WHITE);
                     page.render(bmp,null,null,PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-                    Models.PageIndex idx = new Models.PageIndex(); idx.page=pi; idx.width=w; idx.height=h;
+                    Models.PageIndex idx = new Models.PageIndex();
+                    idx.page=pi; idx.width=w; idx.height=h;
+                    idx.pageWidthPt=page.getWidth(); idx.pageHeightPt=page.getHeight();
                     idx.features = extract(bmp);
                     out.pages.add(idx);
                     if (cb!=null) cb.onProgress(pdf.label+" · стр. "+(pi+1)+" · признаков "+idx.features.size());
