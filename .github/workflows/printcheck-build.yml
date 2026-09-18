@@ -51,16 +51,18 @@ jobs:
         shell: bash
         run: |
           cat printcheck-build/visual_overlay_3201.b64.part* | tr -d '\n\r' | base64 -d > /tmp/visual_overlay.tar.gz
-          sha256sum /tmp/visual_overlay.tar.gz
           test "$(sha256sum /tmp/visual_overlay.tar.gz | awk '{print $1}')" = "f70406d03a0d282ef98cfc9342f20926097bd14a5163548cc90cd42522bbc455"
           tar -xzf /tmp/visual_overlay.tar.gz -C /tmp/pc/printcheck_slim
-      - name: Verify version and visual result
+      - name: Separate template and application
+        run: python3 printcheck-build/patch_alpha3202.py /tmp/pc/printcheck_slim
+      - name: Verify 3.2.0-alpha2
         shell: bash
         run: |
-          grep -q "versionName '3.2.0-alpha1'" /tmp/pc/printcheck_slim/app/build.gradle
-          grep -q 'class ResultView' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/ResultView.java
-          grep -q 'comparisonsDetailed' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'display_name' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/ReadOnlyHttp.java
+          grep -q "versionName '3.2.0-alpha2'" /tmp/pc/printcheck_slim/app/build.gradle
+          grep -q "versionCode 320002" /tmp/pc/printcheck_slim/app/build.gradle
+          grep -q 'template_name' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'application_code' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/ReadOnlyHttp.java
+          grep -q 'СРАВНЕНИЕ С ЭТАЛОНОМ НАНЕСЕНИЯ' /tmp/pc/printcheck_slim/app/src/main/java/ru/printcheck/android/ResultView.java
       - name: Core tests
         shell: bash
         run: |
@@ -90,11 +92,11 @@ jobs:
           gradle --no-daemon --stacktrace assembleDebug
       - name: Collect APK
         run: |
-          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.2.0-alpha1.apk
-          sha256sum PrintCheck_Android_3.2.0-alpha1.apk
+          cp /tmp/pc/printcheck_slim/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.2.0-alpha2.apk
+          sha256sum PrintCheck_Android_3.2.0-alpha2.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.2.0-alpha1_APK
-          path: PrintCheck_Android_3.2.0-alpha1.apk
+          name: PrintCheck_Android_3.2.0-alpha2_APK
+          path: PrintCheck_Android_3.2.0-alpha2.apk
           if-no-files-found: error
           retention-days: 7
