@@ -1,4 +1,4 @@
-name: Build PrintCheck 3.4.0-alpha16 APK
+name: Build PrintCheck 3.4.0-alpha17 APK
 on: [workflow_dispatch, push]
 
 jobs:
@@ -23,40 +23,40 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
-      - name: Prepare canonical alpha16 source
-        run: python3 printcheck-build/prepare_alpha16.py .
-      - name: Verify alpha16 invariants
+      - name: Prepare canonical alpha17 source
+        run: python3 printcheck-build/prepare_alpha17.py .
+      - name: Verify alpha17 invariants
         shell: bash
         run: |
-          grep -q "versionName '3.4.0-alpha16'" .printcheck-alpha16/app/build.gradle
-          grep -q "versionCode 340016" .printcheck-alpha16/app/build.gradle
-          grep -q "item_first_application_preflight_v1" .printcheck-alpha16/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q "direct-application" .printcheck-alpha16/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q "constructor-bridge" .printcheck-alpha16/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q "Техтребования выбранного нанесения" .printcheck-alpha16/app/src/main/java/ru/printcheck/android/ResultView.java
-          grep -q "Само нанесение крупно" .printcheck-alpha16/app/src/main/java/ru/printcheck/android/ResultView.java
-          grep -q "ScaleGestureDetector" .printcheck-alpha16/app/src/main/java/ru/printcheck/android/ZoomImageView.java
-      - name: Alpha16 regression audit
-        run: python3 .printcheck-alpha16/tests/audit_alpha16.py
+          grep -q "versionName '3.4.0-alpha17'" .printcheck-alpha17/app/build.gradle
+          grep -q "versionCode 340017" .printcheck-alpha17/app/build.gradle
+          grep -q "partial_template_recovery_v1" .printcheck-alpha17/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "same-page-partial-template" .printcheck-alpha17/app/src/main/java/ru/printcheck/android/RasterMatcher.java
+          grep -q "partial-template-field-map-v1" .printcheck-alpha17/app/src/main/java/ru/printcheck/android/PartialTemplateLogic.java
+          grep -q "ApplicationFieldMapper.map" .printcheck-alpha17/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "analyzeMappedField" .printcheck-alpha17/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q "удалённой частью конструктора" .printcheck-alpha17/app/src/main/java/ru/printcheck/android/ResultView.java
+      - name: Alpha17 regression audit
+        run: python3 .printcheck-alpha17/tests/audit_alpha17.py
       - name: Core tests
-        run: bash .printcheck-alpha16/tests/run_core.sh
+        run: bash .printcheck-alpha17/tests/run_core.sh
       - name: Build APK
         run: gradle --no-daemon --stacktrace assembleDebug
       - name: Package source
         shell: bash
         run: |
-          cd .printcheck-alpha16
-          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha16_source.zip" . -x '*/build/*' '*.keystore'
+          cd .printcheck-alpha17
+          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha17_source.zip" . -x '*/build/*' '*.keystore'
       - name: Collect APK
         shell: bash
         run: |
-          cp .printcheck-alpha16/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha16.apk
-          sha256sum PrintCheck_Android_3.4.0-alpha16.apk
+          cp .printcheck-alpha17/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha17.apk
+          sha256sum PrintCheck_Android_3.4.0-alpha17.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.4.0-alpha16_BUILD
+          name: PrintCheck_Android_3.4.0-alpha17_BUILD
           path: |
-            PrintCheck_Android_3.4.0-alpha16.apk
-            PrintCheck_Android_3.4.0-alpha16_source.zip
+            PrintCheck_Android_3.4.0-alpha17.apk
+            PrintCheck_Android_3.4.0-alpha17_source.zip
           if-no-files-found: error
           retention-days: 7
