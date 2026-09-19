@@ -2,8 +2,8 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha21
-Current development/build branch: printcheck-build-3.4.0-alpha21
+Current implementation line: Android 3.4.0-alpha22 (build in progress)
+Current development/build branch: printcheck-build-3.4.0-alpha22
 
 ## STRICT CONTINUITY RULE
 
@@ -520,3 +520,31 @@ Key alpha21 behavior:
 
 Next required real fixture:
 order 7920509 with saved diagnostics, comparing isolated artwork evidence position by position.
+
+
+## ALPHA22 — HIGH-RES ARTWORK ROI IS NOW REQUIRED
+
+Reason:
+alpha21 diagnostics from order 7920509 proved that primary artwork segmentation reused global coarse rasters at only 65–100 dpi. This is insufficient for reliable 0.2–0.3 mm boundaries and can cause wrong artwork masks.
+
+Mandatory alpha22+ architecture:
+- coarse adaptive DPI is allowed only for whole-page discovery/registration;
+- once a real selected application field is known, artwork segmentation must rerender the field ROI at a dedicated higher DPI;
+- target DPI is 900;
+- prefer at least 300 dpi when memory allows;
+- enforce an 8M-pixel ROI budget instead of rendering whole giant pages at high DPI;
+- high-res local registration and selected-template subtraction are authoritative for artwork detection;
+- physical artwork measurements come from the high-res mask;
+- saved artwork evidence comes from the high-res ROI;
+- diagnostics must show coarse_geometry_dpi and artwork_analysis_dpi separately.
+
+Observed alpha21 coarse DPI on control order 7920509:
+15637=100, 17488.30=90, 19727.02=100, 30114.30=79, 15423.10=69, 17893.30=65.
+
+Separate issue:
+25900.61 produced no geometry at all in alpha21. Do not assume high-res ROI alone fixes it; if still missing after alpha22, inspect selected-application mapping/alignment independently.
+
+Update compatibility:
+- alpha22 versionCode 340022;
+- applicationId stays ru.printcheck.android;
+- same persistent NON-PRODUCTION alpha signer as alpha20/alpha21 is mandatory.
