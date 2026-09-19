@@ -103,6 +103,11 @@ jobs:
         env:
           RESULT: ${{ job.status }}
         run: |
+          CURRENT_HEAD="$(git ls-remote origin refs/heads/printcheck-build-3.4.0-alpha20 | cut -f1)"
+          if [ "$CURRENT_HEAD" != "$GITHUB_SHA" ]; then
+            echo "Skip stale CI result: source=$GITHUB_SHA current_head=$CURRENT_HEAD"
+            exit 0
+          fi
           mkdir -p .ci
           {
             echo "version=3.4.0-alpha20"
