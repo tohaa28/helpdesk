@@ -1361,3 +1361,149 @@ Real-device acceptance:
 - inspect 30114.30 specifically because alpha24 produced hundreds of binary-mask false positives;
 - if continuous-tone artwork produces >8 stable layers, expected behavior is manual small-element check rather than pseudo-color circles;
 - export alpha25 diagnostics for comparison.
+
+
+---
+
+## 2026-09-19 — alpha26: solid same-color geometry, intersection exclusion, centered issue markers
+
+Branch:
+- printcheck-build-3.4.0-alpha26
+
+User requirement:
+- small elements must NEVER be reported merely at an intersection/contact of different colors;
+- issue circles must be centered on the actual detected small object, narrow region, or physical gap;
+- investigate established image-processing solutions rather than continuing ad-hoc contour heuristics.
+
+User diagnostic basis:
+- PrintCheck_diagnostics_7920509_3.4.0-alpha25 (1).zip
+- control order 7920509.
+
+Alpha25 evidence:
+- 30114.30 / UV-DTF2 still reported 733 positive + 253 negative violations while color_layer_count was only 1.
+- 15637: 64 positive / 8 negative, one layer.
+- 17488.30: 66 positive / 9 negative, one layer.
+- 19727.02: 8 positive, one layer.
+- 17893.30: 327 positive, one layer.
+- 15423.10 remained safely manual due non-authoritative constructor fallback.
+- 25900.61 still had no geometry and remains a separate mapping/alignment issue.
+- visual review of small_UV-DTF2_2147285110.png showed markers along color edges/intersections instead of centers of physical features.
+- artwork evidence itself was contour-like: alpha25's diff mask identified edge fragments rather than complete filled color objects.
+
+Root cause:
+- alpha25 technically separated visible colors, but it treated the layout-minus-template diff contour as final morphological geometry.
+- at a black/white or other cross-color contact, the thin edge fragment looked like a sub-limit positive stroke.
+- bbox-center marker placement could place a circle away from the actual narrow locus or actual gap.
+
+External research / established algorithms:
+- OpenCV distanceTransform: distance from foreground pixels to nearest background is a standard basis for local thickness.
+- OpenCV connectedComponentsWithStats: connected-component labels, geometry and centroids are standard for discrete object centers.
+- medial-axis/skeleton methods use ridges of the distance transform; 2*distance at a medial point estimates local thickness.
+- Euclidean distance transforms have well-known linear-time algorithms (Felzenszwalb/Huttenlocher).
+- PDFBox exposes graphics-state stroking/non-stroking colors and PDF graphics paths; the current Android project already ships pdfbox-android and uses PDFGraphicsStreamEngine, so native PDF vector/color semantics are a feasible future accuracy path without OpenCV.
+Decision:
+- do NOT add the heavy OpenCV Android dependency for alpha26;
+- implement the relevant distance/connected-component concepts directly on existing masks;
+- plan native PDF fill/stroke color extraction as the higher-fidelity next step for CMYK/Pantone/White and vector artwork.
+
+Alpha26 color geometry:
+Mode:
+- visible-color-solids-v2-seeded-components
+
+Important semantic change:
+- layout-minus-template diff is a SEED ONLY.
+- It answers "which visible object belongs to customer artwork?" but it is NOT the shape used for technical width/gap measurement.
+
+Pipeline:
+1. learn stable color directions from isolated diff seed pixels;
+2. classify all non-background pixels in the high-resolution artwork crop to the nearest learned visible color;
+3. reconstruct full connected solid components;
+4. keep only components supported by a seed of that SAME color;
+5. assign every retained pixel one exclusive color owner;
+6. explicitly record cross-color contact/intersection pixels.
+
+This reconstructs a complete white letter/black object from its contour seed rather than treating the 1px contour as the object.
+
+Alpha26 positive rule:
+- Result mode: per-color-medial-gap-v2-intersection-safe.
+- local width is measured on the filled same-color object with a distance-to-background transform and local medial maxima.
+- distance to another color is computed independently.
+- candidate narrow points within the cross-color guard are excluded.
+- therefore a contact/intersection of two colors cannot become a positive small-element warning.
+- a genuinely thin isolated stroke of one color still can.
+
+Alpha26 negative rule:
+- other colors are barriers, not empty space;
+- enclosed-hole flood fill traverses only pixels with no color owner;
+- an enclosed region touching a different color is not considered a negative gap of the active color;
+- disconnected same-color components use nearest-component propagation through unowned space, blocked by other colors;
+- a valid same-color narrow gap is marked at the actual midpoint of the nearest gap.
+
+Marker centers:
+- SmallElementAnalyzer.Box now stores centerX, centerY and feature kind.
+- positive: center is the centroid/representative center of the actual narrow-region mask;
+- negative same-color gap: center is the physical gap midpoint;
+- isolated single object: center is its connected-component centroid.
+- GeometryAnalyzer uses those centers directly.
+- issue circle radius is fixed at 18 px in evidence output rather than derived from the full bbox.
+- a small crosshair is drawn through the exact detected center.
+- marker_style = centered_features_v6_intersection_safe_reference_ruler.
+- result.json examples expose center_x, center_y, feature_kind.
+- result.json sets cross_color_intersections_excluded=true.
+
+Retained constraints:
+- same-color semantics from alpha25 remain;
+- physical reference ruler from alpha24 remains before all morphology;
+- constructor-only non-authoritative reference remains manual;
+- alpha23 performance architecture remains (720 dpi / 4M ROI / cached coarse-to-fine registration);
+- cross-color negative gaps remain ignored;
+- no synthetic field geometry.
+
+Local regression gates:
+- CoreTests: 83/83 PASS.
+New tests cover:
+  * contour seed reconstructs full same-color solid;
+  * touching different colors get exclusive owners/contact map;
+  * different-color intersection does NOT create a positive warning;
+  * isolated truly thin same-color stroke DOES create a positive warning;
+  * same-color gap marker is centered in the physical gap;
+  * another color filling a counter is NOT an empty negative gap;
+  * single-object marker uses connected-component centroid.
+- alpha26 source audit: 28/28 PASS.
+
+Local build constraint:
+- Android Gradle binary is unavailable in the local execution container; final Android compile/signing must be validated by GitHub CI.
+
+Reproducibility:
+- patch bytes: 59876
+- patch SHA-256: e118395e92f605d46b41dc8c4683b8325efed02787bbcc76007070b0d8ab1fc3
+- gzip/base64 transport chars: 19152
+- transport SHA-256: dac56b123f63aa394c392aacdb8178c6efe39891430d833557608728cc85cbe5
+- chunks: pc340a26.b64.part00..part03
+- Git blob SHA checks:
+  part00 97419f17f98f7f00e2dbd12bd3b33f5c1f7fa6f4
+  part01 bb169c9f5797cc0c5b808cd370ebaaf41945324c
+  part02 f6c391ca8473eaa19ebddd603980f0cd1c217fbb
+  part03 632ffd6d1d0969d84244bdc4dd9f4297135222e7
+- generator: printcheck-build/prepare_alpha26.py
+
+Version/update contract:
+- versionName 3.4.0-alpha26
+- versionCode 340026
+- applicationId ru.printcheck.android
+- same persistent alpha signer required.
+
+Known limitations:
+- alpha26 still reconstructs visible RGB solids from the rendered layout; it does not yet use native PDF CMYK/Pantone/spot/White objects as the authoritative color source.
+- native PDF color/path extraction should be the next higher-fidelity improvement.
+- 25900.61 remains a separate field/mapping/alignment issue.
+- CDR remains saved_not_parsed.
+- general rotation registration not implemented.
+- effects/gradients/transparency still not fully artwork-scoped.
+
+Required real-device acceptance:
+- rerun 7920509;
+- inspect 30114.30 first;
+- no circles should appear simply along black/white or other color intersections;
+- every remaining circle should visually sit at the center of a real narrow object/region or same-color gap;
+- export alpha26 diagnostics for further tuning.
