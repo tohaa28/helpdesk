@@ -199,3 +199,74 @@ Next development action:
 - save/export diagnostics;
 - inspect selected colored field, alignment and residual artwork for every position;
 - correct real failures without synthetic geometry fallback.
+
+
+---
+
+## 2026-09-19 — alpha20 started from real diagnostics 7920509
+
+Branch:
+- printcheck-build-3.4.0-alpha20
+
+User-reported problem:
+- alpha19 detection of the actual application/artwork is unsatisfactory.
+
+Diagnostic basis:
+- PrintCheck_diagnostics_7920509_3.4.0-alpha19.zip supplied by the user.
+- Analysis was performed against the downloaded layouts, full constructors, order-specific selected-application PDFs, result.json, report.txt and matching trace.
+
+Root causes found — do not lose these:
+
+1. The order-specific selected-application PDF is already the strongest reference for the exact selected field.
+   In the supplied fixture its red/color-highlighted field directly corresponds to the customer-selected application/place.
+   For several positions the layout→selected-application alignment was already strong while layout→full-constructor was absent, but alpha19 still blocked geometry because it treated full-constructor registration as a prerequisite.
+
+   Observed examples from the diagnostic:
+   - 17488.30 / A2: selected-application alignment about 0.971 coverage / 0.983 score, yet geometry was refused because layout→constructor was missing.
+   - 17893.30 / UV3: selected-application alignment about 0.731 / 0.844, geometry refused for the same reason.
+   - 19727.02 / LM1: selected-application alignment about 0.911 / 0.948, geometry refused.
+   - 30114.30 / UV-DTF2: selected-application alignment about 0.968 / 0.982, geometry refused.
+
+2. Artwork extraction incorrectly removed a dominant customer artwork color.
+   alpha19 GeometryAnalyzer treated the dominant layout color inside the field as substrate/background.
+   On 15637 this discarded the large black part of the actual artwork and retained mainly letters/details.
+   This is architecturally wrong: customer artwork may legitimately fill most or all of a field with one solid color.
+
+3. Field identity size incorrectly preferred a wider placement zone over the selected application size.
+   For 25900.61 / A0 the selected application is 5×0.5 cm = 50×5 mm while the order text also contains a wider field/placement zone 10×0.5 cm = 100×5 mm.
+   alpha19 searched/scored against 100×5 mm. The selected application size must identify the intended highlighted field first; the wider placement zone remains a constraint, never geometry.
+
+4. Full-constructor subtraction can contaminate the residual with service/template differences.
+   The order-specific selected-application template is a cleaner subtraction reference because it already represents the exact application/place selected by the customer.
+
+Architectural correction for alpha20:
+- promote the exact selected-application PDF to PRIMARY field and artwork reference;
+- detect its actual color-highlighted field and use real observed geometry;
+- register layout directly to that selected template;
+- if normal registration fails, allow recovery by a preserved matching colored field;
+- subtract selected-application template from customer layout inside the selected field;
+- do NOT discard the dominant layout color;
+- suppress only actual matching template content / local antialiasing residue;
+- keep the full constructor as supporting/fallback evidence;
+- selected application size is identity evidence before broader placement-zone dimensions;
+- dimensions still never synthesize coordinates;
+- retain alpha7 small-positive/small-negative morphology and font-in-artwork scoping.
+
+Planned/implemented source areas:
+- PartialTemplateLogic: selectedFieldIdentitySizeMm priority.
+- ConstructorFieldLogic: selected-application PDF/raster as real reference-field sources.
+- ConstructorVectorInspector: source-role aware inspection.
+- GeometryAnalyzer: selected-application field detector, selected-template subtraction, reference-neighborhood antialias suppression, actual artwork-mask evidence.
+- MainActivity: selected-application primary path + preserved-field alignment fallback; constructor fallback retained.
+- ResultView/preflight: source-neutral wording and selected-template field treated as a real field.
+- tests: selected-size-vs-placement-zone regression, real selected-application field source, alpha20 invariants.
+
+Local gate before CI:
+- core tests: 54/54 passed;
+- alpha20 source audit: 17/17 passed.
+
+Next:
+- package alpha19→alpha20 reproducible patch in Git;
+- run full Android CI compile/build;
+- collect APK/source/hash artifact;
+- then rerun the SAME order 7920509 and compare field selection and artwork masks position-by-position.
