@@ -537,3 +537,54 @@ Repair:
 - repair commit: ccdab6592aa5ced74bc436ed6ea29aa290f5cff3.
 
 Application detection logic itself is unchanged by this repair.
+
+
+### Alpha21 successful final signed Android build
+
+Canonical successful build:
+- versionName: 3.4.0-alpha21
+- versionCode: 340021
+- applicationId: ru.printcheck.android
+- source commit: 0ea3f268bdf965b9fb299b9ad875e7f58a35c352
+- GitHub Actions run: 35459832052
+- job: 105941624239
+- status: success
+- artifact name: PrintCheck_Android_3.4.0-alpha21_FINAL2_BUILD
+- artifact ID: 10589092459
+- artifact digest: sha256:c012abcb19c6e77ca73f1f6e8a299dc02d82fc84bf22ccf4302bd03a958f0290
+- artifact expires: 2026-09-26T18:02:45Z
+
+All final workflow gates passed:
+- canonical alpha21 source generation;
+- alpha21 source invariants;
+- alpha21 audit;
+- core tests;
+- Android Gradle build;
+- persistent signer verification;
+- source packaging;
+- artifact upload.
+
+Independent downloaded-artifact verification:
+- APK SHA-256: d80340c44e396fcc551a301b46970df0a60866b48a6a3c6a149af1414539725f
+- source ZIP SHA-256: 48b975a6f7f3c8ea08bdc3327c0d49f40b784d5caa54fb0221269c00c978f84b
+- signer file SHA-256: 2c3e07a2474567ca66c91af647fb06010e04a82b2b96aa1f534b17eb8feb1854
+- SHA file SHA-256: 3b415438a64b111a46c47812c4159fe7f418daf5e63d869943d92cd9a3cfb049
+- APK ZIP integrity: PASS
+- source ZIP integrity: PASS
+- packaged app/build.gradle confirms ru.printcheck.android / 340021 / 3.4.0-alpha21
+- private *.p12 is absent from packaged source ZIP
+- ArtworkDiffLogic.java present
+- RegistrationLogic.java present
+- signer DN: CN=PrintCheck Alpha Test, OU=Development, O=PrintCheck, L=Test, ST=Test, C=RU
+- signer SHA-256: 82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Update compatibility:
+- alpha21 uses the exact same persistent non-production alpha signer as alpha20;
+- versionCode increased from 340020 to 340021;
+- applicationId remains unchanged;
+- therefore Android should install alpha21 directly over persistent-signed alpha20 without uninstalling and preserve app data.
+
+Real-world validation still required:
+- rerun control order 7920509;
+- inspect the new isolated “Найденное нанесение” evidence for every position;
+- export diagnostics and compare alpha20/alpha21 field registration and artwork masks.
