@@ -1,4 +1,4 @@
-final_alpha21_trigger=1
+final_alpha21_trigger=2
 purpose=artwork-detection-plus-fullscreen
 expected_version_code=340021
 expected_application_id=ru.printcheck.android
