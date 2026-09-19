@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha21 (build in progress)
+Current implementation line: Android 3.4.0-alpha21
 Current development/build branch: printcheck-build-3.4.0-alpha21
 
 ## STRICT CONTINUITY RULE
@@ -488,3 +488,35 @@ Limitations:
 - scaled-registration small-element morphology is temporarily manual until scale-aware;
 - CDR parsing not implemented;
 - real-order improvement must be verified with new diagnostics rather than inferred from unit tests.
+
+
+## ALPHA21 CANONICAL SUCCESSFUL BUILD CHECKPOINT
+
+- versionName: 3.4.0-alpha21
+- versionCode: 340021
+- applicationId: ru.printcheck.android
+- source commit: 0ea3f268bdf965b9fb299b9ad875e7f58a35c352
+- GitHub Actions run: 35459832052
+- artifact ID: 10589092459
+- artifact name: PrintCheck_Android_3.4.0-alpha21_FINAL2_BUILD
+- artifact digest: sha256:c012abcb19c6e77ca73f1f6e8a299dc02d82fc84bf22ccf4302bd03a958f0290
+- APK SHA-256: d80340c44e396fcc551a301b46970df0a60866b48a6a3c6a149af1414539725f
+- source ZIP SHA-256: 48b975a6f7f3c8ea08bdc3327c0d49f40b784d5caa54fb0221269c00c978f84b
+- persistent signer SHA-256:
+  82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Alpha21 is update-compatible with the persistent-signed alpha20 baseline.
+
+Key alpha21 behavior:
+- local field-centered registration refinement;
+- background-aware selected-template subtraction;
+- dominant solid customer artwork retained;
+- deleted template content excluded from artwork;
+- safe uniform-scale+translation field-anchor recovery;
+- non-uniform scaling remains forbidden;
+- separate artwork_file evidence;
+- larger result previews;
+- immersive fullscreen evidence viewer with pinch, pan, double tap and up to 8× zoom.
+
+Next required real fixture:
+order 7920509 with saved diagnostics, comparing isolated artwork evidence position by position.
