@@ -588,3 +588,82 @@ Real-world validation still required:
 - rerun control order 7920509;
 - inspect the new isolated “Найденное нанесение” evidence for every position;
 - export diagnostics and compare alpha20/alpha21 field registration and artwork masks.
+
+
+---
+
+## 2026-09-19 — alpha22: high-resolution ROI artwork detection
+
+Trigger:
+User reported that preview/result images are too low resolution and suspected this also causes artwork-detection errors. User uploaded:
+- PrintCheck_diagnostics_7920509_3.4.0-alpha21.zip
+
+Diagnostic findings from alpha21, order 7920509:
+- article 15637: coarse geometry DPI 100; field about 127×127 px (32.26×32.26 mm).
+- article 17488.30: 90 dpi; field about 143×54 px (40.36×15.24 mm).
+- article 19727.02: 100 dpi; field about 143×64 px (36.33×16.26 mm).
+- article 30114.30: 79 dpi; field about 156×172 px (50.16×55.30 mm).
+- article 15423.10: 69 dpi; field about 550×267 px (202.46×98.29 mm).
+- article 17893.30: 65 dpi; field about 321×474 px (125.44×185.23 mm).
+- article 25900.61: no geometry object was produced at all; its failure is not explained by DPI alone and remains a separate mapping/alignment issue.
+
+Root cause:
+- RasterPdfIndexer.commonDpi intentionally capped global page rendering near 2200 px on the longest page dimension.
+- GeometryAnalyzer then reused that same 65–100 dpi raster for the primary layout-minus-template artwork segmentation.
+- Small-element analysis later rerendered crops at much higher DPI, so alpha21 could be inspecting fine detail after the primary artwork region had already been selected from a coarse mask.
+- At 65–100 dpi, 0.2–0.3 mm lines are around 0.5–1.2 pixels wide, so anti-aliasing/registration error can dominate the signal.
+
+Alpha22 architecture:
+1. Keep low-cost global page matching at adaptive coarse DPI for page/constructor discovery.
+2. Once a real selected colour field is known, render only that field plus ~5 mm margin from layout and selected reference PDF.
+3. High-resolution artwork ROI target: up to 900 dpi.
+4. Minimum target: 300 dpi when it fits the memory budget.
+5. Per-ROI pixel budget: 8,000,000 pixels per bitmap; DPI is reduced adaptively for physically large fields rather than rendering the entire PDF page at huge resolution.
+6. Re-run local registration inside the high-resolution ROI.
+7. Run background-aware template subtraction on the high-resolution ROI.
+8. Project the final high-res mask back into coarse page coordinates only for legacy overlay/font-scope integration.
+9. Physical artwork width/height/position are measured from the high-resolution mask, not the coarse projection.
+10. Isolated artwork evidence image is generated directly from the high-resolution ROI.
+11. Evidence saving no longer upscales a low-resolution source; maximum output edge is 3200 px, but source detail is preserved rather than invented.
+12. result.json now exposes:
+   - coarse_geometry_dpi
+   - artwork_analysis_dpi
+   - artwork_analysis_mode
+   - artwork_analysis_target_dpi
+   - artwork_analysis_roi_width_px / height_px
+   - artwork_highres_pixels/raw_pixels/components
+   - high-res local-registration score/offset
+   - artwork.measurement_dpi
+
+Why not render all pages at 600–900 dpi:
+- several constructor/application pages are physically very large;
+- whole-page rendering at that resolution can exceed tens or hundreds of megapixels and cause Android OOM;
+- ROI rendering gives high physical detail where it matters without sacrificing phone stability.
+
+Local verification before Git CI:
+- CoreTests: 63/63 passed.
+- alpha22 audit: 17/17 passed.
+- Added pure-Java AnalysisResolutionLogic tests:
+  * small field rises close to 900 dpi;
+  * large field remains within 8M-pixel budget and stays >=300 dpi when feasible;
+  * chosen analysis DPI never drops below coarse DPI.
+
+Reproducibility:
+- alpha21 -> alpha22 patch bytes: 39762
+- patch SHA-256: abdaa0f05855ab76730e0ba34a461b59845da84f4fbbf0d8552bd0f090eeb687
+- gzip/base64 transport length: 15680
+- transport SHA-256: c4c7dd906543b3ab9a37b71dd5f8790f572d1c4f21f3c96b6b27a5297eb945a6
+- chunks: pc340a22.b64.part00..part02
+- generator: printcheck-build/prepare_alpha22.py
+
+Version/update contract:
+- versionName 3.4.0-alpha22
+- versionCode 340022
+- applicationId ru.printcheck.android
+- persistent alpha signer from alpha20/alpha21 must remain unchanged.
+
+Required validation after build:
+- rerun order 7920509;
+- verify artwork_analysis_dpi is substantially higher than coarse_geometry_dpi;
+- compare “Найденное нанесение” against alpha21 for every article;
+- investigate 25900.61 separately if it still has no geometry.
