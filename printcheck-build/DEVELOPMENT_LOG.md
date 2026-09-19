@@ -149,3 +149,53 @@ Next gate:
 - obtain a successful Android CI compile/build from a commit containing the repaired transport generator;
 - collect APK/source/hash artifact;
 - then validate real order 7966463 and save diagnostics.
+
+
+---
+
+## 2026-09-19 — alpha19 final successful build checkpoint
+
+First fully successful alpha19 Android build:
+- source commit: 4ff838665155d50ea7767bf1ad0b20ffe7ed6a9b
+- Actions run: 35452353767
+- result: success
+- all prepare/invariant/audit/core/Gradle/package/hash/upload steps passed.
+
+CI maintenance performed after that success:
+- alpha19 workflow was changed so documentation-only updates to PRINTCHECK_HANDOFF.md, DEVELOPMENT_LOG.md and ALPHA19_MANIFEST.txt do not trigger Android rebuilds;
+- purpose: mandatory detailed logging must not create build races or waste rebuilds.
+
+Final authoritative alpha19 build after the workflow cleanup:
+- source commit: 1b4d84a0194e48870da8772e51444571817e52b0
+- Actions run: 35452512452
+- status: success
+- artifact name: PrintCheck_Android_3.4.0-alpha19_BUILD
+- artifact ID: 10587615583
+- GitHub artifact digest: sha256:6103b1ea801e4564d69635366b923eaa8f62e0c3ec9080f93274c724e5a38fd3
+- artifact expiry reported by GitHub: 2026-09-26T15:41:23Z
+- APK SHA-256: 4a8b71597045897d3b4bbe612580222c44c9db19ad30818a245508e74c932caf
+- source ZIP SHA-256: d134a776d8b9b165728705b0ea1fe3f05c82f46af942001cbce001552487199f
+- SHA file independent SHA-256: 9507b81c91d8c40265e5910c139472eb08aa6fb7d7e0e47456e5b2676717562d
+
+Independent artifact verification after download:
+- APK unzip integrity check: no errors;
+- APK hash independently recomputed and matched CI;
+- source ZIP hash independently recomputed and matched CI;
+- source ZIP contains versionCode 340019 / versionName 3.4.0-alpha19;
+- source ZIP contains ConstructorVectorInspector and ConstructorFieldLogic;
+- source ZIP does not contain ApplicationFieldMapper;
+- source ZIP exposes MIN_COLOR_HIGHLIGHT_SCORE, preserved-colored-field, field_highlight_rgb and “Цветное поле шаблона”;
+- audit_alpha19.py from the packaged source: 15/15 passed;
+- packaged-source core tests: 52/52 passed.
+
+Authoritative current limitations:
+- CDR is preserved but saved_not_parsed;
+- general uniform-scale/rotation registration is not implemented; current registration is still mainly translation/same-scale plus colored-field translation anchor;
+- effects/gradients/transparency still need spatial scoping strictly to isolated customer artwork;
+- real fixture validation of selected application/place → intended colored field is still required.
+
+Next development action:
+- run alpha19 on control order 7966463;
+- save/export diagnostics;
+- inspect selected colored field, alignment and residual artwork for every position;
+- correct real failures without synthetic geometry fallback.
