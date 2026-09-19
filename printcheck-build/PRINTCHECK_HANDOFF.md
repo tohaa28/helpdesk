@@ -2,8 +2,8 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha24
-Current development/build branch: printcheck-build-3.4.0-alpha24
+Current implementation line: Android 3.4.0-alpha25 (build in progress)
+Current development/build branch: printcheck-build-3.4.0-alpha25
 
 ## STRICT CONTINUITY RULE
 
@@ -689,3 +689,60 @@ Automatic small-element markings are forbidden when:
 
 UI:
 compact 70x30dp top-right authentication button; text reflects session state as Вход/Выход.
+
+
+## ALPHA25 — SAME-COLOR TECHNICAL MORPHOLOGY CONTRACT
+
+Authoritative user rule:
+- positive technical element = object/letter/stroke of ONE color;
+- negative technical element = gap/reversal between or inside geometry of that SAME color;
+- cross-color distance is never a negative element.
+
+Required processing order:
+real selected field
+-> reference ruler
+-> calibrated artwork physical size
+-> visible color separation
+-> per-color positive / negative / single-object analysis.
+
+Do NOT restore a combined black/white binary artwork mask as the technical small-element model.
+
+Per-color analysis requirements:
+- split only the already-isolated customer artwork;
+- process every stable visible color independently;
+- anti-alias shades should remain with their parent flat color where possible;
+- positive check measures physical object/stroke thickness for that color;
+- negative check includes enclosed counters/reversals and too-small gaps only between disconnected components of that same color;
+- minSingleElementMm checks isolated objects/letters per color independently;
+- distances between different color layers are ignored for the negative rule.
+
+Diagnostics must retain:
+- color_analysis_mode
+- color_layer_count
+- color_layers[]
+- cross_color_negative_gaps_ignored=true
+- layer id/color on issue examples.
+
+Continuous-tone safety:
+- if no stable color layers are found, or >8 stable visible layers are needed, technical small-element automation becomes MANUAL;
+- never produce hundreds of pseudo-color warnings by quantizing a photograph/gradient.
+
+Important limitation:
+ArtworkColorLayerLogic is rendered-visible-RGB separation, not native PDF CMYK/Pantone/spot parsing.
+Future higher-fidelity color semantics should come from PDF object/color-space parsing, especially for White ink or spot colors invisible/ambiguous after rasterization.
+
+Retained alpha24/alpha23 contracts:
+- reference ruler calibration first;
+- ruler mismatch/anisotropy blocks morphology;
+- unconfirmed constructor fallback cannot create automatic small-element issues;
+- 720dpi/4M high-res performance architecture;
+- top-right Вход/Выход auth UI;
+- persistent signer/update compatibility.
+
+Version:
+- alpha25 versionCode 340025;
+- applicationId ru.printcheck.android;
+- same persistent NON-PRODUCTION alpha signer required.
+
+Separate unresolved fixture:
+- 25900.61 geometry/mapping remains separate from color morphology.
