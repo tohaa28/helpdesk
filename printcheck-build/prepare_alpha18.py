@@ -33,6 +33,20 @@ rejects = list(src18.rglob('*.rej'))
 if rejects:
     raise RuntimeError('alpha18 rejects: ' + ', '.join(map(str, rejects)))
 
+# Compile-time repair: keep the already-computed constructor coverage and use a distinct
+# local for the constructor-integrity checklist. This is applied to the generated source
+# so the packaged source and compiled APK are identical.
+main_path = src18 / 'app/src/main/java/ru/printcheck/android/MainActivity.java'
+main_src = main_path.read_text(encoding='utf-8')
+old_ctor = 'int ctorCandidates=best==null?0:best.optInt("candidate_count",0);double ctorCov=best==null?0:best.optDouble("best_coverage",0);checks.put(check("constructor_integrity",ctorCandidates>0&&ctorCov>=0.55?"ok":"manual",ctorCandidates>0&&ctorCov>=0.55?'
+new_ctor = 'int ctorCandidates=best==null?0:best.optInt("candidate_count",0);double ctorIntegrityCov=best==null?0:best.optDouble("best_coverage",0);checks.put(check("constructor_integrity",ctorCandidates>0&&ctorIntegrityCov>=0.55?"ok":"manual",ctorCandidates>0&&ctorIntegrityCov>=0.55?'
+if old_ctor not in main_src:
+    raise RuntimeError('alpha18 ctorCov compile repair target missing')
+main_src = main_src.replace(old_ctor, new_ctor, 1)
+needle = 'String.format(Locale.ROOT,"Совмещение макета с полным конструктором %.1f%%. Это геометрическая основа поиска реального поля; выбранное нанесение заказа используется для проверки правильности выбора.",ctorCov*100)'
+main_src = main_src.replace(needle, needle.replace('ctorCov*100', 'ctorIntegrityCov*100'), 1)
+main_path.write_text(main_src, encoding='utf-8')
+
 # Hard source invariants before running tests/build.
 gradle = (src18 / 'app/build.gradle').read_text(encoding='utf-8')
 main = (src18 / 'app/src/main/java/ru/printcheck/android/MainActivity.java').read_text(encoding='utf-8')
@@ -53,7 +67,7 @@ checks = {
     'no mapped geometry': 'analyzeMappedField' not in geo and 'mapped_from_selected_application' not in geo,
     'constructor geometry': 'analyzeConstructorField' in geo and 'constructor-vector-subtraction-v1' in geo,
     'manual fallback': 'field_source\",\"manual' in main and 'синтетическая рамка запрещена' in main.lower(),
-    'cdr relation': 'constructorSources' in http and 'saved_not_parsed' in http,
+    'cdr relation': 'constructorSources' in http and 'saved_not_parsed' in http,\n    'no duplicate ctor coverage local': 'double ctorIntegrityCov=' in main and 'double ctorCov=best==null?0:best.optDouble(\"best_coverage\",0)' not in main,
 }
 failed = [k for k, v in checks.items() if not v]
 for k, v in checks.items():
