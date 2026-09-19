@@ -12,9 +12,16 @@ if src14.exists():
     shutil.rmtree(src14)
 shutil.copytree(src13, src14)
 
-parts = sorted(pb.glob('pc340a14.chunk*'))
-if len(parts) != 10:
-    raise RuntimeError(f'alpha14 patch chunks: expected 10, got {len(parts)}')
+part_names = [
+    'pc340a14.chunk00', 'pc340a14.chunk01', 'pc340a14.chunk02', 'pc340a14.chunk03',
+    'pc340a14.chunk04a', 'pc340a14.chunk04b',
+    'pc340a14.chunk04c0', 'pc340a14.chunk04c1', 'pc340a14.chunk04c2', 'pc340a14.chunk04c3',
+    'pc340a14.chunk05', 'pc340a14.chunk06', 'pc340a14.chunk07', 'pc340a14.chunk08', 'pc340a14.chunk09',
+]
+parts = [pb / name for name in part_names]
+missing = [p.name for p in parts if not p.is_file()]
+if missing:
+    raise RuntimeError('alpha14 patch chunks missing: ' + ', '.join(missing))
 encoded = b''.join(p.read_bytes().replace(b'\n', b'').replace(b'\r', b'') for p in parts)
 if len(encoded) != 28704:
     raise RuntimeError(f'alpha14 base64 length mismatch: {len(encoded)}')
