@@ -1313,3 +1313,51 @@ Repair:
   * per-color API parameter minSingleMm exists.
 - application source patch, morphology logic and tests were not changed by this repair.
 - repair commit: e92e787c6707cede222fe006363ff9a3491a7b4e.
+
+
+### Alpha25 successful final signed Android build
+
+Canonical build:
+- versionName: 3.4.0-alpha25
+- versionCode: 340025
+- applicationId: ru.printcheck.android
+- source commit: 9a75468eb2e0831eeba2b45331771909f5213e49
+- GitHub Actions run: 35468997685
+- job: 105966410774
+- status: success
+- artifact: PrintCheck_Android_3.4.0-alpha25_FINAL_BUILD
+- artifact ID: 10592755504
+- artifact digest: sha256:d314f5b702dce34dfe9fc124afc934091b29c89620bc4f773e9d7960b8c247c5
+- artifact expires: 2026-09-26T20:59:51Z
+
+CI gates:
+- prepare_alpha25: PASS
+- source invariants: PASS
+- alpha25 audit: 23/23 PASS
+- core tests: 76/76 PASS
+- Android Gradle build: PASS
+- persistent signer verification: PASS
+- artifact upload: PASS
+
+Independent downloaded-artifact verification:
+- APK SHA-256: 5eb7ad9dcfa31e4aa6489da388c01accd281e21a8eb676241c3b6f4db731288f
+- source ZIP SHA-256: 9c8950512caa8c39e8c9e0564da8fc763e7837ca0b119de4de7a89a630beec28
+- SHA file SHA-256: 287991d348d5e6e7b46851ed6503c5102913c51e994d2789ae965ace1312b544
+- signer TXT SHA-256: 2c3e07a2474567ca66c91af647fb06010e04a82b2b96aa1f534b17eb8feb1854
+- APK ZIP integrity: PASS
+- source ZIP integrity: PASS
+- packaged build.gradle confirms ru.printcheck.android / 340025 / 3.4.0-alpha25
+- packaged source contains no private .p12
+- signer SHA-256: 82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Update compatibility:
+alpha25 retains the exact persistent alpha20-alpha24 signer and applicationId, with versionCode incremented to 340025, so it should install directly over alpha24 without uninstalling or losing app data.
+
+Real-device acceptance:
+- rerun order 7920509;
+- inspect color_layers for every position;
+- confirm cross-color boundaries no longer become negative violations;
+- confirm same-color narrow gaps/counters still do;
+- inspect 30114.30 specifically because alpha24 produced hundreds of binary-mask false positives;
+- if continuous-tone artwork produces >8 stable layers, expected behavior is manual small-element check rather than pseudo-color circles;
+- export alpha25 diagnostics for comparison.
