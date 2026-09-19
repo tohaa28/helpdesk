@@ -667,3 +667,53 @@ Required validation after build:
 - verify artwork_analysis_dpi is substantially higher than coarse_geometry_dpi;
 - compare “Найденное нанесение” against alpha21 for every article;
 - investigate 25900.61 separately if it still has no geometry.
+
+
+### Alpha22 successful final signed Android build
+
+Canonical successful build:
+- versionName: 3.4.0-alpha22
+- versionCode: 340022
+- applicationId: ru.printcheck.android
+- source commit: f5c7ca5ae083d85731c8d16e3e941c2d316a50d2
+- GitHub Actions run: 35461116755
+- job: 105945044808
+- status: success
+- artifact name: PrintCheck_Android_3.4.0-alpha22_FINAL_BUILD
+- artifact ID: 10589449659
+- artifact digest: sha256:c57cdaedfae59dc19709e78d1a01ebc4a2e522a9a48ba1d433deb399635f4f59
+- artifact expires: 2026-09-26T18:26:37Z
+
+All gates passed:
+- canonical alpha22 source generation;
+- alpha22 source invariants;
+- alpha22 audit 17/17;
+- core tests 63/63;
+- Android Gradle build;
+- persistent signer verification;
+- source packaging;
+- artifact upload.
+
+Downloaded artifact verification:
+- APK SHA-256: 2dfee546036afc18dd88ddd386f93f5693a11116f3ee9d3266fc206574c855af
+- source ZIP SHA-256: b514fd73df4c4e9893125b105ab1a19c5dfded1b0f299d8d1feca93df68aa5f0
+- signer TXT SHA-256: 2c3e07a2474567ca66c91af647fb06010e04a82b2b96aa1f534b17eb8feb1854
+- SHA file SHA-256: 016e0abd73e69ae4c602b916a5525aef5da63d81ff5c247674b1b0993c198e9b
+- signer SHA-256: 82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+- packaged app/build.gradle confirms ru.printcheck.android / 340022 / 3.4.0-alpha22.
+
+Update compatibility:
+alpha22 is signed by the exact same persistent test certificate as alpha20 and alpha21 and should install directly over alpha21 without removing the app.
+
+Primary real-world acceptance test:
+rerun order 7920509 and confirm result.json reports highres-roi-v1 with artwork_analysis_dpi around:
+- 15637: up to 900 dpi
+- 17488.30: up to 900 dpi
+- 19727.02: up to 900 dpi
+- 30114.30: up to 900 dpi
+- 15423.10: about 500 dpi under current ROI budget
+- 17893.30: about 470 dpi under current ROI budget
+Actual values depend on the final ROI/margins and clipping.
+
+Separate unresolved case:
+25900.61 had no geometry in alpha21; if it remains missing in alpha22, treat as a mapping/alignment issue rather than a resolution issue.
