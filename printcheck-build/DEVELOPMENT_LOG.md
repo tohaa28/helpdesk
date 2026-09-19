@@ -99,3 +99,53 @@ Initial engineering plan:
    - template text/graphics outside artwork do not become artwork errors.
 6. Update version to 3.4.0-alpha19 everywhere.
 7. Build in CI, collect APK/source/hashes, record exact results here.
+
+
+---
+
+## 2026-09-19 — alpha19 implementation batch: colored-field primary geometry
+
+Implemented locally and encoded into the reproducible alpha18→alpha19 patch:
+- app version changed to versionCode 340019 / versionName 3.4.0-alpha19;
+- ConstructorFieldLogic now requires real color evidence for automatic field selection;
+- uncolored rectangles cannot auto-select only because dimensions/residual fit;
+- generic chromatic highlighting is supported, not only red;
+- field diagnostics expose highlight RGB, role and color score;
+- ConstructorVectorInspector can inspect all PDF pages for colored-field anchors;
+- MainActivity adds preserved-colored-field registration fallback;
+- a mostly deleted customer-retained template is valid when the selected colored field remains and provides a reliable anchor;
+- old whole-template 55% retained-coverage success threshold removed as a blocking rule;
+- deleted constructor/template content is diagnostic-only, not an artwork or confidence penalty;
+- GeometryAnalyzer keeps asymmetric artwork extraction: customer layout minus constructor/template;
+- designer-facing label changed to “Цветное поле шаблона”;
+- CDR preservation retained but CDR parsing is still not implemented;
+- alpha7 positive/negative small-element morphology retained.
+
+Tests:
+- core tests: 52/52 passed;
+- alpha19 source audit: 15/15 passed;
+- patch reapplied successfully to a fresh exact alpha18 source tree and both test sets passed again.
+
+Reproducibility:
+- decoded alpha19 patch length: 92255 bytes;
+- decoded patch SHA-256: cfd6f131a1a91a081c614209313f52d09b41ca8757a838d14467241fd76e9b34;
+- base64 transport length: 28556;
+- base64 transport SHA-256: f97340de8e07b76c68965b011b45b42fedfb26698d046c49792eaa98c1305439;
+- generator: printcheck-build/prepare_alpha19.py;
+- manifest: printcheck-build/ALPHA19_MANIFEST.txt.
+
+CI history:
+- run 35452196424 at source 83e05f4107ebe8f637ed694faf3dfe00843f37f6 failed before source generation because the original 6000-character part03 was stored as 5999 characters in Git;
+- failure was correctly caught by the transport-length invariant before any patch/build step;
+- repair strategy: keep the damaged part03 only as historical evidence, create exact part03a + part03b at 3000 characters each, and make prepare_alpha19.py use those instead;
+- second recorded failure run 35452229659 used source 14b8bc4460d0149ffc08501b5afad5c68b7c3579, which predates the transport repair and is therefore not a valid post-fix build result.
+
+Known limitations after this batch:
+- CDR is saved_not_parsed;
+- general uniform-scale/rotation registration is still not implemented;
+- effects/gradients/transparency still need stricter spatial scoping to isolated artwork; live-font scoping is already artwork-specific.
+
+Next gate:
+- obtain a successful Android CI compile/build from a commit containing the repaired transport generator;
+- collect APK/source/hash artifact;
+- then validate real order 7966463 and save diagnostics.
