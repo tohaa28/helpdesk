@@ -1,4 +1,4 @@
-name: Build PrintCheck 3.4.0-alpha13 APK
+name: Build PrintCheck 3.4.0-alpha14 APK
 on: [workflow_dispatch, push]
 
 jobs:
@@ -23,37 +23,41 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
-      - name: Prepare canonical alpha13 source
-        run: python3 printcheck-build/prepare_alpha13.py .
-      - name: Verify alpha13
+      - name: Prepare canonical alpha14 source
+        run: python3 printcheck-build/prepare_alpha14.py .
+      - name: Verify alpha14 invariants
         shell: bash
         run: |
-          grep -q "versionName '3.4.0-alpha13'" .printcheck-alpha13/app/build.gradle
-          grep -q "versionCode 340013" .printcheck-alpha13/app/build.gradle
-          grep -q "compact_controls_v1" .printcheck-alpha13/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q "Сохранить диагностику" .printcheck-alpha13/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q "PrintCheck_diagnostics_" .printcheck-alpha13/app/src/main/java/ru/printcheck/android/MainActivity.java
-          ! grep -q "Проверить вход" .printcheck-alpha13/app/src/main/java/ru/printcheck/android/MainActivity.java
-          ! grep -q "Сохранить ZIP" .printcheck-alpha13/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "versionName '3.4.0-alpha14'" .printcheck-alpha14/app/build.gradle
+          grep -q "versionCode 340014" .printcheck-alpha14/app/build.gradle
+          grep -q "no_skipped_checks_v1" .printcheck-alpha14/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "small_element_proof_v2" .printcheck-alpha14/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "ensureCoreChecklist" .printcheck-alpha14/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "Открыть PDF-отчёт заказа" .printcheck-alpha14/app/src/main/java/ru/printcheck/android/ResultView.java
+          grep -q "PDF позиции" .printcheck-alpha14/app/src/main/java/ru/printcheck/android/ResultView.java
+          grep -q "Мелкие элементы" .printcheck-alpha14/app/src/main/java/ru/printcheck/android/ResultView.java
+          test -f .printcheck-alpha14/app/src/main/java/ru/printcheck/android/ReportProvider.java
+      - name: Alpha14 regression audit
+        run: python3 .printcheck-alpha14/tests/audit_alpha14.py
       - name: Core tests
-        run: bash .printcheck-alpha13/tests/run_core.sh
+        run: bash .printcheck-alpha14/tests/run_core.sh
       - name: Build APK
         run: gradle --no-daemon --stacktrace assembleDebug
       - name: Package source
         shell: bash
         run: |
-          cd .printcheck-alpha13
-          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha13_source.zip" . -x '*/build/*' '*.keystore'
+          cd .printcheck-alpha14
+          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha14_source.zip" . -x '*/build/*' '*.keystore'
       - name: Collect APK
         shell: bash
         run: |
-          cp .printcheck-alpha13/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha13.apk
-          sha256sum PrintCheck_Android_3.4.0-alpha13.apk
+          cp .printcheck-alpha14/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha14.apk
+          sha256sum PrintCheck_Android_3.4.0-alpha14.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.4.0-alpha13_BUILD
+          name: PrintCheck_Android_3.4.0-alpha14_BUILD
           path: |
-            PrintCheck_Android_3.4.0-alpha13.apk
-            PrintCheck_Android_3.4.0-alpha13_source.zip
+            PrintCheck_Android_3.4.0-alpha14.apk
+            PrintCheck_Android_3.4.0-alpha14_source.zip
           if-no-files-found: error
           retention-days: 7
