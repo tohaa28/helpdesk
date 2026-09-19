@@ -1027,3 +1027,49 @@ Next gates:
 - exact persistent signer verification;
 - artifact integrity/hash verification;
 - rerun 7920509 and inspect ruler/size first, then small-element circles.
+
+
+### Alpha24 successful final signed Android build
+
+Canonical build:
+- versionName: 3.4.0-alpha24
+- versionCode: 340024
+- applicationId: ru.printcheck.android
+- source commit: 5df005250ff34beea815d059da163495ccb834f4
+- GitHub Actions run: 35466938823
+- job: 105960898373
+- status: success
+- artifact: PrintCheck_Android_3.4.0-alpha24_FINAL_BUILD
+- artifact ID: 10590694977
+- artifact digest: sha256:6f56d639c82caff34654e9bc5b1254fe546c63d13fc974d9e7b44669705f36b6
+- artifact expires: 2026-09-26T20:18:48Z
+
+CI gates:
+- prepare_alpha24: PASS
+- source invariants: PASS
+- alpha24 audit: 23/23 PASS
+- core tests: 70/70 PASS
+- Android Gradle build: PASS
+- persistent signer verification: PASS
+- artifact upload: PASS
+
+Independent downloaded-artifact verification:
+- APK SHA-256: a6de421a100a7ee677a3f58066d9890104da7ea91214bc5eac2662556e103ea7
+- source ZIP SHA-256: 3ae49bfbac57e2b20edfea4c9ae6ecc2d61e1a95239478a806a3e8f7bc872cf4
+- SHA file SHA-256: 06a5ea3584536925d86d86ae66874faf421426f59e835341311fb55c1f219c14
+- signer TXT SHA-256: 2c3e07a2474567ca66c91af647fb06010e04a82b2b96aa1f534b17eb8feb1854
+- APK ZIP integrity: PASS
+- source ZIP integrity: PASS
+- packaged build.gradle confirms ru.printcheck.android / 340024 / 3.4.0-alpha24
+- packaged source contains no private .p12
+- signer SHA-256: 82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Update compatibility:
+alpha24 retains the exact persistent alpha20-alpha23 signer and applicationId, with versionCode incremented to 340024, so it should install directly over alpha23 without uninstalling or losing app data.
+
+Real-device acceptance test:
+- rerun order 7920509;
+- first inspect reference_ruler calibration and measured artwork size;
+- only after a valid ruler should small-element circles appear;
+- verify 15423.10 no longer produces automatic constructor-service-graphic circles when selected-application reference is not authoritative;
+- verify whether 25900.61 still has no geometry; if yes, continue separate mapping/alignment investigation.
