@@ -12,8 +12,16 @@ if src17.exists():
     shutil.rmtree(src17)
 shutil.copytree(src16, src17)
 
-patch_gz = pb / 'pc340a17.patch.gz'
-raw = patch_gz.read_bytes()
+part_names = [f'pc340a17.b64.part{i:02d}' for i in range(9)]
+parts = [pb / name for name in part_names]
+missing = [p.name for p in parts if not p.is_file()]
+if missing:
+    raise RuntimeError('alpha17 base64 parts missing: ' + ', '.join(missing))
+encoded = b''.join(p.read_bytes().replace(b'\\n', b'').replace(b'\\r', b'') for p in parts)
+if len(encoded) != 22460:
+    raise RuntimeError(f'alpha17 base64 length mismatch: {len(encoded)}')
+import base64
+raw = base64.b64decode(encoded, validate=True)
 digest = hashlib.sha256(raw).hexdigest()
 expected = '3a56ae97e3dff170fa85a494562f4b6b66d2ad66a89fd80224528a702a8a4871'
 if digest != expected:
