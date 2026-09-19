@@ -1,4 +1,4 @@
-name: Build PrintCheck 3.4.0-alpha14 APK
+name: Build PrintCheck 3.4.0-alpha15 APK
 on: [workflow_dispatch, push]
 
 jobs:
@@ -23,41 +23,38 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
-      - name: Prepare canonical alpha14 source
-        run: python3 printcheck-build/prepare_alpha14.py .
-      - name: Verify alpha14 invariants
+      - name: Prepare canonical alpha15 source
+        run: python3 printcheck-build/prepare_alpha15.py .
+      - name: Verify alpha15 invariants
         shell: bash
         run: |
-          grep -q "versionName '3.4.0-alpha14'" .printcheck-alpha14/app/build.gradle
-          grep -q "versionCode 340014" .printcheck-alpha14/app/build.gradle
-          grep -q "no_skipped_checks_v1" .printcheck-alpha14/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q "small_element_proof_v2" .printcheck-alpha14/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q "ensureCoreChecklist" .printcheck-alpha14/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q "Открыть PDF-отчёт заказа" .printcheck-alpha14/app/src/main/java/ru/printcheck/android/ResultView.java
-          grep -q "PDF позиции" .printcheck-alpha14/app/src/main/java/ru/printcheck/android/ResultView.java
-          grep -q "Мелкие элементы" .printcheck-alpha14/app/src/main/java/ru/printcheck/android/ResultView.java
-          test -f .printcheck-alpha14/app/src/main/java/ru/printcheck/android/ReportProvider.java
-      - name: Alpha14 regression audit
-        run: python3 .printcheck-alpha14/tests/audit_alpha14.py
+          grep -q "versionName '3.4.0-alpha15'" .printcheck-alpha15/app/build.gradle
+          grep -q "versionCode 340015" .printcheck-alpha15/app/build.gradle
+          grep -q "alpha7_application_geometry_v1" .printcheck-alpha15/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'geometry_reference_type","application' .printcheck-alpha15/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "Геометрия по общему конструктору запрещена" .printcheck-alpha15/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "suppressProductionBoundary(hi,target)" .printcheck-alpha15/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+      - name: Alpha15 regression audit
+        run: python3 .printcheck-alpha15/tests/audit_alpha15.py
       - name: Core tests
-        run: bash .printcheck-alpha14/tests/run_core.sh
+        run: bash .printcheck-alpha15/tests/run_core.sh
       - name: Build APK
         run: gradle --no-daemon --stacktrace assembleDebug
       - name: Package source
         shell: bash
         run: |
-          cd .printcheck-alpha14
-          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha14_source.zip" . -x '*/build/*' '*.keystore'
+          cd .printcheck-alpha15
+          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha15_source.zip" . -x '*/build/*' '*.keystore'
       - name: Collect APK
         shell: bash
         run: |
-          cp .printcheck-alpha14/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha14.apk
-          sha256sum PrintCheck_Android_3.4.0-alpha14.apk
+          cp .printcheck-alpha15/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha15.apk
+          sha256sum PrintCheck_Android_3.4.0-alpha15.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.4.0-alpha14_BUILD
+          name: PrintCheck_Android_3.4.0-alpha15_BUILD
           path: |
-            PrintCheck_Android_3.4.0-alpha14.apk
-            PrintCheck_Android_3.4.0-alpha14_source.zip
+            PrintCheck_Android_3.4.0-alpha15.apk
+            PrintCheck_Android_3.4.0-alpha15_source.zip
           if-no-files-found: error
           retention-days: 7
