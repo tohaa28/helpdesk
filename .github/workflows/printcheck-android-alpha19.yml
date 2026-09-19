@@ -6,6 +6,9 @@ on:
       - printcheck-build-3.4.0-alpha19
     paths-ignore:
       - '.ci/alpha19-result.txt'
+      - 'printcheck-build/PRINTCHECK_HANDOFF.md'
+      - 'printcheck-build/DEVELOPMENT_LOG.md'
+      - 'printcheck-build/ALPHA19_MANIFEST.txt'
   workflow_dispatch:
 
 permissions:
