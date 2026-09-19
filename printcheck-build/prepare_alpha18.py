@@ -67,7 +67,8 @@ checks = {
     'no mapped geometry': 'analyzeMappedField' not in geo and 'mapped_from_selected_application' not in geo,
     'constructor geometry': 'analyzeConstructorField' in geo and 'constructor-vector-subtraction-v1' in geo,
     'manual fallback': 'field_source\",\"manual' in main and 'синтетическая рамка запрещена' in main.lower(),
-    'cdr relation': 'constructorSources' in http and 'saved_not_parsed' in http,\n    'no duplicate ctor coverage local': 'double ctorIntegrityCov=' in main and 'double ctorCov=best==null?0:best.optDouble(\"best_coverage\",0)' not in main,
+    'cdr relation': 'constructorSources' in http and 'saved_not_parsed' in http,
+    'no duplicate ctor coverage local': 'double ctorIntegrityCov=' in main and 'double ctorCov=best==null?0:best.optDouble(\"best_coverage\",0)' not in main,
 }
 failed = [k for k, v in checks.items() if not v]
 for k, v in checks.items():
