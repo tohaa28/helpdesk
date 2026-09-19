@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha25 (build in progress)
+Current implementation line: Android 3.4.0-alpha25
 Current development/build branch: printcheck-build-3.4.0-alpha25
 
 ## STRICT CONTINUITY RULE
@@ -746,3 +746,31 @@ Version:
 
 Separate unresolved fixture:
 - 25900.61 geometry/mapping remains separate from color morphology.
+
+
+## ALPHA25 CANONICAL SUCCESSFUL BUILD CHECKPOINT
+
+- versionName: 3.4.0-alpha25
+- versionCode: 340025
+- applicationId: ru.printcheck.android
+- source commit: 9a75468eb2e0831eeba2b45331771909f5213e49
+- GitHub Actions run: 35468997685
+- job ID: 105966410774
+- artifact ID: 10592755504
+- artifact: PrintCheck_Android_3.4.0-alpha25_FINAL_BUILD
+- APK SHA-256: 5eb7ad9dcfa31e4aa6489da388c01accd281e21a8eb676241c3b6f4db731288f
+- source ZIP SHA-256: 9c8950512caa8c39e8c9e0564da8fc763e7837ca0b119de4de7a89a630beec28
+- signer SHA-256:
+  82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Alpha25 is update-compatible with alpha24.
+
+Authoritative small-element sequence:
+real field
+-> physical reference ruler
+-> calibrated artwork size
+-> visible color layers
+-> independent positive / negative / single-object morphology PER COLOR.
+
+Cross-color distances must remain ignored.
+Continuous-tone/unstable visible separation must remain manual, not forced into pseudo-color technical verdicts.
