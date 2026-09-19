@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha26 (build in progress)
+Current implementation line: Android 3.4.0-alpha26
 Current development/build branch: printcheck-build-3.4.0-alpha26
 
 ## STRICT CONTINUITY RULE
@@ -824,3 +824,26 @@ Version:
 - alpha26 versionCode 340026;
 - app id unchanged;
 - same persistent non-production alpha signer required.
+
+
+## ALPHA26 CANONICAL SUCCESSFUL BUILD CHECKPOINT
+
+- versionName: 3.4.0-alpha26
+- versionCode: 340026
+- applicationId: ru.printcheck.android
+- source commit: 6828caa6b1ba4cfb51c511ef5676487351e1ed91
+- GitHub Actions run: 35470975423
+- job ID: 105971763485
+- artifact ID: 10592957794
+- artifact: PrintCheck_Android_3.4.0-alpha26_FINAL_BUILD
+- APK SHA-256: e4d9a48c0e95420002ac7f214e76780351502c3bd2c3d5925e48e653ff6e6feb
+- source ZIP SHA-256: 473bc28271ba3bb614b07cb330c7dd10ac0a481556b43f3156a892277da43fad
+- signer SHA-256:
+  82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Alpha26 is update-compatible with alpha25.
+
+Authoritative morphology:
+diff is seed only -> reconstruct full same-color solid -> exclusive color ownership -> exclude cross-color contacts -> distance/medial positive widths + same-color gaps + single objects -> centered evidence markers.
+
+Do not regress markers to bbox centers or diff-edge contours.
