@@ -14,7 +14,7 @@ shutil.copytree(src12, src13)
 
 raw = base64.b64decode((pb / 'pc340a13.patch.gz.b64').read_bytes().replace(b'\n', b'').replace(b'\r', b''))
 digest = hashlib.sha256(raw).hexdigest()
-expected = '89f445f1610edc5303c7272b44e9c602bb11ac095bd2827aac768cfecf378c06'
+expected = '34ded14c8ee5348428e5ce80fc8dd4d719f011cacc2e85af2a7062f7ea9777ac'
 if digest != expected:
     raise RuntimeError(f'alpha13 patch digest mismatch: {digest}')
 patch_data = gzip.decompress(raw)
