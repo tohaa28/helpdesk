@@ -1,0 +1,101 @@
+name: Build PrintCheck 3.4.0-alpha24 FINAL signed APK
+
+on:
+  push:
+    branches:
+      - printcheck-build-3.4.0-alpha24
+    paths:
+      - 'printcheck-build/ALPHA24_FINAL_TRIGGER.txt'
+  workflow_dispatch:
+
+concurrency:
+  group: printcheck-alpha24-final
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  ANDROID_HOME: /usr/local/lib/android/sdk
+  ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android SDK 35
+        shell: bash
+        run: |
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+
+      - name: Prepare alpha24
+        run: python3 printcheck-build/prepare_alpha24.py .
+
+      - name: Verify alpha24 invariants
+        shell: bash
+        run: |
+          grep -q "versionName '3.4.0-alpha24'" .printcheck-alpha24/app/build.gradle
+          grep -q "versionCode 340024" .printcheck-alpha24/app/build.gradle
+          grep -q "applicationId 'ru.printcheck.android'" .printcheck-alpha24/app/build.gradle
+          grep -q "alphaPersistent" .printcheck-alpha24/app/build.gradle
+          grep -q 'new LinearLayout.LayoutParams(dp(70),dp(30))' .printcheck-alpha24/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'value?"Выход":"Вход"' .printcheck-alpha24/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'removeAllCookies' .printcheck-alpha24/app/src/main/java/ru/printcheck/android/MainActivity.java
+          test -f .printcheck-alpha24/app/src/main/java/ru/printcheck/android/MeasurementCalibrationLogic.java
+          grep -q 'field->reference-ruler->artwork-size->small-elements' .printcheck-alpha24/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q 'artwork_reference_authoritative' .printcheck-alpha24/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q 'analyzeCalibrated' .printcheck-alpha24/app/src/main/java/ru/printcheck/android/SmallElementAnalyzer.java
+          grep -q 'drawReferenceRuler' .printcheck-alpha24/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q 'component_circles_v4_reference_ruler' .printcheck-alpha24/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q 'ARTWORK_TARGET_DPI = 720' .printcheck-alpha24/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q 'MAX_ARTWORK_PIXELS = 4_000_000L' .printcheck-alpha24/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+
+      - name: Alpha24 audit
+        run: python3 .printcheck-alpha24/tests/audit_alpha24.py
+
+      - name: Core tests
+        run: bash .printcheck-alpha24/tests/run_core.sh
+
+      - name: Build
+        working-directory: .printcheck-alpha24
+        run: gradle --no-daemon --stacktrace assembleDebug
+
+      - name: Verify persistent signer
+        shell: bash
+        run: |
+          APK=.printcheck-alpha24/app/build/outputs/apk/debug/app-debug.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$APK" | tee PrintCheck_Android_3.4.0-alpha24_SIGNER.txt
+          grep -qi "822540c7386d193fd3dec165620398572306a20b2640b8769181597766a45d11" PrintCheck_Android_3.4.0-alpha24_SIGNER.txt
+
+      - name: Package
+        shell: bash
+        run: |
+          cp .printcheck-alpha24/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha24.apk
+          cd .printcheck-alpha24
+          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha24_source.zip" . -x '*/build/*' '*.keystore' '*.p12'
+          cd "$GITHUB_WORKSPACE"
+          sha256sum PrintCheck_Android_3.4.0-alpha24.apk PrintCheck_Android_3.4.0-alpha24_source.zip | tee PrintCheck_Android_3.4.0-alpha24_SHA256.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PrintCheck_Android_3.4.0-alpha24_FINAL_BUILD
+          path: |
+            PrintCheck_Android_3.4.0-alpha24.apk
+            PrintCheck_Android_3.4.0-alpha24_source.zip
+            PrintCheck_Android_3.4.0-alpha24_SHA256.txt
+            PrintCheck_Android_3.4.0-alpha24_SIGNER.txt
+          if-no-files-found: error
+          retention-days: 7
