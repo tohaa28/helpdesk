@@ -2,8 +2,8 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha23
-Current development/build branch: printcheck-build-3.4.0-alpha23
+Current implementation line: Android 3.4.0-alpha24 (build in progress)
+Current development/build branch: printcheck-build-3.4.0-alpha24
 
 ## STRICT CONTINUITY RULE
 
@@ -618,3 +618,44 @@ Performance architecture:
 - small-element pass reuses high-res artwork mask whenever resolution is sufficient;
 - otherwise renders a tight artwork crop only, capped at 1600 dpi / 2.5M pixels;
 - per-stage timing diagnostics are mandatory for future performance work.
+
+
+## ALPHA24 — PHYSICAL REFERENCE RULER BEFORE SMALL-ELEMENT DETECTION
+
+User-mandated measurement order:
+**real field -> reference ruler -> artwork physical size -> small elements**.
+
+This order is mandatory. Do not run automatic small-element morphology using renderer DPI alone.
+
+Reference-ruler rules:
+- derive pixels/mm from the observed real selected application field;
+- selected application physical dimensions are allowed as the named physical reference only when consistent with observed/vector field geometry;
+- when both order-selected dimensions and vector field dimensions exist, disagreement >12% blocks automatic morphology;
+- X/Y calibration anisotropy >5.5% blocks automatic morphology;
+- invalid ruler => manual small-element check, no automatic issue circles.
+
+Authoritative fine-artwork rule:
+- exact selected-application-template is authoritative;
+- sufficiently agreeing selected application binding (>=0.55) may also be authoritative;
+- a general constructor fallback can help position the field but is NOT sufficient by itself for automatic small-element issue marking.
+- This rule was added because alpha23 article 15423.10 had reference_role=constructor, application_field_agreement=0, and falsely marked constructor service text/lines as hundreds of small-element violations.
+
+Diagnostic requirement:
+reference_ruler, calibrated artwork size, measurement_source and measurement_sequence must remain visible in result JSON/evidence.
+
+Authentication UI:
+- compact 70×30dp Вход/Выход button in upper-right header;
+- actual session state detected via gifts.ru website session/logout link;
+- logout clears PrintCheck WebView cookies/session locally;
+- login remains website-only.
+
+Alpha23 performance architecture MUST remain:
+720dpi/4M main high-res ROI, cached/coarse-to-fine registration, calibrated mask reuse/tight fine rerender.
+
+Version/update:
+- alpha24 versionCode 340024;
+- applicationId unchanged;
+- same persistent non-production alpha signer required.
+
+Separate unresolved fixture:
+25900.61 had no geometry in alpha23. Do not conflate that mapping/alignment failure with reference-ruler calibration.
