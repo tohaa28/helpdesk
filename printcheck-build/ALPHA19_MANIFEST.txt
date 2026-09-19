@@ -57,3 +57,29 @@ CANONICAL ALPHA19 RULES
 - template service graphics are not customer artwork
 - CDR is preserved with relation but is still not parsed
 - registration is still primarily translation/same-scale; general uniform scale/rotation remains future work
+
+
+FINAL SUCCESSFUL BUILD
+source commit: 1b4d84a0194e48870da8772e51444571817e52b0
+GitHub Actions run: 35452512452
+status: success
+artifact name: PrintCheck_Android_3.4.0-alpha19_BUILD
+artifact ID: 10587615583
+artifact archive digest: sha256:6103b1ea801e4564d69635366b923eaa8f62e0c3ec9080f93274c724e5a38fd3
+artifact expires: 2026-09-26T15:41:23Z
+APK SHA-256: 4a8b71597045897d3b4bbe612580222c44c9db19ad30818a245508e74c932caf
+source ZIP SHA-256: d134a776d8b9b165728705b0ea1fe3f05c82f46af942001cbce001552487199f
+SHA file SHA-256: 9507b81c91d8c40265e5910c139472eb08aa6fb7d7e0e47456e5b2676717562d
+
+FINAL VERIFICATION
+- canonical source generation: PASS
+- source invariants: PASS
+- alpha19 audit: 15/15 PASS
+- core tests: 52/52 PASS
+- Android Gradle build: PASS
+- artifact upload: PASS
+- downloaded APK zip integrity: PASS
+- downloaded hashes match CI: PASS
+
+DOCUMENTATION CI POLICY
+Documentation-only changes to PRINTCHECK_HANDOFF.md, DEVELOPMENT_LOG.md and ALPHA19_MANIFEST.txt are ignored by the alpha19 Android workflow so required logging does not trigger redundant rebuilds.
