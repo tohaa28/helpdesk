@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha22 (build in progress)
+Current implementation line: Android 3.4.0-alpha22
 Current development/build branch: printcheck-build-3.4.0-alpha22
 
 ## STRICT CONTINUITY RULE
@@ -548,3 +548,25 @@ Update compatibility:
 - alpha22 versionCode 340022;
 - applicationId stays ru.printcheck.android;
 - same persistent NON-PRODUCTION alpha signer as alpha20/alpha21 is mandatory.
+
+
+## ALPHA22 CANONICAL BUILD CHECKPOINT
+
+- versionName: 3.4.0-alpha22
+- versionCode: 340022
+- applicationId: ru.printcheck.android
+- source commit: f5c7ca5ae083d85731c8d16e3e941c2d316a50d2
+- GitHub Actions run: 35461116755
+- artifact ID: 10589449659
+- artifact: PrintCheck_Android_3.4.0-alpha22_FINAL_BUILD
+- APK SHA-256: 2dfee546036afc18dd88ddd386f93f5693a11116f3ee9d3266fc206574c855af
+- source ZIP SHA-256: b514fd73df4c4e9893125b105ab1a19c5dfded1b0f299d8d1feca93df68aa5f0
+- signer SHA-256:
+  82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Alpha22 is update-compatible with persistent-signed alpha21.
+
+Authoritative alpha22 artwork pipeline:
+coarse page discovery -> real selected colored field -> high-res ROI render -> high-res local registration -> high-res selected-template subtraction -> high-res physical measurement/evidence -> coarse-coordinate projection only for legacy overlays/font scoping.
+
+Do not regress primary artwork segmentation back to RasterPdfIndexer.commonDpi.
