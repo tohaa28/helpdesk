@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha24 (build in progress)
+Current implementation line: Android 3.4.0-alpha24
 Current development/build branch: printcheck-build-3.4.0-alpha24
 
 ## STRICT CONTINUITY RULE
@@ -659,3 +659,33 @@ Version/update:
 
 Separate unresolved fixture:
 25900.61 had no geometry in alpha23. Do not conflate that mapping/alignment failure with reference-ruler calibration.
+
+
+## ALPHA24 CANONICAL SUCCESSFUL BUILD CHECKPOINT
+
+- versionName: 3.4.0-alpha24
+- versionCode: 340024
+- applicationId: ru.printcheck.android
+- source commit: 5df005250ff34beea815d059da163495ccb834f4
+- GitHub Actions run: 35466938823
+- job ID: 105960898373
+- artifact ID: 10590694977
+- artifact: PrintCheck_Android_3.4.0-alpha24_FINAL_BUILD
+- APK SHA-256: a6de421a100a7ee677a3f58066d9890104da7ea91214bc5eac2662556e103ea7
+- source ZIP SHA-256: 3ae49bfbac57e2b20edfea4c9ae6ecc2d61e1a95239478a806a3e8f7bc872cf4
+- signer SHA-256:
+  82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Alpha24 is update-compatible with alpha23.
+
+Authoritative measurement sequence:
+real selected field -> reference ruler -> calibrated artwork size -> small-element morphology.
+
+Automatic small-element markings are forbidden when:
+- reference ruler is invalid;
+- selected-size/vector-field disagreement >12%;
+- X/Y scale disagreement >5.5%;
+- fine-artwork reference is only an unconfirmed general constructor fallback.
+
+UI:
+compact 70x30dp top-right authentication button; text reflects session state as Вход/Выход.
