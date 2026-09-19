@@ -897,3 +897,133 @@ Performance validation requirement:
 - export diagnostics;
 - inspect timing_coarse_render_ms / timing_artwork_highres_ms / timing_small_elements_ms / timing_geometry_total_ms per item;
 - do not claim a numeric speed-up until the on-device run is measured.
+
+
+---
+
+## 2026-09-19 — alpha24: reference-ruler calibration before small elements + compact auth button
+
+Branch:
+- printcheck-build-3.4.0-alpha24
+
+User requirements:
+1. Move the login button to the upper-right corner and make it smaller. If the program is authenticated, show "Выход".
+2. Rework small-element detection so the program first establishes a physical reference ruler, measures the actual artwork size, and only then searches for small elements. Current alpha23 produced wrong measurement and wrong issue marks.
+
+Evidence from user-supplied diagnostic:
+- archive: PrintCheck_diagnostics_7920509_3.4.0-alpha23.zip
+- control order: 7920509.
+
+Important alpha23 observations:
+- 15637 / LM1: artwork reported 28.05×18.87 mm, artwork analysis 720 dpi, small pass 1513 dpi, 64 positive issue zones and 5 negative zones.
+- 17488.30 / A2: 19.90×13.51 mm, 720/1524 dpi, 66 positive and 19 negative zones.
+- 19727.02 / LM1: 33.76×8.68 mm, 720/1524 dpi, 8 positive zones.
+- 30114.30 / UV-DTF2: 45.83×36.44 mm, 720 dpi reused mask, 733 positive and 544 negative zones.
+- 17893.30 / UV3: 113.66×104.80 mm, 318/356 dpi, 327 positive and 77 negative zones.
+- 25900.61 / A0: geometry still missing entirely; this remains a separate mapping/alignment problem.
+- 15423.10 / LRM: geometry used constructor fallback with reference_role=constructor and application_field_agreement=0; artwork reported 116.27×96.91 mm; 835 positive and 836 negative zones. Visual proof showed constructor service text/lines being marked as small artwork.
+
+Root-cause decisions:
+- renderer DPI must not be accepted blindly as the physical measurement scale;
+- physical mm measurement must be calibrated from the real selected application field;
+- small-element morphology must run only after that calibration;
+- general constructor geometry may support field placement, but it is not an authoritative fine-artwork subtraction reference when the selected application template was not confirmed.
+
+Alpha24 measurement sequence:
+1. identify real selected application field;
+2. establish reference ruler from the observed field pixels and validated physical field dimensions;
+3. validate selected application size against vector field dimensions when both exist;
+4. validate X/Y scale consistency;
+5. convert artwork pixel bbox into calibrated physical mm;
+6. only then run positive/negative small-element morphology with calibrated pixels/mm.
+
+New MeasurementCalibrationLogic:
+- MAX_ORDER_VECTOR_DISAGREEMENT = 12%;
+- MAX_AXIS_ANISOTROPY = 5.5%;
+- output includes width/height mm, pxPerMm X/Y, effective pixels/mm, effective DPI, anisotropy, order/vector disagreement, source and failure reason.
+- physical reference priority when order+vector agree: selected application size, confirmed by vector field geometry.
+- vector-only and selected-size-only fallbacks are explicit and recorded.
+
+Geometry JSON additions:
+- measurement_sequence = field->reference-ruler->artwork-size->small-elements
+- reference_ruler:
+  calibrated
+  source
+  width_mm / height_mm
+  px_per_mm_x / px_per_mm_y
+  effective_dpi
+  axis_scale_error_pct
+  order_vector_disagreement_pct
+  reason
+- artwork measurement_source identifies reference-ruler calibration.
+- small-element JSON records ruler calibration, artwork size, measurement sequence and pixels/mm.
+
+Safety gates:
+- if the reference ruler cannot be calibrated, automatic small-element issue circles are blocked and the check becomes manual;
+- if selected-size/vector-field disagreement exceeds 12%, automatic small-element analysis is blocked;
+- if X/Y scale anisotropy exceeds 5.5%, automatic small-element analysis is blocked;
+- artwork_reference_authoritative is true only for selected-application-template or sufficiently agreeing application binding (>=0.55);
+- constructor fallback can establish placement but cannot automatically generate small-element violations without authoritative selected-application reference;
+- this specifically prevents alpha23-style service-graphic circles for 15423.10.
+
+SmallElementAnalyzer:
+- added analyzeCalibrated(... pixelsPerMm, ...);
+- positive widths, negative widths and noise thresholds derive from calibrated pixels/mm;
+- old DPI overload retained for backwards compatibility/tests.
+
+Visual evidence:
+- small-element overlay now draws a blue physical reference ruler before issue circles;
+- label format includes the ruler physical length and calibrated artwork W×H in mm;
+- marker style: component_circles_v4_reference_ruler.
+
+Authentication UI:
+- compact login button moved to header upper-right;
+- dimensions 70×30 dp;
+- button text toggles Вход / Выход based on detected session state;
+- WebView session detection uses gifts.ru DOM logout link;
+- hidden gifts.ru root load checks persisted cookies/session at startup;
+- local logout clears app cookies, WebView history/cache, and session state;
+- authentication itself remains website-only; no direct credential handling was introduced;
+- diagnostics/export control now uses full card width.
+
+Performance:
+- alpha23 performance architecture remains in place:
+  artwork target 720 dpi;
+  4M main ROI budget;
+  cached registration samples;
+  coarse-to-fine registration;
+  mask reuse/tight fine crop;
+  stage timings.
+
+Local verification:
+- clean alpha23 -> alpha24 patch application: PASS, no .rej;
+- CoreTests: 70/70 PASS;
+- alpha24 audit: 23/23 PASS;
+- standalone Java syntax probe exposed no new parser error; missing Android/repository symbols outside Gradle were expected.
+
+Reproducible patch:
+- decoded patch length: 82035 bytes
+- patch SHA-256: 069eef2c43a73fb3eb4d6bc93d98df7a9e4e433510058f9e221b0f261425c853
+- base64/gzip transport length: 28048 chars
+- transport SHA-256: ed38fdaa5c3d64553da3e03225900356369fd412b3681d7547783cf87b8de758
+- chunks: pc340a24.b64.part00..part05
+- all six Git blob hashes were verified against local git hash-object before generator creation.
+- generator: printcheck-build/prepare_alpha24.py
+
+Version/update contract:
+- versionName 3.4.0-alpha24
+- versionCode 340024
+- applicationId ru.printcheck.android
+- persistent alpha signer unchanged.
+
+Known limitations carried forward:
+- 25900.61 still requires separate mapping/alignment work if alpha24 does not recover it;
+- general rotation registration not implemented;
+- CDR is saved but not parsed;
+- effects/gradients/transparency remain globally scoped.
+
+Next gates:
+- Android CI compile;
+- exact persistent signer verification;
+- artifact integrity/hash verification;
+- rerun 7920509 and inspect ruler/size first, then small-element circles.
