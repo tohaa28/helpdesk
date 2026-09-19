@@ -295,3 +295,51 @@ Repair:
 
 Next gate:
 - rerun full CI from the repair commit and require Android compile + artifact packaging to pass.
+
+
+### Persistent Android update signing added — user requirement
+
+User requirement:
+- installing a new PrintCheck test build must update the existing app instead of requiring uninstall/reinstall.
+
+Android requirements verified for our project:
+- applicationId remains `ru.printcheck.android`;
+- every later build must have a strictly larger versionCode;
+- all update-compatible APKs must use the same signing certificate.
+
+Problem with prior alpha builds:
+- CI used the default Gradle debug signing identity;
+- hosted CI runners can generate different debug keys;
+- therefore a later APK can be rejected by Android as signed by a different certificate.
+
+Alpha20+ solution:
+- a dedicated persistent NON-PRODUCTION alpha signing identity was created;
+- base64 transport stored in Git at `printcheck-build/NON_PRODUCTION_ALPHA_SIGNING.p12.b64`;
+- prepare_alpha20.py verifies both transport SHA and decoded PKCS12 SHA before use;
+- generated source receives `signing/printcheck-alpha-test.p12`;
+- app/build.gradle gets signingConfig `alphaPersistent`;
+- the debug APK is signed with that persistent identity;
+- packaged source ZIP explicitly excludes *.p12 so the binary private key is not copied into the user-facing source archive;
+- the signing material remains Git-backed only for internal alpha continuity.
+
+Persistent alpha certificate:
+- alias: printcheck-alpha
+- certificate SHA-256 fingerprint: 82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+- PKCS12 SHA-256: 153e3e22548b7c089caff4cf012aa7f0e41b9091b344fb9f6496377feecebb10
+- base64 transport SHA-256: 098c0b74d82bb794cf063a526b20f48365f2948915baef6275151ae69d8f2fb1
+- certificate validity: 2026-09-19 through 2054-02-04.
+
+Important transition rule:
+- alpha19 was already distributed with the older temporary/default debug signing path;
+- its private signing identity is not preserved;
+- therefore alpha19 -> first persistent-signed alpha20 may require ONE final uninstall/reinstall;
+- after a persistent-signed alpha20 is installed, alpha21/alpha22/etc. must install as normal Android updates, preserving app data, provided applicationId is unchanged and versionCode increases.
+
+Security boundary:
+- this persistent key is explicitly a NON-PRODUCTION alpha/test key;
+- never use this key for a public/production release;
+- before production distribution, establish a separate protected production signing identity and migration/distribution strategy.
+
+CI continuity hardening:
+- alpha20 workflow now refuses to write .ci/alpha20-result.txt when the run source SHA is no longer the current branch HEAD;
+- this prevents an older concurrent run from overwriting the result of a newer build.
