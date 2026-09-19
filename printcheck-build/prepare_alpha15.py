@@ -66,7 +66,7 @@ helper2='''    private static JSONArray filterUnsupportedConstructorDuplicates(J
 
 '''
 marker='    private static boolean isAuxiliaryConstructorPdf'
-if 'filterUnsupportedConstructorDuplicates' not in s[s.find(marker)-1000:s.find(marker)]:
+if 'private static JSONArray filterUnsupportedConstructorDuplicates' not in s:
     s=s.replace(marker,helper2+marker)
 write(p,s)
 
