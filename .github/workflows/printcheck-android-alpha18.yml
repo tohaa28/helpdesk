@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - printcheck-build-3.4.0-alpha18
+    paths-ignore:
+      - '.ci/alpha18-result.txt'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   ANDROID_HOME: /usr/local/lib/android/sdk
@@ -83,3 +85,23 @@ jobs:
             PrintCheck_Android_3.4.0-alpha18_SHA256.txt
           if-no-files-found: error
           retention-days: 7
+
+      - name: Record CI result
+        if: always()
+        shell: bash
+        env:
+          RESULT: ${{ job.status }}
+        run: |
+          mkdir -p .ci
+          {
+            echo "version=3.4.0-alpha18"
+            echo "source_commit=$GITHUB_SHA"
+            echo "status=$RESULT"
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "run_attempt=$GITHUB_RUN_ATTEMPT"
+          } > .ci/alpha18-result.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .ci/alpha18-result.txt
+          git diff --cached --quiet || git commit -m "Record alpha18 CI result [skip ci]"
+          git push
