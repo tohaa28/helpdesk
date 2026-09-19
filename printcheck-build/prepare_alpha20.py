@@ -50,6 +50,16 @@ rejects = list(src20.rglob("*.rej"))
 if rejects:
     raise RuntimeError("alpha20 patch rejects: " + ", ".join(str(p.relative_to(src20)) for p in rejects))
 
+# CI run 35454434785 exposed one syntax-only parenthesis loss in the patch source.
+# Keep this deterministic post-patch repair explicit and audited so the generated source is reproducible.
+main_path = src20 / "app/src/main/java/ru/printcheck/android/MainActivity.java"
+main_text = main_path.read_text(encoding="utf-8")
+bad_fragment = '.put("template_fragment_detected",(layoutApp!=null&&"selected-field-anchor".equals(layoutApp.matchMethod))||(layoutCtor!=null&&("same-page-partial-template".equals(layoutCtor.matchMethod)||"preserved-colored-field".equals(layoutCtor.matchMethod)));'
+good_fragment = '.put("template_fragment_detected",(layoutApp!=null&&"selected-field-anchor".equals(layoutApp.matchMethod))||(layoutCtor!=null&&("same-page-partial-template".equals(layoutCtor.matchMethod)||"preserved-colored-field".equals(layoutCtor.matchMethod))));'
+if bad_fragment not in main_text:
+    raise RuntimeError("alpha20 expected syntax repair fragment not found")
+main_path.write_text(main_text.replace(bad_fragment, good_fragment, 1), encoding="utf-8")
+
 build_gradle = (src20 / "app/build.gradle").read_text(encoding="utf-8")
 field_logic = (src20 / "app/src/main/java/ru/printcheck/android/ConstructorFieldLogic.java").read_text(encoding="utf-8")
 partial = (src20 / "app/src/main/java/ru/printcheck/android/PartialTemplateLogic.java").read_text(encoding="utf-8")
