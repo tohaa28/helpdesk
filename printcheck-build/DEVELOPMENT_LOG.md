@@ -515,3 +515,25 @@ Repair:
 - repair commit: 887d718784180167db3817cbd524bae2c067ab91.
 
 No user-facing detection rule was weakened to make the build pass.
+
+
+### Alpha21 final CI attempt 2 — escaped-newline generator bug
+
+- source commit: 88bab90687b7c6da1ddc60c1817c1f2a161c634c
+- Actions run: 35458974434
+- canonical source generation: PASS
+- invariants: PASS
+- audit: PASS
+- core tests: PASS (60/60)
+- Android compile: FAIL
+
+Cause:
+- deterministic high-resolution API repair emitted the two Java statements separated by a literal backslash+n sequence instead of a real newline;
+- javac correctly rejected the illegal '\\' character.
+
+Repair:
+- prepare_alpha21.py now emits a real newline;
+- generator invariant additionally rejects the literal "\\n            MaskResult hi=" sequence in GeometryAnalyzer;
+- repair commit: ccdab6592aa5ced74bc436ed6ea29aa290f5cff3.
+
+Application detection logic itself is unchanged by this repair.
