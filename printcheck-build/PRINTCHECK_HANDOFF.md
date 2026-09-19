@@ -2,8 +2,8 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha19
-Current development/build branch: printcheck-build-3.4.0-alpha19
+Current implementation line: Android 3.4.0-alpha20
+Current development/build branch: printcheck-build-3.4.0-alpha20
 
 ## STRICT CONTINUITY RULE
 
@@ -436,3 +436,20 @@ alpha19 predates this persistent signing identity, so moving from an already-ins
 
 Security:
 this key is NON-PRODUCTION test signing material. Never promote it to production signing.
+
+
+## ALPHA20 SIGNED BUILD CHECKPOINT
+
+Canonical update-compatible alpha baseline:
+- versionName: 3.4.0-alpha20
+- versionCode: 340020
+- applicationId: ru.printcheck.android
+- source commit: 6a000b08878cee7cc82c59003758eb3f8d1e58f5
+- GitHub Actions run: 35455256258
+- artifact ID: 10588296469
+- APK SHA-256: 712d7931a67c624f6582ee9e3c6dbf33a7bf6c3048c56866b0eb874f5668128e
+- source ZIP SHA-256: 98b0d953480377e5ddb6bcc266e25ced8e5e0fe54c7ce99ee47c38e2b60881ba
+- persistent alpha signing certificate SHA-256:
+  82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+All alpha21+ builds must preserve the same applicationId and signer and increment versionCode. A build violating any of these conditions must not be distributed as an update-compatible alpha.
