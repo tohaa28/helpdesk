@@ -2,8 +2,8 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha20
-Current development/build branch: printcheck-build-3.4.0-alpha20
+Current implementation line: Android 3.4.0-alpha21 (build in progress)
+Current development/build branch: printcheck-build-3.4.0-alpha21
 
 ## STRICT CONTINUITY RULE
 
@@ -453,3 +453,38 @@ Canonical update-compatible alpha baseline:
   82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
 
 All alpha21+ builds must preserve the same applicationId and signer and increment versionCode. A build violating any of these conditions must not be distributed as an update-compatible alpha.
+
+
+## ALPHA21 DEVELOPMENT DELTA — ARTWORK DETECTION AND FULLSCREEN PHONE EVIDENCE
+
+Alpha21 is built strictly on the persistent-signed alpha20 baseline.
+
+Primary detection changes:
+- local field-centered registration refinement before template subtraction;
+- background-aware ArtworkDiffLogic;
+- selected-template subtraction no longer removes a legitimate dominant/solid customer color merely because it is common;
+- deletions from the template remain non-artwork;
+- nearby matching template FEATURE suppresses edge residue only where appropriate;
+- safe uniform-scale+translation recovery from preserved colored fields;
+- significant non-uniform scaling remains rejected;
+- separate artwork_file evidence explicitly shows what PrintCheck considers the customer application.
+
+UI:
+- larger inline evidence;
+- fullscreen immersive viewer on tap;
+- pinch-to-zoom, pan, double-tap zoom, up to 8×.
+
+Update compatibility:
+- versionCode 340021;
+- same applicationId ru.printcheck.android;
+- same persistent alpha signer as alpha20 is mandatory and checked both in generator and CI.
+
+Tests before CI:
+- core 60/60;
+- audit 20/20.
+
+Limitations:
+- rotation registration not yet implemented;
+- scaled-registration small-element morphology is temporarily manual until scale-aware;
+- CDR parsing not implemented;
+- real-order improvement must be verified with new diagnostics rather than inferred from unit tests.
