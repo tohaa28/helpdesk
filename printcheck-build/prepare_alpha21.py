@@ -59,6 +59,16 @@ rejects = list(src21.rglob("*.rej"))
 if rejects:
     raise RuntimeError("alpha21 patch rejects: " + ", ".join(str(p.relative_to(src21)) for p in rejects))
 
+# Final Android compile sync: the high-resolution small-element path must use
+# the alpha21 RegistrationRefinement + ColorEstimate signature as well.
+geo_path = src21 / "app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java"
+geo_text = geo_path.read_text(encoding="utf-8")
+old_hi_call = '            MaskResult hi=detectArtworkInField(l,r,0,0,localL,localR,lbg.color,rbg.color,target);'
+new_hi_call = '            RegistrationRefinement hiTr=new RegistrationRefinement();hiTr.scale=1.0;hiTr.dx=0;hiTr.dy=0;\\n            MaskResult hi=detectArtworkInField(l,r,hiTr,localL,localR,lbg,rbg,target);'
+if old_hi_call not in geo_text:
+    raise RuntimeError("alpha21 expected high-resolution artwork API repair fragment not found")
+geo_path.write_text(geo_text.replace(old_hi_call, new_hi_call, 1), encoding="utf-8")
+
 build_gradle = (src21 / "app/build.gradle").read_text(encoding="utf-8")
 main = (src21 / "app/src/main/java/ru/printcheck/android/MainActivity.java").read_text(encoding="utf-8")
 geom = (src21 / "app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java").read_text(encoding="utf-8")
@@ -78,6 +88,7 @@ required = {
     "uniform field anchor": "uniform_field_scale_anchor_v1" in main,
     "local field registration": "local_field_registration_v1" in main and "local_registration_refined" in geom,
     "background aware diff": "ArtworkDiffLogic.isAdded" in geom and "background-aware-local-registration" in geom,
+    "high-resolution diff API synced": "detectArtworkInField(l,r,hiTr,localL,localR,lbg,rbg,target)" in geom and "detectArtworkInField(l,r,0,0" not in geom,
     "artwork evidence": "artwork_file" in geom and "saveArtworkEvidence" in geom,
     "fullscreen viewer": "Theme_Black_NoTitleBar_Fullscreen" in result and "SYSTEM_UI_FLAG_IMMERSIVE_STICKY" in result,
     "double tap zoom": "onDoubleTap" in zoom and "maxScale=8f" in zoom,
