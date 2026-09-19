@@ -14,7 +14,16 @@ if src19.exists():
     shutil.rmtree(src19)
 shutil.copytree(src18, src19)
 
-part_names = [f"pc340a19.b64.part{i:02d}" for i in range(5)]
+# part03 is intentionally split into two smaller exact chunks after the first
+# CI attempt exposed a one-character transport loss in the original 6000-byte file.
+part_names = [
+    "pc340a19.b64.part00",
+    "pc340a19.b64.part01",
+    "pc340a19.b64.part02",
+    "pc340a19.b64.part03a",
+    "pc340a19.b64.part03b",
+    "pc340a19.b64.part04",
+]
 parts = [pb / name for name in part_names]
 missing = [p.name for p in parts if not p.is_file()]
 if missing:
