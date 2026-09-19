@@ -1,0 +1,103 @@
+name: Build PrintCheck 3.4.0-alpha26 FINAL signed APK
+
+on:
+  push:
+    branches:
+      - printcheck-build-3.4.0-alpha26
+    paths:
+      - 'printcheck-build/ALPHA26_FINAL_TRIGGER.txt'
+  workflow_dispatch:
+
+concurrency:
+  group: printcheck-alpha26-final
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  ANDROID_HOME: /usr/local/lib/android/sdk
+  ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android SDK 35
+        shell: bash
+        run: |
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+
+      - name: Prepare alpha26
+        run: python3 printcheck-build/prepare_alpha26.py .
+
+      - name: Verify alpha26 invariants
+        shell: bash
+        run: |
+          grep -q "versionName '3.4.0-alpha26'" .printcheck-alpha26/app/build.gradle
+          grep -q "versionCode 340026" .printcheck-alpha26/app/build.gradle
+          grep -q "applicationId 'ru.printcheck.android'" .printcheck-alpha26/app/build.gradle
+          grep -q "alphaPersistent" .printcheck-alpha26/app/build.gradle
+          grep -q "visible-color-solids-v2-seeded-components" .printcheck-alpha26/app/src/main/java/ru/printcheck/android/ArtworkColorLayerLogic.java
+          grep -q "per-color-medial-gap-v2-intersection-safe" .printcheck-alpha26/app/src/main/java/ru/printcheck/android/SmallElementAnalyzer.java
+          grep -q "distanceToOtherColour" .printcheck-alpha26/app/src/main/java/ru/printcheck/android/SmallElementAnalyzer.java
+          grep -q "negativeSameColor" .printcheck-alpha26/app/src/main/java/ru/printcheck/android/SmallElementAnalyzer.java
+          grep -q "analyzeColorLayers(colors.layers,colors.owner" .printcheck-alpha26/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q "cross_color_intersections_excluded" .printcheck-alpha26/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q "center_x" .printcheck-alpha26/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q "feature_kind" .printcheck-alpha26/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q "centered_features_v6_intersection_safe_reference_ruler" .printcheck-alpha26/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q "float radius=18f" .printcheck-alpha26/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q "small_elements_per_color_medial_v3" .printcheck-alpha26/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "ARTWORK_TARGET_DPI = 720" .printcheck-alpha26/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+          grep -q "MAX_ARTWORK_PIXELS = 4_000_000L" .printcheck-alpha26/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
+
+      - name: Alpha26 audit
+        run: python3 .printcheck-alpha26/tests/audit_alpha26.py
+
+      - name: Core tests
+        run: bash .printcheck-alpha26/tests/run_core.sh
+
+      - name: Build
+        working-directory: .printcheck-alpha26
+        run: gradle --no-daemon --stacktrace assembleDebug
+
+      - name: Verify persistent signer
+        shell: bash
+        run: |
+          APK=.printcheck-alpha26/app/build/outputs/apk/debug/app-debug.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$APK" | tee PrintCheck_Android_3.4.0-alpha26_SIGNER.txt
+          grep -qi "822540c7386d193fd3dec165620398572306a20b2640b8769181597766a45d11" PrintCheck_Android_3.4.0-alpha26_SIGNER.txt
+
+      - name: Package
+        shell: bash
+        run: |
+          cp .printcheck-alpha26/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha26.apk
+          cd .printcheck-alpha26
+          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha26_source.zip" . -x '*/build/*' '*.keystore' '*.p12'
+          cd "$GITHUB_WORKSPACE"
+          sha256sum PrintCheck_Android_3.4.0-alpha26.apk PrintCheck_Android_3.4.0-alpha26_source.zip | tee PrintCheck_Android_3.4.0-alpha26_SHA256.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PrintCheck_Android_3.4.0-alpha26_FINAL_BUILD
+          path: |
+            PrintCheck_Android_3.4.0-alpha26.apk
+            PrintCheck_Android_3.4.0-alpha26_source.zip
+            PrintCheck_Android_3.4.0-alpha26_SHA256.txt
+            PrintCheck_Android_3.4.0-alpha26_SIGNER.txt
+          if-no-files-found: error
+          retention-days: 7
