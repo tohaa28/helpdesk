@@ -70,7 +70,7 @@ required = {
     "continuous-tone guard": "colors.layers.size()>8" in geom,
     "empty-layer guard": 'if(colors.layers.isEmpty())' in geom,
     "marker style v5": "component_circles_v5_per_color_reference_ruler" in geom,
-    "single-element check": '"single_element"' in main and "minSingleElementMm" in small,
+    "single-element check": '"single_element"' in main and "singleObjects" in small and "minSingleMm" in small,
 
     "legacy binary morphology not used hi": "analyzeCalibrated(hi.mask" not in geom,
     "legacy binary morphology not used mask": "analyzeCalibrated(mask.mask" not in geom,
