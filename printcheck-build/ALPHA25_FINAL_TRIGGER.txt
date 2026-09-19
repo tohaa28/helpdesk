@@ -1,4 +1,4 @@
-alpha25_final=1
+alpha25_final=2
 reason=per_color_positive_negative_single_elements
 expected_version=3.4.0-alpha25
 expected_version_code=340025
