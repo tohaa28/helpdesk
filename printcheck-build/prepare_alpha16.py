@@ -33,6 +33,15 @@ rejects = list(src16.rglob('*.rej'))
 if rejects:
     raise RuntimeError('alpha16 rejects: ' + ', '.join(map(str,rejects)))
 
+# Compile-time repair found by Android javac: keep the typed inspector result and serialize it explicitly.
+main_path = src16 / 'app/src/main/java/ru/printcheck/android/MainActivity.java'
+main_src = main_path.read_text(encoding='utf-8')
+old_typed = 'JSONObject pc=pdfObjectResults.get(layout.file.getName());if(pc!=null)c.put("layout_pdf_preflight",pc);'
+new_typed = 'PdfObjectInspector.Result pc=pdfObjectResults.get(layout.file.getName());if(pc!=null)c.put("layout_pdf_preflight",pdfInspectionJson(pc));'
+if old_typed in main_src:
+    main_src = main_src.replace(old_typed, new_typed)
+main_path.write_text(main_src, encoding='utf-8')
+
 gradle = (src16 / 'app/build.gradle').read_text(encoding='utf-8')
 main = (src16 / 'app/src/main/java/ru/printcheck/android/MainActivity.java').read_text(encoding='utf-8')
 view = (src16 / 'app/src/main/java/ru/printcheck/android/ResultView.java').read_text(encoding='utf-8')
