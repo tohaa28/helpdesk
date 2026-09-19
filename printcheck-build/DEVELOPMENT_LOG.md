@@ -270,3 +270,28 @@ Next:
 - run full Android CI compile/build;
 - collect APK/source/hash artifact;
 - then rerun the SAME order 7920509 and compare field selection and artwork masks position-by-position.
+
+
+### CI attempt 1 — syntax-only failure and deterministic repair
+
+- source commit: bf9076bb9594adedba70e3011f822c4f59394b86
+- Actions run: 35454434785
+- prepare source: PASS
+- alpha20 invariants: PASS
+- alpha20 audit: PASS
+- core tests: PASS
+- Android compile: FAIL
+
+Compiler cause:
+- MainActivity.java line 291 had one missing closing parenthesis in the new template_fragment_detected expression.
+- This was not a logic/test failure; Gradle javac stopped on syntax before packaging.
+
+Repair:
+- local javac syntax check confirmed the line-291 parse error disappears after adding the missing parenthesis;
+- Android-symbol errors outside Gradle are expected in that standalone javac check;
+- reproducibility is preserved by an explicit deterministic post-patch repair inside printcheck-build/prepare_alpha20.py;
+- repair commit: c02713b2e46af7dd91428d71d2077715bcbe9d2e.
+- the repair is intentionally visible rather than silently modifying generated source.
+
+Next gate:
+- rerun full CI from the repair commit and require Android compile + artifact packaging to pass.
