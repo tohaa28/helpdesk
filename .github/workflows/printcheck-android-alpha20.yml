@@ -103,10 +103,29 @@ jobs:
         env:
           RESULT: ${{ job.status }}
         run: |
-          CURRENT_HEAD="$(git ls-remote origin refs/heads/printcheck-build-3.4.0-alpha20 | cut -f1)"
+          git fetch origin printcheck-build-3.4.0-alpha20 --quiet
+          CURRENT_HEAD="$(git rev-parse origin/printcheck-build-3.4.0-alpha20)"
           if [ "$CURRENT_HEAD" != "$GITHUB_SHA" ]; then
-            echo "Skip stale CI result: source=$GITHUB_SHA current_head=$CURRENT_HEAD"
-            exit 0
+            NON_DOC_CHANGES="$(git diff --name-only "$GITHUB_SHA..$CURRENT_HEAD" | grep -Ev '^(\.ci/alpha20-result\.txt|printcheck-build/(PRINTCHECK_HANDOFF\.md|DEVELOPMENT_LOG\.md|ALPHA20_MANIFEST\.txt))          mkdir -p .ci
+          {
+            echo "version=3.4.0-alpha20"
+            echo "source_commit=$GITHUB_SHA"
+            echo "status=$RESULT"
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "run_attempt=$GITHUB_RUN_ATTEMPT"
+          } > .ci/alpha20-result.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .ci/alpha20-result.txt
+          git diff --cached --quiet || git commit -m "Record alpha20 CI result [skip ci]"
+          git push
+ || true)"
+            if [ -n "$NON_DOC_CHANGES" ]; then
+              echo "Skip stale CI result: newer non-documentation changes exist."
+              echo "$NON_DOC_CHANGES"
+              exit 0
+            fi
+            echo "Only documentation/result files changed after source commit; CI result remains authoritative."
           fi
           mkdir -p .ci
           {
