@@ -1073,3 +1073,218 @@ Real-device acceptance test:
 - only after a valid ruler should small-element circles appear;
 - verify 15423.10 no longer produces automatic constructor-service-graphic circles when selected-application reference is not authoritative;
 - verify whether 25900.61 still has no geometry; if yes, continue separate mapping/alignment investigation.
+
+
+---
+
+## 2026-09-19 — alpha25: per-color positive/negative/single-element morphology
+
+Branch:
+- printcheck-build-3.4.0-alpha25
+
+User correction / authoritative semantic requirement:
+- Positive and negative technical elements are defined WITHIN ONE COLOR.
+- A positive element is a physical object/letter/stroke of one color.
+- A negative element is a physical empty gap/reversal belonging to the geometry of that SAME color.
+- Distances between objects of different colors must never be interpreted as a negative element.
+- A physical object/letter itself must not be smaller than the method's allowed positive/single-object rule.
+- A physical gap between same-color objects, or an enclosed reversal/counter in that color, must not be smaller than the method's allowed negative rule.
+- Black/white raster contrast is NOT itself a valid technical color separation.
+
+Evidence from user-supplied alpha24 diagnostic:
+- archive: PrintCheck_diagnostics_7920509_3.4.0-alpha24 (1).zip
+- control order: 7920509.
+- The previous binary-mask model still produced very large issue counts on multi-color/contrast artwork.
+- Example: article 30114.30 / UV-DTF2 had hundreds of positive and negative violations because the morphology treated the combined raster artwork as one binary foreground/background structure.
+- This contradicted the user's production rule: a white object adjacent to a black object must not create a same-color negative gap merely because the raster has a black/white boundary.
+- Alpha24 ruler calibration and constructor-authority gate remain valid and are retained.
+
+Alpha25 architecture:
+
+### 1. Visible artwork is split into independent color layers
+New class:
+- ArtworkColorLayerLogic.java
+
+Mode:
+- visible-color-separations-v1-background-ray
+
+Input:
+- already-isolated artwork mask;
+- high-resolution layout raster;
+- estimated local background.
+
+Behavior:
+- only pixels belonging to the isolated customer artwork mask are considered;
+- visible colors are grouped independently;
+- clustering uses RGB direction away from the estimated background so anti-aliased shades of the same flat printed color tend to stay in the same color layer instead of becoming artificial grey layers;
+- rare but strong small spot-color components are retained;
+- near-background fringes can be ignored;
+- raw color-layer cap remains bounded for phone performance.
+
+Important limitation:
+- this is visible rendered RGB separation, NOT native PDF CMYK/spot-color object parsing;
+- it is appropriate for stable flat visible colors and specifically prevents black/white union;
+- continuous-tone raster/photographic artwork is not forced into false technical separations.
+
+### 2. SmallElementAnalyzer now has a per-color API
+New authoritative API:
+- analyzeColorLayers(...)
+
+Legacy binary APIs remain only for compatibility/regression tests, but GeometryAnalyzer no longer invokes them for production small-element analysis.
+
+Result mode:
+- per-color-positive-gap-v1
+
+Per color:
+- positive
+- negative
+- single
+- layer id
+- visible RGB
+- artwork pixel count
+
+### 3. Positive element rule
+Within each color layer independently:
+- analyze physical local thickness/ridge;
+- identify too-thin positive regions;
+- never merge objects merely because another visible color touches or overlaps nearby in the raster representation.
+
+### 4. Negative element rule
+New function:
+- negativeSameColor(...)
+
+Two allowed negative concepts, both inside ONE color layer:
+1. enclosed reversals/counters/holes inside an object of that color;
+2. narrow physical gaps between disconnected components/letters of that SAME color.
+
+Cross-color gaps are structurally impossible in this pass because each color layer is processed separately.
+
+JSON invariant:
+- cross_color_negative_gaps_ignored = true
+
+### 5. Single object / letter rule
+New function:
+- singleObjects(...)
+
+Purpose:
+- enforce minSingleElementMm on an isolated object/letter of one color.
+
+Decision:
+- an object's connected-component physical bounding size is evaluated;
+- a long thin legitimate stroke is not incorrectly classified as a tiny isolated object solely because one dimension is narrow;
+- the positive thickness rule still handles stroke-width requirements separately.
+
+### 6. Color-aware evidence
+Small-element overlay:
+- positive violation circle: yellow;
+- negative same-color gap/reversal: cyan;
+- too-small isolated single object: orange;
+- each marker includes a center swatch showing the actual analyzed color layer.
+
+Marker style:
+- component_circles_v5_per_color_reference_ruler
+
+The alpha24 physical reference ruler remains visible and authoritative before this analysis.
+
+### 7. JSON diagnostics
+Added:
+- color_analysis_mode
+- color_layer_count
+- color_artwork_pixels
+- color_assigned_pixels
+- color_ignored_near_background_pixels
+- cross_color_negative_gaps_ignored
+- color_layers[]
+
+Each color layer contains:
+- layer_id
+- visible color
+- pixels
+- positive result
+- negative result
+- single result
+
+Examples can include:
+- layer_id
+- color
+- object_width_mm
+- object_height_mm
+
+### 8. Fail-safe for continuous-tone / uncertain separation
+Automatic per-color morphology is allowed only when stable visible color layers can be identified.
+
+If:
+- no stable layers are found; or
+- more than 8 stable visible layers are required / image behaves like continuous-tone full-color raster,
+
+then:
+- automatic small-element verdict is NOT emitted;
+- the check is marked manual;
+- no hundreds of misleading pseudo-color issue circles are drawn.
+
+This deliberately favors an explicit manual check over a technically false automated result.
+
+### 9. Existing safety contracts retained
+Still mandatory:
+- real field -> reference ruler -> calibrated artwork size -> small elements;
+- invalid ruler blocks automatic small-element analysis;
+- >12% selected-size/vector-field mismatch blocks it;
+- >5.5% X/Y calibration anisotropy blocks it;
+- unconfirmed general-constructor fallback is not authoritative for fine small-element marking;
+- exact selected-application template remains the preferred authoritative artwork reference;
+- no synthetic geometry from order dimensions;
+- alpha23 performance architecture remains:
+  720 dpi main high-res ROI;
+  4M-pixel main budget;
+  cached registration samples;
+  coarse-to-fine registration;
+  mask reuse/tight fine rerender;
+  stage timings.
+
+### 10. Regression tests
+New tests include:
+- anti-aliased shades of one flat color stay in one color layer;
+- different visible colors stay separate;
+- black/red (cross-color) proximity does NOT create a negative same-color gap;
+- two same-color objects with too-small spacing DO create a negative gap;
+- enclosed reversal/counter inside one same-color object IS negative;
+- too-small isolated object is checked only inside its own color layer.
+
+Local gates before Git CI:
+- CoreTests: 76/76 PASS.
+- alpha25 source audit: 23/23 PASS.
+- clean canonical alpha24 + alpha25 patch: PASS, no .rej.
+- clean reapplication: audit 23/23 and CoreTests 76/76 PASS.
+
+Reproducibility:
+- decoded patch length: 77577 bytes
+- patch SHA-256: 2138292cf7ac5256886d8e7ed47b71b7283318b8fc96d0f83c202bf34a4b234d
+- gzip/base64 transport length: 26568 chars
+- transport SHA-256: bf2b0f8185f1ae6d8b9985e213d81a68c148e113ad875cfd3cea7cd3c804818e
+- chunks: pc340a25.b64.part00..part05
+- every Git transport chunk blob SHA was verified against the local canonical chunk before generator creation.
+- generator: printcheck-build/prepare_alpha25.py
+
+Version/update:
+- versionName 3.4.0-alpha25
+- versionCode 340025
+- applicationId ru.printcheck.android
+- persistent alpha signer must remain unchanged.
+
+Known limitations / follow-up:
+- visible RGB separation is not yet native vector CMYK/Pantone/spot separation;
+- a true White ink object rendered against an indistinguishable white background can be impossible to recover reliably from raster alone; native PDF object/color-space parsing is the correct future path;
+- continuous-tone full-color raster intentionally becomes manual for technical same-color morphology;
+- 25900.61 remains a separate geometry/mapping issue if still absent;
+- CDR remains saved_not_parsed;
+- general rotation registration not implemented;
+- effects/gradients/transparency still not fully artwork-scoped.
+
+Acceptance test after APK:
+- rerun order 7920509;
+- verify that different visible colors are listed as separate color_layers;
+- verify cross_color_negative_gaps_ignored=true;
+- verify black/white or other cross-color boundaries no longer produce negative issue circles;
+- verify same-color narrow gaps still do;
+- inspect 30114.30 issue count/overlay specifically;
+- export alpha25 diagnostics for measured comparison.
