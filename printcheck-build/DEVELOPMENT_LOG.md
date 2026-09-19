@@ -490,3 +490,28 @@ Repair:
 - repair source commit: cc825eb3f11a07fa1da657367354fe47f72f229e.
 
 No application logic changed in this repair.
+
+
+### Alpha21 final CI attempt 1 — Android compile API mismatch
+
+- source commit: 8446193b39884f20742262ce6a97d8e15359e747
+- Actions run: 35458799060
+- canonical source generation: PASS
+- alpha21 invariants: PASS
+- alpha21 audit: PASS
+- core tests: PASS (60/60)
+- Android compile: FAIL
+
+Compiler cause:
+- GeometryAnalyzer.java high-resolution small-element path still called detectArtworkInField with the old alpha20 parameter list.
+- alpha21 changed the method to receive RegistrationRefinement and ColorEstimate objects.
+- only this high-resolution call-site remained unsynchronised.
+
+Repair:
+- high-resolution path now creates an identity RegistrationRefinement for the already-cropped aligned bitmaps and passes ColorEstimate objects directly;
+- prepare_alpha21.py performs the repair deterministically after patch application;
+- generator now has an invariant that rejects any remaining legacy detectArtworkInField(l,r,0,0...) call;
+- local core tests remain 60/60 and audit remains 20/20 after repair;
+- repair commit: 887d718784180167db3817cbd524bae2c067ab91.
+
+No user-facing detection rule was weakened to make the build pass.
