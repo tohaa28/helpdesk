@@ -51,7 +51,7 @@ checks = {
     'partial logic': logic.is_file() and 'partial-template-field-map-v1' in logic.read_text(encoding='utf-8'),
     'field mapper': mapper.is_file() and 'PartialTemplateLogic' in mapper.read_text(encoding='utf-8'),
     'mapper call': 'ApplicationFieldMapper.map' in main,
-    'authoritative application size': 'applicationSize' in logic.read_text(encoding='utf-8'),
+    'authoritative application size': 'parseApplicationSizeMm(applicationSize)' in mapper.read_text(encoding='utf-8'),
     'partial matcher': 'same-page-partial-template' in matcher,
     'mapped field geometry': 'analyzeMappedField' in geo and 'mapped_from_selected_application' in geo,
     'constructor subtraction': 'template_fragment_mode' in geo,
