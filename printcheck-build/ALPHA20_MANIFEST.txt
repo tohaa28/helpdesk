@@ -1,0 +1,57 @@
+PrintCheck Android 3.4.0-alpha20 — canonical build manifest
+Date: 2026-09-19
+
+VERSION
+versionName=3.4.0-alpha20
+versionCode=340020
+applicationId=ru.printcheck.android
+branch=printcheck-build-3.4.0-alpha20
+
+BUILD
+source_commit=6a000b08878cee7cc82c59003758eb3f8d1e58f5
+actions_run=35455256258
+artifact_name=PrintCheck_Android_3.4.0-alpha20_BUILD
+artifact_id=10588296469
+artifact_digest=sha256:9c3e9b7ee24ec53e6eb937458e618c1814af5487cbd9e8a974accfddf9451390
+artifact_expires=2026-09-26T16:33:40Z
+
+FILES
+apk_sha256=712d7931a67c624f6582ee9e3c6dbf33a7bf6c3048c56866b0eb874f5668128e
+source_zip_sha256=98b0d953480377e5ddb6bcc266e25ced8e5e0fe54c7ce99ee47c38e2b60881ba
+sha_file_sha256=f5848f8e1545950e157824756646a9d9ed5fe79b4ee203c7b6989c663dd3e448
+
+PERSISTENT NON-PRODUCTION ALPHA SIGNING
+alias=printcheck-alpha
+certificate_sha256=82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+pkcs12_sha256=153e3e22548b7c089caff4cf012aa7f0e41b9091b344fb9f6496377feecebb10
+transport_sha256=098c0b74d82bb794cf063a526b20f48365f2948915baef6275151ae69d8f2fb1
+valid_from=2026-09-19
+valid_until=2054-02-04
+purpose=alpha20+ in-place Android test updates only
+production_key=false
+
+UPDATE CONTRACT
+- Keep applicationId ru.printcheck.android.
+- Increment versionCode on every distributed build.
+- Sign every alpha20+ distributed APK with the same persistent alpha signer.
+- Never fall back to ephemeral CI debug signing.
+- alpha19 -> alpha20 may require one final uninstall because alpha19 predates persistent signing.
+- alpha20 -> alpha21+ should install as an Android update and preserve app data.
+
+ARTWORK-DETECTION CHANGESET
+- exact selected-application template promoted to primary field/artwork reference;
+- selected application field detected from real color-highlighted template geometry;
+- layout registered directly to selected application template;
+- preserved selected field can recover alignment when most template content was deleted;
+- dominant customer artwork color is no longer discarded as background;
+- selected-template subtraction suppresses only matching template/reference content;
+- selected application size takes identity priority over broader placement-zone size;
+- full constructor retained as supporting/fallback evidence;
+- synthetic order-size geometry remains forbidden.
+
+TEST GATES BEFORE BUILD
+core_tests=54/54_pass
+alpha20_audit=17/17_pass
+
+KNOWN SECURITY BOUNDARY
+The persistent alpha signer is an internal NON-PRODUCTION test key. It must not be used as a production signing identity.
