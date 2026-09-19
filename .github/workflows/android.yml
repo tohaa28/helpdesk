@@ -1,4 +1,4 @@
-name: Build PrintCheck 3.4.0-alpha15 APK
+name: Build PrintCheck 3.4.0-alpha16 APK
 on: [workflow_dispatch, push]
 
 jobs:
@@ -23,38 +23,40 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
-      - name: Prepare canonical alpha15 source
-        run: python3 printcheck-build/prepare_alpha15.py .
-      - name: Verify alpha15 invariants
+      - name: Prepare canonical alpha16 source
+        run: python3 printcheck-build/prepare_alpha16.py .
+      - name: Verify alpha16 invariants
         shell: bash
         run: |
-          grep -q "versionName '3.4.0-alpha15'" .printcheck-alpha15/app/build.gradle
-          grep -q "versionCode 340015" .printcheck-alpha15/app/build.gradle
-          grep -q "alpha7_application_geometry_v1" .printcheck-alpha15/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q 'geometry_reference_type","application' .printcheck-alpha15/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q "Геометрия по общему конструктору запрещена" .printcheck-alpha15/app/src/main/java/ru/printcheck/android/MainActivity.java
-          grep -q "suppressProductionBoundary(hi,target)" .printcheck-alpha15/app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java
-      - name: Alpha15 regression audit
-        run: python3 .printcheck-alpha15/tests/audit_alpha15.py
+          grep -q "versionName '3.4.0-alpha16'" .printcheck-alpha16/app/build.gradle
+          grep -q "versionCode 340016" .printcheck-alpha16/app/build.gradle
+          grep -q "item_first_application_preflight_v1" .printcheck-alpha16/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "direct-application" .printcheck-alpha16/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "constructor-bridge" .printcheck-alpha16/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "Техтребования выбранного нанесения" .printcheck-alpha16/app/src/main/java/ru/printcheck/android/ResultView.java
+          grep -q "Само нанесение крупно" .printcheck-alpha16/app/src/main/java/ru/printcheck/android/ResultView.java
+          grep -q "ScaleGestureDetector" .printcheck-alpha16/app/src/main/java/ru/printcheck/android/ZoomImageView.java
+      - name: Alpha16 regression audit
+        run: python3 .printcheck-alpha16/tests/audit_alpha16.py
       - name: Core tests
-        run: bash .printcheck-alpha15/tests/run_core.sh
+        run: bash .printcheck-alpha16/tests/run_core.sh
       - name: Build APK
         run: gradle --no-daemon --stacktrace assembleDebug
       - name: Package source
         shell: bash
         run: |
-          cd .printcheck-alpha15
-          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha15_source.zip" . -x '*/build/*' '*.keystore'
+          cd .printcheck-alpha16
+          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha16_source.zip" . -x '*/build/*' '*.keystore'
       - name: Collect APK
         shell: bash
         run: |
-          cp .printcheck-alpha15/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha15.apk
-          sha256sum PrintCheck_Android_3.4.0-alpha15.apk
+          cp .printcheck-alpha16/app/build/outputs/apk/debug/app-debug.apk PrintCheck_Android_3.4.0-alpha16.apk
+          sha256sum PrintCheck_Android_3.4.0-alpha16.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: PrintCheck_Android_3.4.0-alpha15_BUILD
+          name: PrintCheck_Android_3.4.0-alpha16_BUILD
           path: |
-            PrintCheck_Android_3.4.0-alpha15.apk
-            PrintCheck_Android_3.4.0-alpha15_source.zip
+            PrintCheck_Android_3.4.0-alpha16.apk
+            PrintCheck_Android_3.4.0-alpha16_source.zip
           if-no-files-found: error
           retention-days: 7
