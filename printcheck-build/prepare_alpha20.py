@@ -60,6 +60,57 @@ if bad_fragment not in main_text:
     raise RuntimeError("alpha20 expected syntax repair fragment not found")
 main_path.write_text(main_text.replace(bad_fragment, good_fragment, 1), encoding="utf-8")
 
+# All alpha20+ CI APKs use one persistent NON-PRODUCTION signing identity.
+# This allows Android to install later alpha builds as updates instead of requiring uninstall.
+# The key is intentionally limited to internal alpha builds and must never be reused as a production release key.
+signing_b64_path = pb / "NON_PRODUCTION_ALPHA_SIGNING.p12.b64"
+if not signing_b64_path.is_file():
+    raise RuntimeError("persistent alpha signing material is missing")
+signing_encoded = signing_b64_path.read_bytes().replace(b"\n", b"").replace(b"\r", b"")
+expected_signing_b64_sha256 = "098c0b74d82bb794cf063a526b20f48365f2948915baef6275151ae69d8f2fb1"
+if hashlib.sha256(signing_encoded).hexdigest() != expected_signing_b64_sha256:
+    raise RuntimeError("persistent alpha signing base64 sha256 mismatch")
+signing_bytes = base64.b64decode(signing_encoded, validate=True)
+expected_signing_p12_sha256 = "153e3e22548b7c089caff4cf012aa7f0e41b9091b344fb9f6496377feecebb10"
+if hashlib.sha256(signing_bytes).hexdigest() != expected_signing_p12_sha256:
+    raise RuntimeError("persistent alpha signing p12 sha256 mismatch")
+signing_dir = src20 / "signing"
+signing_dir.mkdir(parents=True, exist_ok=True)
+(signing_dir / "printcheck-alpha-test.p12").write_bytes(signing_bytes)
+(signing_dir / "README.txt").write_text(
+    "PrintCheck alpha builds from GitHub CI use a persistent NON-PRODUCTION test signing identity.\n"
+    "Certificate SHA-256: 82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11\n"
+    "Purpose: permit in-place Android updates between alpha20 and later alpha test builds.\n"
+    "The private signing file is excluded from packaged source ZIPs and must not be used for production releases.\n",
+    encoding="utf-8",
+)
+
+gradle_path = src20 / "app/build.gradle"
+gradle_text = gradle_path.read_text(encoding="utf-8")
+signing_marker = "alphaPersistent"
+if signing_marker not in gradle_text:
+    signing_config = '''
+    // Persistent NON-PRODUCTION signing identity for install-over-update alpha builds.
+    signingConfigs {
+        alphaPersistent {
+            storeFile file("$rootDir/signing/printcheck-alpha-test.p12")
+            storePassword 'PrintCheckAlpha2026!'
+            keyAlias 'printcheck-alpha'
+            keyPassword 'PrintCheckAlpha2026!'
+            enableV1Signing true
+            enableV2Signing true
+        }
+    }
+
+'''
+    gradle_text = gradle_text.replace("    testOptions {", signing_config + "    testOptions {", 1)
+    gradle_text = gradle_text.replace(
+        "        debug { minifyEnabled false }",
+        "        debug {\n            minifyEnabled false\n            signingConfig signingConfigs.alphaPersistent\n        }",
+        1,
+    )
+    gradle_path.write_text(gradle_text, encoding="utf-8")
+
 build_gradle = (src20 / "app/build.gradle").read_text(encoding="utf-8")
 field_logic = (src20 / "app/src/main/java/ru/printcheck/android/ConstructorFieldLogic.java").read_text(encoding="utf-8")
 partial = (src20 / "app/src/main/java/ru/printcheck/android/PartialTemplateLogic.java").read_text(encoding="utf-8")
@@ -69,6 +120,7 @@ geom = (src20 / "app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java")
 required = {
     "versionCode 340020": "versionCode 340020" in build_gradle,
     "versionName alpha20": "versionName '3.4.0-alpha20'" in build_gradle,
+    "persistent alpha signing config": "alphaPersistent" in build_gradle and "printcheck-alpha-test.p12" in build_gradle,
     "selected application primary marker": "selected_application_template_primary_v2" in main,
     "selected field identity size": "selectedFieldIdentitySizeMm" in partial,
     "application raster real source": "SOURCE_APPLICATION_RASTER" in field_logic,
