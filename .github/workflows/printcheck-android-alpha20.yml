@@ -52,6 +52,8 @@ jobs:
           grep -q "versionName '3.4.0-alpha20'" .printcheck-alpha20/app/build.gradle
           grep -q "versionCode 340020" .printcheck-alpha20/app/build.gradle
           grep -q "selected_application_template_primary_v2" .printcheck-alpha20/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q "alphaPersistent" .printcheck-alpha20/app/build.gradle
+          test -f .printcheck-alpha20/signing/printcheck-alpha-test.p12
           grep -q "recoverAlignmentFromApplicationField" .printcheck-alpha20/app/src/main/java/ru/printcheck/android/MainActivity.java
           grep -q "selectedFieldIdentitySizeMm" .printcheck-alpha20/app/src/main/java/ru/printcheck/android/PartialTemplateLogic.java
           grep -q "SOURCE_APPLICATION_RASTER" .printcheck-alpha20/app/src/main/java/ru/printcheck/android/ConstructorFieldLogic.java
@@ -76,7 +78,7 @@ jobs:
         shell: bash
         run: |
           cd .printcheck-alpha20
-          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha20_source.zip" . -x '*/build/*' '*.keystore'
+          zip -qr "$GITHUB_WORKSPACE/PrintCheck_Android_3.4.0-alpha20_source.zip" . -x '*/build/*' '*.keystore' '*.p12'
 
       - name: Collect APK and hashes
         shell: bash
