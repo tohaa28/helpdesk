@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha23 (build in progress)
+Current implementation line: Android 3.4.0-alpha23
 Current development/build branch: printcheck-build-3.4.0-alpha23
 
 ## STRICT CONTINUITY RULE
@@ -590,3 +590,31 @@ Do not restore alpha22 exhaustive full-radius high-DPI registration or unconditi
 Update compatibility:
 - versionCode 340023;
 - same applicationId and persistent signer as alpha20–alpha22.
+
+
+## ALPHA23 CANONICAL SUCCESSFUL BUILD CHECKPOINT
+
+- versionName: 3.4.0-alpha23
+- versionCode: 340023
+- applicationId: ru.printcheck.android
+- source commit: 85ec610f83247ae3246238a736e87e8baf948883
+- GitHub Actions run: 35464170600
+- job ID: 105953218866
+- artifact ID: 10590573476
+- artifact: PrintCheck_Android_3.4.0-alpha23_FINAL_BUILD
+- APK SHA-256: 2afac3b7a11cc75f375abd35e29f0ae99bc4af81c08e65f48957b3e490b0710c
+- source ZIP SHA-256: b5fed7c7ac9085862d4b44bb6cbfbe375ada0c711eab5e5e12d4ce4743c339d8
+- signer SHA-256:
+  82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Alpha23 is update-compatible with alpha22.
+
+Performance architecture:
+- high-res artwork quality retained;
+- target 720 dpi / 4M pixel main ROI;
+- cached registration support samples;
+- coarse-to-fine local registration;
+- bulk pixel row reads;
+- small-element pass reuses high-res artwork mask whenever resolution is sufficient;
+- otherwise renders a tight artwork crop only, capped at 1600 dpi / 2.5M pixels;
+- per-stage timing diagnostics are mandatory for future performance work.
