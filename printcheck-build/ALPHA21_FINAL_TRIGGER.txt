@@ -1,0 +1,7 @@
+final_alpha21_trigger=1
+purpose=artwork-detection-plus-fullscreen
+expected_version_code=340021
+expected_application_id=ru.printcheck.android
+expected_transport_sha256=d11d7ab37077fc3aaad7445bcb776ae8019ab4d16be8c95e88380807684b7c98
+expected_patch_sha256=e5da0522349a4a51bf0b9da0081994894e3090d74fa78ae72bf80c13db79c956
+expected_signer_sha256=82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
