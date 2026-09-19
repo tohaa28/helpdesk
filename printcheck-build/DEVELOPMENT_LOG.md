@@ -343,3 +343,33 @@ Security boundary:
 CI continuity hardening:
 - alpha20 workflow now refuses to write .ci/alpha20-result.txt when the run source SHA is no longer the current branch HEAD;
 - this prevents an older concurrent run from overwriting the result of a newer build.
+
+
+### Alpha20 successful signed Android build — update-compatible baseline
+
+Successful build:
+- source commit: 6a000b08878cee7cc82c59003758eb3f8d1e58f5
+- Actions run: 35455256258
+- status: success
+- artifact: PrintCheck_Android_3.4.0-alpha20_BUILD
+- artifact ID: 10588296469
+- GitHub artifact digest: sha256:9c3e9b7ee24ec53e6eb937458e618c1814af5487cbd9e8a974accfddf9451390
+- artifact expiry: 2026-09-26T16:33:40Z
+
+Independent artifact verification:
+- APK SHA-256: 712d7931a67c624f6582ee9e3c6dbf33a7bf6c3048c56866b0eb874f5668128e
+- source ZIP SHA-256: 98b0d953480377e5ddb6bcc266e25ced8e5e0fe54c7ce99ee47c38e2b60881ba
+- SHA file SHA-256: f5848f8e1545950e157824756646a9d9ed5fe79b4ee203c7b6989c663dd3e448
+- APK ZIP integrity: PASS
+- signer owner: CN=PrintCheck Alpha Test, OU=Development, O=PrintCheck, L=Test, ST=Test, C=RU
+- signer SHA-256: 82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+- signer algorithm: SHA384withRSA / 3072-bit RSA
+- signer validity: 2026-09-19 through 2054-02-04
+- packaged source contains alphaPersistent signing config and signing/README.txt;
+- packaged source intentionally does NOT contain the private *.p12 file.
+
+This successful alpha20 APK is the canonical install-over-update baseline for all subsequent alpha builds.
+
+Transition:
+- an already installed alpha19 may require one final uninstall before installing this alpha20 because alpha19 was produced before persistent signing was introduced;
+- after this signed alpha20 is installed, all later distributed alpha APKs must retain applicationId ru.printcheck.android, use this same test signer, and increase versionCode so Android treats them as updates and preserves app data.
