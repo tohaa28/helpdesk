@@ -1,4 +1,4 @@
-alpha21_final2=1
+alpha21_final2=2
 expected_version=3.4.0-alpha21
 expected_version_code=340021
 expected_application_id=ru.printcheck.android
