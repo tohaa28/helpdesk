@@ -2,8 +2,8 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha22
-Current development/build branch: printcheck-build-3.4.0-alpha22
+Current implementation line: Android 3.4.0-alpha23 (build in progress)
+Current development/build branch: printcheck-build-3.4.0-alpha23
 
 ## STRICT CONTINUITY RULE
 
@@ -570,3 +570,23 @@ Authoritative alpha22 artwork pipeline:
 coarse page discovery -> real selected colored field -> high-res ROI render -> high-res local registration -> high-res selected-template subtraction -> high-res physical measurement/evidence -> coarse-coordinate projection only for legacy overlays/font scoping.
 
 Do not regress primary artwork segmentation back to RasterPdfIndexer.commonDpi.
+
+
+## ALPHA23 PERFORMANCE CONTRACT
+
+alpha22 high-res quality stays, but its exhaustive computation is forbidden.
+
+Required pipeline:
+- whole-page discovery: coarse adaptive raster;
+- artwork segmentation: dedicated high-res ROI, target 720 dpi, >=300 dpi when feasible, 4M-pixel budget;
+- high-res registration: cached reference support samples + coarse-to-fine offset search;
+- hot raster diff/background sampling: bulk row reads, not millions of Bitmap.getPixel() calls;
+- small-element analyzer reuses the artwork high-res mask when >=4 px/rule;
+- additional fine render only for rules that truly need it, tight around detected artwork, target ~6 px/rule, <=1600 dpi, 2.5M-pixel budget;
+- result.json must retain timing_coarse_render_ms / timing_artwork_highres_ms / timing_small_elements_ms / timing_geometry_total_ms.
+
+Do not restore alpha22 exhaustive full-radius high-DPI registration or unconditional second high-res render.
+
+Update compatibility:
+- versionCode 340023;
+- same applicationId and persistent signer as alpha20–alpha22.
