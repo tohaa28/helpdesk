@@ -52,7 +52,7 @@ checks = {
     'order size parser only': 'parseApplicationSizeMm' in partial and 'class Mapping' not in partial and 'static Mapping map' not in partial,
     'no mapped geometry': 'analyzeMappedField' not in geo and 'mapped_from_selected_application' not in geo,
     'constructor geometry': 'analyzeConstructorField' in geo and 'constructor-vector-subtraction-v1' in geo,
-    'manual fallback': 'no_confident_constructor_vector_field' in main,
+    'manual fallback': 'field_source\",\"manual' in main and 'синтетическая рамка запрещена' in main.lower(),
     'cdr relation': 'constructorSources' in http and 'saved_not_parsed' in http,
 }
 failed = [k for k, v in checks.items() if not v]
