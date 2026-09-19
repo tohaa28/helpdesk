@@ -464,3 +464,29 @@ Next gate:
 - successful GitHub Android build;
 - independent artifact/signature/hash verification;
 - rerun order 7920509 and compare isolated artwork images position by position.
+
+
+### Alpha21 CI attempt 1 — transport integrity failure
+
+- source commit: 9759af9ae34da4080c733c5fbb9a3559b5668ee2
+- Actions run: 35458553556
+- failure step: Prepare canonical alpha21 source
+- alpha20 reconstruction completed successfully.
+- alpha21 patch was NOT applied because transport SHA did not match.
+- observed transport SHA: b1bc3a70dcc574dcff6bc520d5d7552c5cea6481848364d1b47594e7a15dce42
+- expected transport SHA: d11d7ab37077fc3aaad7445bcb776ae8019ab4d16be8c95e88380807684b7c98
+
+Diagnosis:
+- all transport chunk lengths were correct;
+- Git blob hashes matched local originals for part00, part01, part02, part04, part05;
+- only part03 differed despite identical length, proving a same-length one-character mutation during text transport.
+
+Repair:
+- original damaged Git part03 retained only as historical evidence;
+- exact local part03 split into part03a + part03b, 2750 chars each;
+- local Git blob SHA part03a: a814f61cc6e539af3ccd83d9c041661d7f1d2ab1;
+- local Git blob SHA part03b: ebf3c411a3266f144a2471364b46b5ab2ab60a79;
+- prepare_alpha21.py changed to use the two exact halves;
+- repair source commit: cc825eb3f11a07fa1da657367354fe47f72f229e.
+
+No application logic changed in this repair.
