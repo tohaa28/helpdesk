@@ -851,3 +851,49 @@ Acceptance criteria:
 - order 7920509 must no longer require tens of minutes;
 - diagnostics must expose per-stage timings so any remaining hotspot can be measured on-device;
 - artwork detection quality must not regress to alpha21 coarse-DPI behavior.
+
+
+### Alpha23 successful final signed Android build
+
+Canonical build:
+- versionName: 3.4.0-alpha23
+- versionCode: 340023
+- applicationId: ru.printcheck.android
+- source commit: 85ec610f83247ae3246238a736e87e8baf948883
+- GitHub Actions run: 35464170600
+- job: 105953218866
+- status: success
+- artifact: PrintCheck_Android_3.4.0-alpha23_FINAL_BUILD
+- artifact ID: 10590573476
+- artifact digest: sha256:42971990950361310b32b5819d5ea904deccedbe90dab8879e0a687cbf18316e
+- artifact expires: 2026-09-26T19:24:16Z
+
+Final gates:
+- prepare_alpha23: PASS
+- source invariants: PASS
+- alpha23 audit: 23/23 PASS
+- core tests: 66/66 PASS
+- Android Gradle build: PASS
+- persistent signer verification: PASS
+- artifact upload: PASS
+
+Downloaded-artifact verification:
+- APK SHA-256: 2afac3b7a11cc75f375abd35e29f0ae99bc4af81c08e65f48957b3e490b0710c
+- source ZIP SHA-256: b5fed7c7ac9085862d4b44bb6cbfbe375ada0c711eab5e5e12d4ce4743c339d8
+- SHA file SHA-256: 632c94a0d3e9ea074b69ec0eb9016d2b44f45dfd2b9ba54833e5d39b5fd96bb5
+- signer TXT SHA-256: 2c3e07a2474567ca66c91af647fb06010e04a82b2b96aa1f534b17eb8feb1854
+- APK ZIP integrity: PASS
+- source ZIP integrity: PASS
+- packaged build.gradle confirms ru.printcheck.android / 340023 / 3.4.0-alpha23
+- packaged source contains no private .p12
+- signer SHA-256: 82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Update compatibility:
+alpha23 is signed with the exact persistent alpha20-alpha22 test signer, retains applicationId, and increments versionCode, so it should install over alpha22 without uninstall/data loss.
+
+Performance validation requirement:
+- rerun order 7920509;
+- record total wall-clock order time;
+- export diagnostics;
+- inspect timing_coarse_render_ms / timing_artwork_highres_ms / timing_small_elements_ms / timing_geometry_total_ms per item;
+- do not claim a numeric speed-up until the on-device run is measured.
