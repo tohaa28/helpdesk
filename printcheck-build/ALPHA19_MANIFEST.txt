@@ -1,0 +1,38 @@
+PrintCheck 3.4.0-alpha19 reproducibility manifest
+Date: 2026-09-19
+Branch: printcheck-build-3.4.0-alpha19
+Base implementation: PrintCheck 3.4.0-alpha18
+
+PATCH TRANSPORT
+parts:
+  printcheck-build/pc340a19.b64.part00
+  printcheck-build/pc340a19.b64.part01
+  printcheck-build/pc340a19.b64.part02
+  printcheck-build/pc340a19.b64.part03
+  printcheck-build/pc340a19.b64.part04
+concatenated base64 length: 28556
+concatenated base64 SHA-256: f97340de8e07b76c68965b011b45b42fedfb26698d046c49792eaa98c1305439
+decoded gzip patch SHA-256: cfd6f131a1a91a081c614209313f52d09b41ca8757a838d14467241fd76e9b34
+decoded patch length: 92255 bytes
+
+GENERATOR
+printcheck-build/prepare_alpha19.py
+It regenerates canonical alpha18 first, copies it to .printcheck-alpha19,
+verifies the transport hash, decodes the exact patch, verifies patch hash,
+applies it, and verifies alpha19 source invariants.
+
+LOCAL PRE-CI VERIFICATION
+- patch applied cleanly to a fresh exact alpha18 source tree
+- alpha19 regression audit: 15/15 passed
+- core tests: 52/52 passed
+
+CANONICAL ALPHA19 RULES
+- application field must be a real color-highlighted vector field from template
+- uncolored rectangles cannot auto-select solely by geometry/order size
+- order dimensions never synthesize geometry
+- heavily deleted retained template is allowed if target colored field remains
+- whole-template retained coverage is not a blocking condition
+- layout minus constructor remains the artwork extraction direction
+- template service graphics are not customer artwork
+- CDR is preserved with relation but is still not parsed
+- registration is still primarily translation/same-scale; general uniform scale/rotation remains future work
