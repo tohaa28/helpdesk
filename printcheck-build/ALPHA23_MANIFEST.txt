@@ -1,0 +1,59 @@
+PrintCheck Android 3.4.0-alpha23 — canonical build manifest
+Date: 2026-09-19
+
+VERSION
+versionName=3.4.0-alpha23
+versionCode=340023
+applicationId=ru.printcheck.android
+branch=printcheck-build-3.4.0-alpha23
+
+BUILD
+source_commit=85ec610f83247ae3246238a736e87e8baf948883
+actions_run=35464170600
+job_id=105953218866
+artifact_name=PrintCheck_Android_3.4.0-alpha23_FINAL_BUILD
+artifact_id=10590573476
+artifact_digest=sha256:42971990950361310b32b5819d5ea904deccedbe90dab8879e0a687cbf18316e
+artifact_expires=2026-09-26T19:24:16Z
+
+FILES
+apk_sha256=2afac3b7a11cc75f375abd35e29f0ae99bc4af81c08e65f48957b3e490b0710c
+source_zip_sha256=b5fed7c7ac9085862d4b44bb6cbfbe375ada0c711eab5e5e12d4ce4743c339d8
+sha_file_sha256=632c94a0d3e9ea074b69ec0eb9016d2b44f45dfd2b9ba54833e5d39b5fd96bb5
+signer_txt_sha256=2c3e07a2474567ca66c91af647fb06010e04a82b2b96aa1f534b17eb8feb1854
+apk_zip_integrity=PASS
+source_zip_integrity=PASS
+
+SIGNING
+persistent_alpha_signer=true
+certificate_sha256=82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+update_compatible_with_alpha22=true
+
+TEST GATES
+source_generation=PASS
+source_invariants=PASS
+audit_alpha23=23/23_PASS
+core_tests=66/66_PASS
+android_build=PASS
+signer_verification=PASS
+artifact_upload=PASS
+
+PERFORMANCE PIPELINE
+main_artwork_target_dpi=720
+main_artwork_min_dpi=300
+main_artwork_pixel_budget=4000000
+main_roi_margin_mm=3.5
+registration_samples_max=12000
+registration_search=coarse_to_fine
+pixel_access=bulk_row_reads
+reuse_highres_for_small_elements_if_px_per_rule_gte=4
+fine_rule_target_px_per_rule=6
+fine_rule_max_dpi=1600
+fine_rule_pixel_budget=2500000
+fine_rule_crop=detected_artwork_bbox
+stage_timings=true
+
+REAL DEVICE ACCEPTANCE
+control_order=7920509
+required_metrics=timing_coarse_render_ms,timing_artwork_highres_ms,timing_small_elements_ms,timing_geometry_total_ms
+numeric_speedup_not_claimed_until_measured=true
