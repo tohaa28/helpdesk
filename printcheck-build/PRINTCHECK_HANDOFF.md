@@ -2,8 +2,8 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha25
-Current development/build branch: printcheck-build-3.4.0-alpha25
+Current implementation line: Android 3.4.0-alpha26 (build in progress)
+Current development/build branch: printcheck-build-3.4.0-alpha26
 
 ## STRICT CONTINUITY RULE
 
@@ -774,3 +774,53 @@ real field
 
 Cross-color distances must remain ignored.
 Continuous-tone/unstable visible separation must remain manual, not forced into pseudo-color technical verdicts.
+
+
+## ALPHA26 — INTERSECTION-SAFE CENTERED FEATURE CONTRACT
+
+Authoritative requirements:
+1. A contact/intersection between DIFFERENT colors is never by itself a technical small element.
+2. Technical morphology is performed on reconstructed SOLID geometry of one color, not on the thin layout-minus-template contour.
+3. The report marker is centered on the real detected feature:
+   - positive narrow region -> actual narrow-region center;
+   - same-color negative gap -> physical gap midpoint;
+   - single small object -> connected-component centroid.
+
+Required pipeline:
+diff seed
+-> stable visible color
+-> reconstruct full same-color connected solid
+-> exclusive owner map
+-> cross-color intersection/contact exclusion
+-> per-color local-thickness / same-color-gap / single-object measurement
+-> centered markers.
+
+Do NOT regress to using the diff contour as the positive object.
+
+Algorithmic basis:
+- distance-transform / medial-ridge concept for local width;
+- connected components / centroids for objects;
+- nearest same-color components through unowned space for gap centers;
+- other colors are barriers in negative-gap propagation.
+
+Current alpha26 implementation intentionally avoids adding OpenCV; concepts are implemented on existing masks for APK size/control.
+Future higher-fidelity direction: use existing PDFBox PDFGraphicsStreamEngine to recover native vector paths and stroking/non-stroking color state (CMYK/RGB/spot/White where available), then use raster reconstruction only as fallback.
+
+Diagnostics:
+- cross_color_intersections_excluded=true
+- feature center_x / center_y
+- feature_kind
+- marker_style=centered_features_v6_intersection_safe_reference_ruler
+
+Retained:
+- reference ruler before morphology;
+- per-color same-color-only semantics;
+- constructor authority guard;
+- 720dpi/4M performance architecture;
+- top-right auth UI;
+- persistent update-compatible signer.
+
+Version:
+- alpha26 versionCode 340026;
+- app id unchanged;
+- same persistent non-production alpha signer required.
