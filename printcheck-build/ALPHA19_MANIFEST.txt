@@ -4,27 +4,48 @@ Branch: printcheck-build-3.4.0-alpha19
 Base implementation: PrintCheck 3.4.0-alpha18
 
 PATCH TRANSPORT
-parts:
+active parts:
   printcheck-build/pc340a19.b64.part00
   printcheck-build/pc340a19.b64.part01
   printcheck-build/pc340a19.b64.part02
-  printcheck-build/pc340a19.b64.part03
+  printcheck-build/pc340a19.b64.part03a
+  printcheck-build/pc340a19.b64.part03b
   printcheck-build/pc340a19.b64.part04
-concatenated base64 length: 28556
-concatenated base64 SHA-256: f97340de8e07b76c68965b011b45b42fedfb26698d046c49792eaa98c1305439
+
+NOTE:
+  printcheck-build/pc340a19.b64.part03 is retained only as historical evidence of
+  the first CI transport failure and is NOT used by prepare_alpha19.py.
+
+active part lengths:
+  part00 = 6000
+  part01 = 6000
+  part02 = 6000
+  part03a = 3000
+  part03b = 3000
+  part04 = 4556
+
+concatenated active base64 length: 28556
+concatenated active base64 SHA-256: f97340de8e07b76c68965b011b45b42fedfb26698d046c49792eaa98c1305439
 decoded gzip patch SHA-256: cfd6f131a1a91a081c614209313f52d09b41ca8757a838d14467241fd76e9b34
 decoded patch length: 92255 bytes
 
 GENERATOR
 printcheck-build/prepare_alpha19.py
 It regenerates canonical alpha18 first, copies it to .printcheck-alpha19,
-verifies the transport hash, decodes the exact patch, verifies patch hash,
-applies it, and verifies alpha19 source invariants.
+verifies exact transport length and SHA-256, decodes the patch, verifies
+the decoded patch SHA-256, applies it, and verifies alpha19 source invariants.
 
 LOCAL PRE-CI VERIFICATION
 - patch applied cleanly to a fresh exact alpha18 source tree
 - alpha19 regression audit: 15/15 passed
 - core tests: 52/52 passed
+
+CI TRANSPORT HISTORY
+- run 35452196424, source 83e05f4107ebe8f637ed694faf3dfe00843f37f6:
+  failed in Prepare canonical alpha19 source because original part03 arrived as
+  5999 bytes instead of 6000, producing total base64 length 28555.
+- repair: original part03 replaced in the active generator by exact 3000-byte
+  part03a + exact 3000-byte part03b; global transport SHA check remains mandatory.
 
 CANONICAL ALPHA19 RULES
 - application field must be a real color-highlighted vector field from template
