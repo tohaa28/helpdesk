@@ -717,3 +717,70 @@ Actual values depend on the final ROI/margins and clipping.
 
 Separate unresolved case:
 25900.61 had no geometry in alpha21; if it remains missing in alpha22, treat as a mapping/alignment issue rather than a resolution issue.
+
+
+---
+
+## 2026-09-19 — alpha23: performance recovery after alpha22 high-res ROI
+
+User report:
+- alpha22 takes several tens of minutes for one order.
+
+Root causes found in alpha22 source:
+1. High-res artwork ROI was rendered at up to 900 dpi / 8M px per bitmap.
+2. Local high-res registration evaluated every pixel offset in a ~0.8 mm search radius. At high DPI this means thousands of candidate offsets.
+3. Every candidate rescanned the reference support area and used many Bitmap.getPixel() calls.
+4. Artwork subtraction itself used per-pixel getPixel() in the hot loop.
+5. Small-element analysis rerendered layout + reference again at 600–2400 dpi and repeated template subtraction, even when the existing high-res artwork mask already had enough physical resolution.
+6. Evidence extraction again read artwork pixels one-by-one.
+
+Alpha23 optimization:
+- main artwork target DPI: 720 instead of 900;
+- main artwork bitmap budget: 4M instead of 8M pixels;
+- ROI margin: 3.5 mm instead of 5 mm;
+- registration support pixels are collected once per field and capped at 12,000 representative samples;
+- registration translation search is coarse-to-fine instead of exhaustive per-pixel over the full radius;
+- background estimation and artwork subtraction use bulk Bitmap.getPixels row reads;
+- no per-pixel temporary row-array allocation in neighborhood matching;
+- small-element morphology reuses the existing artwork high-res mask whenever that mask provides >=4 px across the smallest active rule;
+- only genuinely finer rules trigger a second render;
+- second render target is ~6 px/rule, capped at 1600 dpi instead of 10 px/rule / 2400 dpi;
+- second render is cropped around the detected artwork bbox, not the entire production field, with 2.5M-pixel budget;
+- evidence image extraction uses bulk row reads;
+- stage timings are emitted in result.json:
+  timing_coarse_render_ms
+  timing_artwork_highres_ms
+  timing_small_elements_ms
+  timing_geometry_total_ms
+
+Quality constraints retained:
+- global matching remains coarse only;
+- authoritative artwork detection still uses dedicated high-res ROI;
+- minimum artwork ROI target remains 300 dpi when feasible;
+- selected-template subtraction/background-aware logic unchanged;
+- no synthetic field geometry;
+- alpha7 positive/negative morphology retained;
+- full-screen evidence retained.
+
+Local reproducibility gates:
+- clean alpha22 + alpha23 patch: PASS, no rejects;
+- core tests: 66/66 PASS;
+- alpha23 audit: 23/23 PASS.
+
+Patch:
+- decoded bytes: 56788
+- patch SHA-256: 3a4eb46682094245aa525ece86b37a8a5610f371f161b0605314ddc4c9eef421
+- transport chars: 18796
+- transport SHA-256: 01d9f64368b4f54cfa068b37b9e19d088a0b894f21f3065a7144eaa5d59b39c1
+- final transport part03 split into exact halves after same-length API mutation was detected; Git blob SHAs verified.
+
+Version/update:
+- versionName 3.4.0-alpha23
+- versionCode 340023
+- applicationId unchanged
+- persistent signer unchanged.
+
+Acceptance criteria:
+- order 7920509 must no longer require tens of minutes;
+- diagnostics must expose per-stage timings so any remaining hotspot can be measured on-device;
+- artwork detection quality must not regress to alpha21 coarse-DPI behavior.
