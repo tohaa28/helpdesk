@@ -2,207 +2,335 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha18
-Current build branch: printcheck-build-3.4.0-alpha18
+Current implementation line: Android 3.4.0-alpha19
+Current development/build branch: printcheck-build-3.4.0-alpha19
 
 ## STRICT CONTINUITY RULE
 
-This file is the permanent Git-backed handoff for PrintCheck. It must be updated whenever behavior, architecture, rules, file mapping, diagnostics, test expectations, build process, versioning, or known limitations change.
+This is the canonical Git-backed handoff for PrintCheck. It is intentionally detailed enough that a new chat must be able to continue development without asking the user to reconstruct earlier decisions.
 
-A new chat must be able to continue development from Git without reconstructing decisions from memory.
+For every meaningful PrintCheck change:
+1. Change code/build infrastructure in Git.
+2. Append DEVELOPMENT_LOG.md with what changed, why, files/classes affected, tests, failures/fixes, and exact next step.
+3. Update this handoff when canonical behavior, architecture, requirements, build process, limitations, fixtures, or next steps change.
+4. Update the version everywhere it is user-visible and in artifact names.
+5. Record exact source commit, GitHub Actions run, artifact ID, and hashes for successful builds.
+6. Do not keep implementation-critical knowledge only in chat.
+7. Documentation-only commits are ignored by the alpha19 Android workflow so logging can continue without causing CI races.
 
-For every meaningful change:
-1. Update code in Git.
-2. Update DEVELOPMENT_LOG.md with what changed and why.
-3. Update this handoff if the change affects canonical behavior, architecture, rules, limitations, build instructions, or next steps.
-4. Record tests performed and their result.
-5. Record the exact branch/commit and produced artifacts when available.
-6. Never rely on chat-only context for an implementation decision.
-
-No release is considered complete until the documentation above matches the actual code.
+A release/checkpoint is not complete until source invariants, tests, Android build, artifact collection, hashes, and documentation are all recorded.
 
 ## PRODUCT PURPOSE
 
-PrintCheck checks customer artwork against:
-- the actual order data;
-- the constructor/template for the ordered article;
+PrintCheck checks customer artwork for each ordered item against:
+- the exact order article/item;
 - the exact application method selected by the customer;
 - the exact application place selected by the customer;
-- the technical requirements for that application method.
+- the corresponding template/constructor;
+- the technical requirements for that selected application method.
 
-The output must be short, structured, understandable to a technical designer, and visually explain what was found and what is wrong.
+The primary user is a technical designer. The result must therefore be short, structured, visual, and explainable, while detailed diagnostics remain exportable separately.
 
 ## CANONICAL CHECKING ALGORITHM — USER CONFIRMED 2026-09-19
 
 ### 1. Read the order page
 
-For every ordered item obtain and preserve:
-- article;
-- item ID / item relation when available;
-- selected application method;
+For every ordered position obtain and preserve:
+- article / SKU;
+- base article when relevant;
+- item_id and DOM/order relation when available;
+- selected application code/name;
 - selected application place;
-- relations between the item and its layout/template files.
+- field/max-size metadata supplied by the order;
+- relation to customer layouts;
+- relation to article template/constructor;
+- relation to the selected application-template/technical requirements.
 
-Do not guess application type or place from filenames when the page contains the relation.
+Relationship priority:
+1. “Шаблоны макетов” tab is authoritative for article ↔ constructor because article and constructor are shown side-by-side.
+2. Selected applications block is authoritative for the customer's selected application.
+3. DOM item IDs and explicit order relations.
+4. Base article grouping.
+5. URL/article fallback.
+6. Filename matching is diagnostic/final fallback only.
+
+Login remains website-only. Do not reintroduce embedded/direct application authentication.
 
 ### 2. Download source files
 
 Download and preserve:
-- customer layouts;
-- templates / constructors in PDF;
-- templates / constructors in CDR;
-- all useful relation metadata from the page.
+- customer layout files;
+- template/constructor PDF;
+- template/constructor CDR;
+- available supporting AI/EPS/ZIP links/files;
+- source URL, article/item relation, role, format, and hashes/diagnostics.
 
-PDF and CDR must remain associated with the exact article / item / template relation from the order page.
+PDF and CDR must remain tied to the exact article/item/template relation from the order page.
 
-### 3. Find the customer-selected application field in the template
+Current implementation preserves CDR but does not parse it yet. CDR status is explicitly saved_not_parsed; PDF remains the active geometric source.
 
-The application field exists inside the template and is always highlighted by color.
+### 3. Find the selected application field in the template
 
-Primary task:
-- identify the color-highlighted field that corresponds to the application method and application place selected by the customer;
-- use the real geometry from the template.
+The target application field exists in the template and is always highlighted by color.
 
-Critical rule:
-- DO NOT construct a synthetic field from width/height values from the order;
-- DO NOT choose an arbitrary rectangle only because its dimensions look plausible;
-- dimensions from the order may only be supporting verification.
+Canonical rules:
+- the field must come from real template geometry;
+- color highlighting is the primary automatic identification signal;
+- do not construct a synthetic rectangle from order width/height;
+- do not choose an arbitrary uncolored rectangle just because its dimensions look plausible;
+- order dimensions may only verify candidate identity and infer physical scale;
+- selected application-template may only provide supporting evidence, never final geometry;
+- if a real colored field cannot be identified confidently, return manual review instead of guessing.
 
-The field color is the principal signal and must become the core of the next implementation line.
+Alpha19 supports a generic chromatic highlight signal rather than hard-coding only red.
 
-### 4. Compare template and customer layout
+### 4. Register customer layout to the correct template
 
-Register the customer layout against the correct full template and determine whether the artwork occupies the correct application field.
+Compare the customer layout with the correct full template and establish the position of the artwork relative to the target colored field.
 
-Partial template deletion is allowed.
+Partial template deletion is explicitly allowed.
 
-If the customer/designer removed most of the template but the relevant application field is preserved, this is NOT an error.
+If the designer/customer removed most of the template but the target colored field is still present, this is NOT an error. Whole-template retained percentage must never be a blocking condition.
 
-The application must not require an arbitrary percentage of the whole template to remain.
+Alpha19 has two registration paths:
+- existing template/raster registration for compatible same-scale geometry;
+- preserved-colored-field fallback, which pairs the retained colored field in the customer layout with the colored field in the full template and derives translation from that anchor.
 
-Use whatever retained template information is sufficient to establish the field and artwork position.
+Deleted constructor/template content is diagnostic-only and must not be interpreted as customer artwork.
 
-Template service graphics are not customer artwork:
-- field outline;
+Non-uniform warp is not desired/accepted.
+
+### 5. Isolate actual customer artwork
+
+After registration, separate customer artwork from template service graphics.
+
+Canonical direction:
+customer artwork = layout foreground minus matching constructor/template foreground.
+
+Template service content is not customer artwork:
+- colored field boundary/fill;
 - product outlines;
 - guides;
+- dashed field frames;
 - labels;
 - technical lines;
-- other constructor/template objects.
+- other constructor/template graphics.
 
-### 5. Check the actual artwork against technical requirements
+A constructor part deleted by the customer is not artwork.
 
-After the real artwork has been separated from template content, check only that artwork against the requirements of the exact application method selected by the customer.
+If no stable added artwork remains after subtraction, do not fabricate artwork; return manual review.
 
-Examples include, where relevant:
+### 6. Check only actual artwork against the selected technology requirements
+
+Apply technical rules belonging to the exact application method selected by the customer.
+
+Relevant checks include, where applicable:
 - live fonts;
 - gradients;
 - transparency;
 - prohibited effects;
+- maximum dimensions;
 - minimum positive elements;
 - minimum negative elements / knockouts;
-- allowed size;
-- resolution;
-- technology-specific constraints.
+- minimum element/letter sizes;
+- raster resolution;
+- ink/CMYK/technology-specific constraints;
+- protective field/bleed and other method-specific rules.
 
-Requirements belonging only to the template must not cause a customer-artwork failure.
+Strict font rule:
+live fonts are forbidden only in the actual customer artwork. Text in the template/constructor/service labels/outside the application must not create a font error.
 
-## REPORT / UX REQUIREMENTS
+Current limitation to preserve in future work:
+live-font scoping is artwork-specific, but effects/gradients/transparency still need stronger spatial scoping to the isolated artwork. Do not falsely claim this is fully solved in alpha19.
 
-The result must not be primarily a technical log.
+Alpha7 positive/negative small-element morphology and its visual markers are trusted behavior and must be preserved.
 
-For each item show a compact human-readable summary:
+### 7. Produce a designer-first report
+
+For each item show a compact readable summary:
 - article;
 - application method;
 - application place;
-- template found / not found;
-- field found / not found;
-- placement correct / incorrect / manual review;
-- dimensions;
-- technical-rule violations;
+- template found/not found;
+- colored field found/not found;
+- placement correct/incorrect/manual;
+- actual artwork dimensions;
+- technical violations;
 - final status.
 
-Visual evidence must be large and understandable:
-- show the relevant template/product area;
-- show the selected colored application field;
-- show detected artwork;
-- mark violations with clear circles/arrows;
-- if placement is wrong, show both the actual and expected region clearly.
+Visual evidence must be prominent:
+- relevant template/product area;
+- selected colored application field;
+- detected customer artwork;
+- clear circles/arrows for violations;
+- if placement is wrong, visibly show actual vs expected region.
 
-Diagnostics must still be available separately and in detail.
+Detailed logs/diagnostics remain separately exportable.
 
-## FONT RULE
+## CURRENT ALPHA19 IMPLEMENTATION
 
-Live fonts are forbidden only in the actual customer artwork.
+### Version
+- Android versionCode: 340019
+- Android versionName: 3.4.0-alpha19
+- branch: printcheck-build-3.4.0-alpha19
 
-Text in:
-- template;
-- constructor;
-- service labels;
-- areas outside the actual application
+### Main behavior added in alpha19
+- ConstructorFieldLogic.MIN_COLOR_HIGHLIGHT_SCORE = 0.48.
+- Automatic field selection filters to real candidates with sufficient color-highlight evidence.
+- Uncolored rectangles cannot auto-select solely from geometry/order size/residual.
+- Generic strongly chromatic stroke/fill colors are supported; red receives only a small preference rather than being the sole accepted color.
+- Diagnostics expose field_color_score, field_highlight_rgb, and field_highlight_role.
+- ConstructorVectorInspector can inspect all PDF pages for colored-field anchors.
+- MainActivity includes preserved-colored-field registration fallback for severely deleted retained templates.
+- Old whole-template ~55% coverage criterion was removed as a blocking success condition.
+- Deleted template content no longer reduces field confidence merely because it is absent.
+- GeometryAnalyzer keeps asymmetric layout-minus-constructor artwork extraction.
+- UI label is “Цветное поле шаблона”.
+- CDR/AI/EPS/ZIP preservation from alpha18 remains.
+- No synthetic order-size field mapper was reintroduced.
+- ApplicationFieldMapper remains removed.
+- Alpha7 small-element morphology remains.
 
-must not cause an artwork-font error.
+### Field candidate policy
+A candidate must originate from real PDF/CDR vector source data and carry real source path IDs.
+Current alpha19 automatic selection uses:
+- color-highlight evidence as primary evidence;
+- geometry/style;
+- order-size agreement only as verification/scale support;
+- page plausibility;
+- added residual artwork;
+- selected application-template agreement as supporting evidence.
 
-## CURRENT ALPHA18 STATE
+If colored candidates are absent or ambiguous, the correct result is manual review.
 
-Alpha18 implemented a real-vector-field architecture for PDF constructors and removed synthetic order-size field construction.
+## ALPHA19 TEST/BUILD CHECKPOINT
 
-Implemented:
-- PDF constructor vector inspection via pdfbox-android;
-- candidates backed by real PDF path IDs;
-- order dimensions used only as evidence/scaling;
-- asymmetric layout-minus-constructor residual logic;
-- preservation of CDR/AI/EPS/ZIP constructor sources;
-- manual fallback instead of inventing geometry;
-- alpha7-style positive/negative small-element morphology retained;
-- detailed field/alignment/residual diagnostics;
-- UI wording around “real constructor field”.
+Local/reproducibility checks:
+- clean alpha18 → alpha19 patch reapply: success;
+- alpha19 source audit: 15/15 passed;
+- core tests: 52/52 passed.
 
-Current alpha18 build:
+Final GitHub Actions checkpoint:
+- source commit: 1b4d84a0194e48870da8772e51444571817e52b0
+- workflow run: 35452512452
+- run status: success
+- artifact name: PrintCheck_Android_3.4.0-alpha19_BUILD
+- artifact ID: 10587615583
+- artifact archive digest: sha256:6103b1ea801e4564d69635366b923eaa8f62e0c3ec9080f93274c724e5a38fd3
+- artifact expiration reported by GitHub: 2026-09-26T15:41:23Z
+- APK SHA-256: 4a8b71597045897d3b4bbe612580222c44c9db19ad30818a245508e74c932caf
+- source ZIP SHA-256: d134a776d8b9b165728705b0ea1fe3f05c82f46af942001cbce001552487199f
+- SHA file SHA-256 (local independent hash): 9507b81c91d8c40265e5910c139472eb08aa6fb7d7e0e47456e5b2676717562d
+
+Final run steps all passed:
+- canonical alpha19 source generation;
+- source invariants;
+- alpha19 audit;
+- core tests;
+- Android Gradle compile/build;
+- source packaging;
+- APK/source hashing;
+- artifact upload;
+- CI result recording.
+
+The downloaded final APK was independently checked with unzip -t and reported no compressed-data errors. The downloaded APK/source SHA-256 values matched the CI hash file.
+
+### Reproducible source transport
+Generator:
+- printcheck-build/prepare_alpha19.py
+
+Manifest:
+- printcheck-build/ALPHA19_MANIFEST.txt
+
+Active transport chunks:
+- pc340a19.b64.part00
+- pc340a19.b64.part01
+- pc340a19.b64.part02
+- pc340a19.b64.part03a
+- pc340a19.b64.part03b
+- pc340a19.b64.part04
+
+Concatenated active base64:
+- length: 28556
+- SHA-256: f97340de8e07b76c68965b011b45b42fedfb26698d046c49792eaa98c1305439
+
+Decoded patch:
+- length: 92255 bytes
+- SHA-256: cfd6f131a1a91a081c614209313f52d09b41ca8757a838d14467241fd76e9b34
+
+Historical damaged pc340a19.b64.part03 is intentionally not used by prepare_alpha19.py. It is retained only as evidence of the first transport failure.
+
+### CI failure history worth retaining
+- run 35452196424 / source 83e05f4107ebe8f637ed694faf3dfe00843f37f6 failed before alpha19 source generation because original part03 was 5999 instead of 6000 chars; invariant correctly stopped the build at total transport length 28555.
+- run 35452229659 / source 14b8bc4460d0149ffc08501b5afad5c68b7c3579 also predates the repaired active transport.
+- subsequent concurrent early repair/doc runs are not release checkpoints; the authoritative successful checkpoints are run 35452353767 and final run 35452512452.
+- run 35452353767 / source 4ff838665155d50ea7767bf1ad0b20ffe7ed6a9b was the first fully successful alpha19 APK build.
+- run 35452512452 / source 1b4d84a0194e48870da8772e51444571817e52b0 is the final documented build after CI paths-ignore cleanup.
+
+## HISTORICAL ALPHA18 BASELINE
+
+Alpha18 established the no-synthetic-field architecture:
+- real PDF vector field candidates backed by source path IDs;
+- order dimensions demoted to supporting evidence/scaling;
+- asymmetric layout-minus-constructor residual;
+- CDR/AI/EPS/ZIP source preservation;
+- manual fallback instead of fabricated geometry;
+- alpha7 morphology retained;
+- detailed field/alignment/residual diagnostics.
+
+Alpha18 successful checkpoint:
 - branch: printcheck-build-3.4.0-alpha18
-- successful source commit: b645fd5077b64a053e926efbaf7fdedf30c0cdde
-- successful Actions run: 35448700332
-- successful artifact name: PrintCheck_Android_3.4.0-alpha18_BUILD
+- source commit: b645fd5077b64a053e926efbaf7fdedf30c0cdde
+- Actions run: 35448700332
+- artifact: PrintCheck_Android_3.4.0-alpha18_BUILD
 - APK SHA-256: 61642079af67bd4dc85551d6e2a429b68152910f07ae5b8b4ed243db8f7b89fd
 - source ZIP SHA-256: 00852094e3af6a217004f3768ff1023fb884b7a6fbec0152191d61af27fae2af
 
-## IMPORTANT ALPHA18 LIMITATIONS
+Alpha19 supersedes alpha18 for current development.
 
-These are not to be forgotten in future chats:
+## IMPORTANT CURRENT LIMITATIONS
 
-1. CDR files are preserved but not parsed.
-   Current status: saved_not_parsed.
-   PDF is the active geometric source.
+1. CDR parsing is not implemented.
+   - CDR is downloaded/preserved with relation.
+   - parse_status remains saved_not_parsed.
+   - PDF is the active vector geometry source.
 
-2. Field discovery in alpha18 is still candidate/scoring based.
-   The newly confirmed canonical rule is stronger:
-   the target field is color-highlighted in the template and field color must become the primary detector.
+2. General scale/rotation registration is not implemented.
+   - RasterMatcher remains fundamentally translation/same-scale.
+   - preserved-colored-field fallback also derives translation.
+   - alpha19 can infer physical 1:1 / 1:10 field scale after selection, but this is not the same as general image registration with uniform scaling/rotation.
+   - non-uniform warp must remain forbidden.
 
-3. RasterMatcher still fundamentally assumes translation / same-scale registration.
-   Uniform scale and rotation registration are not generally implemented.
-   Non-uniform warp is not desired.
+3. Effects/gradients/transparency are not yet fully spatially scoped to isolated customer artwork.
+   - live fonts are already scoped to artwork.
+   - future work must ensure template-only effects never create customer-artwork errors.
 
-4. Alpha18 still contains legacy-style whole-template integrity heuristics such as constructor coverage.
-   Canonical behavior now says missing template content is acceptable if the target field is preserved and placement can be established.
-   Therefore whole-template coverage must not be a blocking requirement.
+4. Real-order color-field mapping still needs fixture validation.
+   - alpha19 makes color evidence primary and uses application/order evidence for disambiguation.
+   - real order 7966463 must be used to verify that the selected application/place resolves to the intended colored field in actual production PDFs.
 
-5. Application-template and order dimensions may support identification but must never synthesize the production field.
+5. CDR should become a true inspectable geometry source in a later version if feasible without requiring Corel or an external desktop converter on the Android device.
 
 ## NEXT IMPLEMENTATION PRIORITIES
 
-1. Replace/augment generic rectangle candidate scoring with explicit colored-field detection from template geometry.
-2. Determine how field color maps to selected application/place using actual order/template evidence.
-3. Make partial-template cases succeed when the target field remains even if most of the template is deleted.
-4. Extend registration safely for uniform scale and, if needed by real fixtures, rotation.
-5. Preserve the rule that non-uniform deformation is not accepted.
-6. Continue isolating template content from customer artwork before running technical checks.
-7. Add real CDR parsing/inspection path when feasible without requiring Corel on the Android device.
-8. Keep rich diagnostics and designer-first visuals.
-9. Validate using real control orders, especially 7966463 and historical 7920509.
+Immediate next step:
+1. Install/run alpha19 on control order 7966463.
+2. Use “Сохранить диагностику”.
+3. Upload the diagnostic ZIP.
+4. Inspect field_candidates → selected_field → alignment → residual artwork for every position.
+5. Fix the real cause of any wrong/manual result; never introduce a synthetic field fallback.
+
+Then, based on real diagnostics:
+6. Extend Models.Occurrence/RasterMatcher/GeometryAnalyzer for safe uniform-scale registration and, only if actual fixtures require it, rotation.
+7. Keep non-uniform deformation forbidden.
+8. Spatially scope effects/gradients/transparency strictly to detected customer artwork.
+9. Continue improving designer-first visual evidence/report compactness.
+10. Implement/assess CDR vector inspection without Corel dependency.
 
 ## CONTROL FIXTURES
 
-Order 7966463:
+### Order 7966463
+Item/article mappings:
 - 49164234 / 19555.303
 - 49164235 / 19555.305
 - 49164563 / 16274.303
@@ -223,38 +351,62 @@ CDR sources:
 Hoodie and polo are strong partial-template fixtures.
 Cap is a harder registration case.
 
-Historical regression fixture:
+### Historical regression order
 - order 7920509 / oid 7738671
 
-Never reintroduce synthetic geometry that recreates the old false fields seen there.
+Historical alpha14 false geometry examples that must never return:
+- article 30114.30 incorrectly produced ~260.64 × 55.49 mm instead of ~5 × 5.5 cm;
+- article 25900.61 incorrectly produced ~8.6 × 3.13 mm instead of ~5 × 0.5 cm.
+
+These failures were caused by treating unrelated/general constructor geometry as the production field and then counting guide/dashed lines as artwork/small elements. Never reintroduce that behavior.
 
 ## VERSIONING RULE
 
-Every new PrintCheck version must update the version number:
-- in the release/archive/artifact name;
-- in Android versionName/versionCode;
-- everywhere the UI displays the version;
-- in handoff and change log documentation.
+Every new PrintCheck version must update:
+- Android versionCode;
+- Android versionName;
+- every UI location displaying the version;
+- artifact/archive/release names;
+- README/PROGRESS as relevant;
+- PRINTCHECK_HANDOFF.md;
+- DEVELOPMENT_LOG.md.
 
 ## BUILD / DELIVERY RULE
 
-Whenever practical, deliver a ready installable artifact, not only source code.
+Whenever practical deliver a ready installable Android/Windows artifact, not only source code.
 
-Before declaring a build complete:
+Before declaring a version/checkpoint complete:
 - source invariants pass;
 - tests pass;
-- compilation/build passes;
+- Android/desktop compilation passes as applicable;
 - artifact is collected;
-- hashes are recorded;
-- documentation is updated;
-- known limitations are stated.
+- artifact integrity is checked;
+- SHA-256 hashes are recorded;
+- known limitations are explicit;
+- handoff and development log are current.
+
+## PERMANENT GIT DOCUMENTATION
+
+Read these first in every new chat:
+- printcheck-build/PRINTCHECK_HANDOFF.md
+- printcheck-build/DEVELOPMENT_LOG.md
+- printcheck-build/ALPHA19_MANIFEST.txt
+- .ci/alpha19-result.txt
+
+Source reconstruction:
+- printcheck-build/prepare_alpha19.py
+
+Android workflow:
+- .github/workflows/printcheck-android-alpha19.yml
 
 ## STARTING A NEW CHAT
 
-Before changing code in a new chat:
-1. Read this file.
-2. Read DEVELOPMENT_LOG.md.
-3. Identify latest branch/commit/build.
-4. Read the current implementation sources from that commit.
-5. Continue from the documented next step.
-6. Do not ask the user to repeat already documented requirements.
+Before changing PrintCheck code in a new chat:
+1. Read PRINTCHECK_HANDOFF.md completely.
+2. Read DEVELOPMENT_LOG.md, especially its latest entries.
+3. Read the current version manifest and .ci result.
+4. Identify the latest authoritative source commit/run/artifact.
+5. Regenerate/read the current implementation source from that commit before editing.
+6. Continue from NEXT IMPLEMENTATION PRIORITIES.
+7. Do not ask the user to repeat requirements already documented here.
+8. Keep logging every meaningful change back to Git.
