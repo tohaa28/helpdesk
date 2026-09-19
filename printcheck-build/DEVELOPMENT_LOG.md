@@ -1288,3 +1288,28 @@ Acceptance test after APK:
 - verify same-color narrow gaps still do;
 - inspect 30114.30 issue count/overlay specifically;
 - export alpha25 diagnostics for measured comparison.
+
+
+### Alpha25 final CI attempt 1 — generator invariant typo
+
+- trigger source commit: 8513267ff1dcb1823c8ef8ef63a9756d45a44f6a
+- GitHub Actions run: 35468931469
+- job: 105966234076
+- prepare_alpha24 reconstruction: PASS
+- alpha25 patch transport SHA: PASS
+- alpha25 patch SHA: PASS
+- alpha25 patch application: PASS
+- failure: prepare_alpha25.py invariant named "single-element check".
+
+Cause:
+- the invariant required the literal symbol minSingleElementMm to exist inside SmallElementAnalyzer.
+- alpha25's new per-color API intentionally names that method parameter minSingleMm, while MainActivity/rules still use minSingleElementMm.
+- this was an overly specific generator text check, not an application-logic failure.
+
+Repair:
+- invariant now confirms:
+  * MainActivity contains single_element checklist integration;
+  * SmallElementAnalyzer contains singleObjects;
+  * per-color API parameter minSingleMm exists.
+- application source patch, morphology logic and tests were not changed by this repair.
+- repair commit: e92e787c6707cede222fe006363ff9a3491a7b4e.
