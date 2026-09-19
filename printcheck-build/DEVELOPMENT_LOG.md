@@ -1507,3 +1507,49 @@ Required real-device acceptance:
 - no circles should appear simply along black/white or other color intersections;
 - every remaining circle should visually sit at the center of a real narrow object/region or same-color gap;
 - export alpha26 diagnostics for further tuning.
+
+
+### Alpha26 successful final signed Android build
+
+Canonical build:
+- versionName: 3.4.0-alpha26
+- versionCode: 340026
+- applicationId: ru.printcheck.android
+- source commit: 6828caa6b1ba4cfb51c511ef5676487351e1ed91
+- GitHub Actions run: 35470975423
+- job: 105971763485
+- status: success
+- artifact: PrintCheck_Android_3.4.0-alpha26_FINAL_BUILD
+- artifact ID: 10592957794
+- artifact digest: sha256:bfe27b3e8975ff72db1539383ccb1f7d741af4909cd1340158759333ca197b71
+- artifact expires: 2026-09-26T21:39:24Z
+
+CI gates:
+- prepare_alpha26: PASS
+- source invariants: PASS
+- alpha26 audit: 28/28 PASS
+- core tests: 83/83 PASS
+- Android Gradle build: PASS
+- persistent signer verification: PASS
+- artifact upload: PASS
+
+Independent downloaded-artifact verification:
+- APK SHA-256: e4d9a48c0e95420002ac7f214e76780351502c3bd2c3d5925e48e653ff6e6feb
+- source ZIP SHA-256: 473bc28271ba3bb614b07cb330c7dd10ac0a481556b43f3156a892277da43fad
+- SHA file SHA-256: 3bd346b2113c25f88823cc1d3d4d92ab2d483e19a12d502f25ef92f81fd330cc
+- signer TXT SHA-256: 2c3e07a2474567ca66c91af647fb06010e04a82b2b96aa1f534b17eb8feb1854
+- APK ZIP integrity: PASS
+- source ZIP integrity: PASS
+- packaged build.gradle confirms ru.printcheck.android / 340026 / 3.4.0-alpha26
+- packaged source contains no private .p12
+- signer SHA-256: 82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Update compatibility:
+alpha26 retains the exact persistent alpha20-alpha25 signer and applicationId, with versionCode incremented to 340026, so it should install directly over alpha25 without uninstall/data loss.
+
+Real-device acceptance:
+- rerun order 7920509;
+- inspect 30114.30 first;
+- intersections/contacts of different colors must not produce technical small-element markers;
+- every marker should visually land at the center of a real narrow same-color feature, same-color gap/reversal, or tiny same-color object;
+- export alpha26 diagnostics after the run.
