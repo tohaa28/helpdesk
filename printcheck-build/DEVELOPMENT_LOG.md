@@ -373,3 +373,94 @@ This successful alpha20 APK is the canonical install-over-update baseline for al
 Transition:
 - an already installed alpha19 may require one final uninstall before installing this alpha20 because alpha19 was produced before persistent signing was introduced;
 - after this signed alpha20 is installed, all later distributed alpha APKs must retain applicationId ru.printcheck.android, use this same test signer, and increase versionCode so Android treats them as updates and preserves app data.
+
+
+---
+
+## 2026-09-19 — alpha21: stronger artwork detection + phone fullscreen evidence
+
+Branch:
+- printcheck-build-3.4.0-alpha21
+
+User requirements:
+- improve the methods for determining the actual customer application/artwork on the product;
+- result images are too small and must open clearly fullscreen on a phone;
+- alpha21 must install over the persistent-signed alpha20 without uninstalling;
+- every change remains fully documented in Git.
+
+Detection changes:
+1. Added ArtworkDiffLogic as a pure-Java classifier for changed pixels.
+   - unchanged template pixels are not artwork;
+   - a customer color added onto template/background remains artwork even if the same color exists in a nearby technical line;
+   - a template feature deleted by the designer is not artwork;
+   - small local displacement of a real template feature can be suppressed as registration/rasterization residue.
+2. GeometryAnalyzer uses selected-template subtraction v3:
+   - engine marker: template-reference-subtraction-v3-local-registration;
+   - actual diff marker: layout-minus-selected-template-v3-background-aware-local-registration.
+3. Added local registration refinement around the real selected color field.
+   - searches a small neighborhood around the global registration;
+   - scores stable template/color features around the production field;
+   - records refined/baseline score, inliers, samples and registration scale.
+   - purpose: 1–3 px global raster offset should no longer turn template/service edges into fake artwork.
+4. Added RegistrationLogic for safe field-anchor uniform-scale estimation.
+   - uniform scaling is permitted as a registration recovery mechanism;
+   - significant X/Y anisotropy is rejected;
+   - non-uniform warp remains forbidden.
+5. Models.Occurrence now carries scale and rotationDeg.
+   - alpha21 uses scale;
+   - general rotation registration is NOT yet implemented, rotationDeg remains 0 in current paths.
+6. Preserved selected-field and constructor-field recovery can use uniform-scale+translation, not translation only.
+7. Artwork physical dimensions are adjusted for registration scale.
+8. For scaled registration, the old high-resolution small-element morphology is conservatively marked manual until that analyzer becomes fully scale-aware; no false automatic result is preferred over an incorrect one.
+9. New isolated evidence image:
+   - geometry JSON key: artwork_file;
+   - image contains the detected customer artwork by itself plus target-field/artwork bounds;
+   - designer can immediately inspect whether PrintCheck isolated the right object.
+
+Phone/UI changes:
+- visual previews in ResultView increased substantially;
+- detected artwork evidence is displayed first as “Найденное нанесение”;
+- tapping evidence opens a true fullscreen Dialog using Theme_Black_NoTitleBar_Fullscreen;
+- immersive navigation/status-bar hiding;
+- pinch zoom retained;
+- max zoom increased to 8×;
+- double tap toggles quick zoom;
+- panning retained;
+- fullscreen image decoding is sized for the actual screen and bitmap resources are recycled on dismiss.
+
+Regression tests before CI:
+- core tests: 60/60 passed;
+- alpha21 source audit: 20/20 passed;
+- added dedicated tests for:
+  * uniform scale accepted;
+  * non-uniform scale rejected;
+  * solid artwork on plain field retained;
+  * deleted template line not artwork;
+  * same-color nearby technical line does not erase new customer artwork;
+  * shifted real template feature is suppressed.
+
+Reproducible patch:
+- alpha20 -> alpha21 decoded patch length: 99589 bytes;
+- decoded patch SHA-256: e5da0522349a4a51bf0b9da0081994894e3090d74fa78ae72bf80c13db79c956;
+- base64/gzip transport length: 32836;
+- transport SHA-256: d11d7ab37077fc3aaad7445bcb776ae8019ab4d16be8c95e88380807684b7c98;
+- chunks: pc340a21.b64.part00..part05;
+- generator: printcheck-build/prepare_alpha21.py.
+
+Signing/update contract:
+- applicationId stays ru.printcheck.android;
+- versionCode becomes 340021;
+- versionName becomes 3.4.0-alpha21;
+- alphaPersistent signer from alpha20 is inherited and generator verifies exact PKCS12 SHA;
+- CI additionally verifies the built APK certificate fingerprint with apksigner before upload.
+
+Known limitations at this checkpoint:
+- general rotation registration is still not implemented;
+- CDR remains preserved but saved_not_parsed;
+- scale-aware high-resolution positive/negative morphology still needs follow-up;
+- real improvement on order 7920509 must be validated with an alpha21 diagnostic ZIP; local logic tests do not substitute for that real fixture.
+
+Next gate:
+- successful GitHub Android build;
+- independent artifact/signature/hash verification;
+- rerun order 7920509 and compare isolated artwork images position by position.
