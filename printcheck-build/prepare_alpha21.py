@@ -14,7 +14,16 @@ if src21.exists():
     shutil.rmtree(src21)
 shutil.copytree(src20, src21)
 
-part_names = [f"pc340a21.b64.part{i:02d}" for i in range(6)]
+# part03 is split into exact halves after CI detected a one-character transport mutation.
+part_names = [
+    "pc340a21.b64.part00",
+    "pc340a21.b64.part01",
+    "pc340a21.b64.part02",
+    "pc340a21.b64.part03a",
+    "pc340a21.b64.part03b",
+    "pc340a21.b64.part04",
+    "pc340a21.b64.part05",
+]
 parts = [pb / name for name in part_names]
 missing = [p.name for p in parts if not p.is_file()]
 if missing:
