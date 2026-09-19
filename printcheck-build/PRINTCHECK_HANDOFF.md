@@ -410,3 +410,29 @@ Before changing PrintCheck code in a new chat:
 6. Continue from NEXT IMPLEMENTATION PRIORITIES.
 7. Do not ask the user to repeat requirements already documented here.
 8. Keep logging every meaningful change back to Git.
+
+
+## PERSISTENT ANDROID UPDATE SIGNING — REQUIRED FROM ALPHA20 FORWARD
+
+User requirement:
+new test APKs must install over the currently installed PrintCheck build without uninstalling it and without losing app data.
+
+Rules:
+1. Keep Android applicationId exactly `ru.printcheck.android`.
+2. Increment versionCode for every distributed build.
+3. All alpha20+ update-compatible test APKs must use the same persistent signing identity.
+4. Do not fall back to per-run/default CI debug signing for distributed artifacts.
+5. CI must fail if the persistent alpha signing material or expected hashes are missing/mismatched.
+
+Implementation:
+- Git transport: `printcheck-build/NON_PRODUCTION_ALPHA_SIGNING.p12.b64`
+- generated key file: `.printcheck-alpha20/signing/printcheck-alpha-test.p12`
+- Gradle signing config: `alphaPersistent`
+- certificate SHA-256 fingerprint:
+  `82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11`
+
+Transition limitation:
+alpha19 predates this persistent signing identity, so moving from an already-installed alpha19 to the first persistent-signed alpha20 may require one final uninstall. Once the persistent-signed alpha20 is installed, later alpha builds are expected to update it in place.
+
+Security:
+this key is NON-PRODUCTION test signing material. Never promote it to production signing.
