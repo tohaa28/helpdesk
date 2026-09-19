@@ -1,5 +1,5 @@
 version=3.4.0-alpha20
-source_commit=bf9076bb9594adedba70e3011f822c4f59394b86
-status=failure
-run_id=35454434785
+source_commit=6a000b08878cee7cc82c59003758eb3f8d1e58f5
+status=success
+run_id=35455256258
 run_attempt=1
