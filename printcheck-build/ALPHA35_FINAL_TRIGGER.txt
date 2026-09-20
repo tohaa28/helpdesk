@@ -10,3 +10,4 @@ Changes:
 - scan multi-page generated template for selected highlighted field.
 
 Expected core tests: 103/103.
+Retry: transport validation fixed.\n
