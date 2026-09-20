@@ -1,0 +1,6 @@
+PrintCheck 3.4.0-alpha33 final build trigger
+Date: 2026-09-20
+UI status labels:
+- OK: "макет ок"
+- violation: "макет не по тт"
+Single-line badge. Technical logic unchanged from alpha32.
