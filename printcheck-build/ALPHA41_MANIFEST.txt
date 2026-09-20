@@ -1,0 +1,47 @@
+PrintCheck Android 3.4.0-alpha41 — canonical build manifest
+Date: 2026-09-20
+
+VERSION
+versionName=3.4.0-alpha41
+versionCode=340041
+applicationId=ru.printcheck.android
+branch=printcheck-build-3.4.0-alpha41
+
+BUILD
+source_commit=bdbc224eb54c1a65d0835400cbe2fde79aa0f1c3
+actions_run=35532561441
+job_id=106135631027
+artifact_name=PrintCheck_Android_3.4.0-alpha41_FINAL_BUILD
+artifact_id=10611786492
+artifact_digest=sha256:4b58adedf6f097a7d4e37e847fe541dc52ce8920df04031eb1c9757960f1f5e9
+artifact_expires=2026-09-27T19:32:29Z
+
+FILES
+apk_sha256=de9263b667e758ab912fb01e6ef25423bcec6702005a9ffd874b9f8e71948142
+source_zip_sha256=8f4b1ebc30ae634a9239e4bc8504a18c726587ac850e369fb83eef8b994b3591
+
+SIGNING
+persistent_alpha_signer=true
+certificate_sha256=82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+update_compatible_with_alpha40=true
+
+TEST_GATES
+source_generation=PASS
+source_invariants=PASS
+audit_alpha41=PASS
+core_tests=135/135_PASS
+android_build=PASS
+signer_verification=PASS
+artifact_upload=PASS
+
+ALPHA41_MEASUREMENTS
+geometry_calculation_unchanged=true
+brief_surface_shows_field_size=true
+brief_artwork_shows_detected_size=true
+brief_size_check_shows_artwork_and_field=true
+selected_application_card_shows_both_sizes=true
+detailed_field_label=Поле нанесения по конструктору
+detailed_artwork_label=Найденное нанесение в макете
+pdf_field_label=Поле нанесения по конструктору
+pdf_artwork_label=Найденное нанесение в макете
+quick_check_same_measurements=true
