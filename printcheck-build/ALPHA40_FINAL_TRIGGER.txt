@@ -1,0 +1,11 @@
+PrintCheck 3.4.0-alpha40 final build trigger
+Date: 2026-09-20
+
+Universal neutral CMYK exception:
+- pure CMYK black C0 M0 Y0 K100 is allowed for every application technology;
+- pure CMYK white C0 M0 Y0 K0 is allowed for every application technology;
+- coloured process CMYK remains subject to the technology-specific rule;
+- rich black is not treated as universal black;
+- colour-model facts distinguish coloured CMYK vs pure black/white CMYK.
+
+Expected core tests: 135/135.
