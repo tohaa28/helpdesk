@@ -1838,3 +1838,65 @@ Real-device acceptance:
 - verify tree hierarchy and arrow disclosure behavior;
 - verify batch orders start collapsed;
 - verify article details do not allocate/load evidence until detailed checklist is opened.
+
+
+---
+
+## 2026-09-20 — alpha29: denser result tree and brief artwork evidence
+
+Branch:
+- printcheck-build-3.4.0-alpha29
+
+User visual requirements:
+1. Move the old "безопасная проверка read-only" text into the same line as the product name/version and shorten it to exactly "read-only".
+2. Do not show a per-article/preflight status badge opposite the ORDER node. If order-wide statuses are ever introduced later, they must be semantically order-wide rather than copied from one application.
+3. Show the "Найденное нанесение" evidence image in the brief checklist.
+4. Make the brief checklist denser and two-column to save vertical phone space.
+
+Implementation:
+- Header is a single horizontal brand line:
+  PrintCheck + BuildConfig.VERSION_NAME + read-only.
+- Main title reduced from 24sp to 22sp; version/read-only are 9sp muted/bold and single-line.
+- The separate subtitle "безопасная проверка read-only" is removed.
+- Queue wording from alpha28 remains exactly "Заказы ожидающие проверку".
+
+Order tree:
+- successful order node trailing badge removed;
+- failed order node trailing badge also removed;
+- order meta line still shows aggregate counts (articles/errors/warnings/manual/OK), so useful order-wide information remains without misusing an application-level status;
+- article nodes retain their own status badges.
+
+Brief checklist:
+- checks are rendered as a compact two-column grid;
+- each cell has a small icon, up to two lines of title, and compact status label;
+- cell padding 6×4dp; inter-column spacing 2dp;
+- brief method/place/alignment/small-elements summary padding reduced;
+- article PDF action spacing reduced.
+
+Found-artwork evidence:
+- geometry.artwork_file ("Найденное нанесение") moved into the brief checklist;
+- image height 240dp, tap still opens the existing fullscreen zoom viewer;
+- image is loaded only on FIRST article expansion through article-level TreeToggle firstOpen;
+- therefore collapsed articles do not eagerly decode the brief evidence.
+- duplicate "Найденное нанесение" panel removed from detailed checklist;
+- detailed checklist still includes focus/placement/small-element evidence, measurements, requirements, full checks, files and comparisons;
+- detailed checklist remains separately lazy-loaded.
+
+Technical preflight:
+- NO geometry/morphology change;
+- alpha26 intersection-safe same-color logic retained;
+- alpha27 rule-sized hollow circles retained;
+- reference ruler retained;
+- 720dpi / 4M performance architecture retained.
+
+Local verification:
+- CoreTests: 86/86 PASS.
+- audit_alpha29.py: 30/30 PASS.
+- deterministic generator tested against canonical alpha28 extracted source: PASS (with local signing check intentionally skipped because packaged source excludes .p12).
+- CI generator keeps signing check strict.
+
+Version/update:
+- versionName 3.4.0-alpha29
+- versionCode 340029
+- applicationId ru.printcheck.android
+- persistent alpha signer unchanged.
