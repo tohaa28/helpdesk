@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha29 (build in progress)
+Current implementation line: Android 3.4.0-alpha29
 Current development/build branch: printcheck-build-3.4.0-alpha29
 
 ## STRICT CONTINUITY RULE
@@ -1001,3 +1001,31 @@ Version:
 - alpha29 versionCode 340029;
 - applicationId unchanged;
 - same persistent non-production alpha signer required.
+
+
+## ALPHA29 CANONICAL SUCCESSFUL BUILD CHECKPOINT
+
+- versionName: 3.4.0-alpha29
+- versionCode: 340029
+- applicationId: ru.printcheck.android
+- source commit: 0870044ae89f075db6d7de64a3d19f74e30ca856
+- GitHub Actions run: 35507611527
+- job ID: 106069963490
+- artifact ID: 10604612015
+- artifact: PrintCheck_Android_3.4.0-alpha29_FINAL_BUILD
+- APK SHA-256: c1d3693ede92c4c4e512a2343bc9ab4843494db303272745d07b21cf1730858f
+- source ZIP SHA-256: a3dfcc6eb40b3f2e5cf6236a7208193545d83d1d0130c7efca613d769d5a44f0
+- signer SHA-256:
+  82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Alpha29 is update-compatible with alpha28.
+
+UI contract:
+- one-line header: PrintCheck + small version + read-only;
+- no status badge on order node;
+- article status badge retained;
+- brief checklist is dense two-column;
+- found-artwork evidence belongs to brief checklist and lazy-loads on first article open;
+- no duplicate found-artwork in detailed checklist.
+
+Technical preflight remains alpha28/27/26 unchanged.
