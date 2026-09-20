@@ -97,14 +97,14 @@ replace_once('tests/run_core.sh',
              'MeasurementCalibrationLogic,ArtworkColorLayerLogic,MarkerSizeLogic}.java')
 ct = src27 / 'tests/CoreTests.java'
 cs = ct.read_text(encoding='utf-8')
-anchor = '  System.out.println("TOTAL "+passed+" passed);\n'
-if anchor not in cs:
-    raise RuntimeError('CoreTests final anchor missing')
+anchor = 'System.out.println("TOTAL "+passed+" passed");'
+if cs.count(anchor) != 1:
+    raise RuntimeError(f'CoreTests final anchor count={cs.count(anchor)}')
 extra = '''  test("alpha27 marker diameter equals physical rule",()->{float d=MarkerSizeLogic.diameterPx(.20,40.0f,1.0f);ok(Math.abs(d-8.0f)<.0001f);ok(Math.abs(MarkerSizeLogic.radiusPx(.20,40.0f,1.0f)-4.0f)<.0001f);});
   test("alpha27 marker diameter respects evidence scale",()->{float d=MarkerSizeLogic.diameterPx(.30,30.0f,.5f);ok(Math.abs(d-4.5f)<.0001f);});
   test("alpha27 invalid marker rule produces no circle",()->{ok(MarkerSizeLogic.diameterPx(-1,30.0f,1.0f)==0f);ok(MarkerSizeLogic.diameterPx(.2,0,1.0f)==0f);ok(MarkerSizeLogic.diameterPx(.2,30.0f,0)==0f);});
 '''
-ct.write_text(cs.replace(anchor, extra + anchor, 1), encoding='utf-8')
+ct.write_text(cs.replace(anchor, extra + '  ' + anchor, 1), encoding='utf-8')
 
 (src27 / 'tests/audit_alpha27.py').write_text(r'''from pathlib import Path
 root=Path(__file__).resolve().parents[1]
