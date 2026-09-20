@@ -1,0 +1,5 @@
+PrintCheck 3.4.0-alpha30 final build trigger
+Date: 2026-09-20
+Feature: strict automatic guard-field measurement from confirmed significant artwork to each real print-field edge.
+Expected core tests: 90/90.
+Expected alpha30 audit: 27/27.
