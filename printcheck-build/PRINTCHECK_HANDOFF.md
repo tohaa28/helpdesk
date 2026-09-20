@@ -2,8 +2,8 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha28
-Current development/build branch: printcheck-build-3.4.0-alpha28
+Current implementation line: Android 3.4.0-alpha29 (build in progress)
+Current development/build branch: printcheck-build-3.4.0-alpha29
 
 ## STRICT CONTINUITY RULE
 
@@ -964,3 +964,40 @@ UI contract:
 - detailed checklist lazy-loads evidence only on first open.
 
 Technical preflight remains alpha27/alpha26 unchanged.
+
+
+## ALPHA29 — COMPACT RESULT TREE CONTRACT
+
+Header:
+- one horizontal line only: PrintCheck + small version + "read-only";
+- do not restore the separate "безопасная проверка read-only" subtitle.
+
+Order node:
+- no trailing article/preflight status badge at order level;
+- aggregate count text is allowed;
+- future order status, if introduced, must describe the whole order rather than reuse a position status.
+
+Brief checklist:
+- dense two-column grid on phone;
+- "Найденное нанесение" belongs in the brief checklist;
+- found-artwork preview loads lazily on first ARTICLE expansion;
+- tapping it still opens fullscreen zoom;
+- article PDF report remains in brief checklist.
+
+Detailed checklist:
+- do not duplicate "Найденное нанесение";
+- retain remaining evidence, measurements, technical requirements, all checks, files and comparisons;
+- retain lazy loading.
+
+Do not regress technical behavior from alpha28/27/26:
+- physical-rule marker diameter;
+- no center dot/crosshair;
+- cross-color intersections excluded;
+- same-color morphology;
+- reference ruler;
+- 720dpi/4M performance pipeline.
+
+Version:
+- alpha29 versionCode 340029;
+- applicationId unchanged;
+- same persistent non-production alpha signer required.
