@@ -18,3 +18,5 @@ New Quick Check workflow:
 Expected core tests: 135/135.
 
 Retry: chunked patch transport, decompressed patch SHA unchanged.
+
+Retry 2: replace inaccessible PrintDocumentAdapter callbacks with PdfDocument + WebView.draw.
