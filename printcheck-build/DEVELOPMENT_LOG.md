@@ -1553,3 +1553,112 @@ Real-device acceptance:
 - intersections/contacts of different colors must not produce technical small-element markers;
 - every marker should visually land at the center of a real narrow same-color feature, same-color gap/reversal, or tiny same-color object;
 - export alpha26 diagnostics after the run.
+
+
+---
+
+## 2026-09-20 — alpha27: rule-sized hollow markers, no center symbol
+
+User requirement:
+- remove points from the centers of issue circles;
+- make each circle the same physical size as the minimum allowed element for that specific rule.
+
+Interpretation implemented:
+- requested size is the OUTER DIAMETER of the circle, not its radius;
+- positive marker diameter = positive rule mm;
+- negative marker diameter = negative rule mm;
+- single-object marker diameter = minSingleElementMm;
+- diameter is converted to source pixels using the already calibrated reference-ruler pixels/mm and then multiplied by evidence-image output scale;
+- stroke width is compensated inward so the outer visible circle diameter stays aligned to the requested physical rule;
+- no center crosshair;
+- no center color swatch/dot;
+- marker center coordinates from alpha26 remain unchanged.
+
+Geometry/morphology:
+- alpha26 intersection-safe per-color geometry is retained unchanged:
+  * diff is seed only;
+  * full same-color solids are reconstructed;
+  * cross-color contacts/intersections excluded;
+  * positive uses same-color medial/local thickness;
+  * negative uses same-color empty gaps/reversals with other colors as barriers;
+  * single-object center uses component centroid.
+- reference-ruler calibration remains authoritative.
+- performance architecture remains 720 dpi / 4M main ROI / cached coarse-to-fine registration.
+
+New helper:
+- MarkerSizeLogic.diameterPx(ruleMm, pixelsPerMm, outputScale)
+- MarkerSizeLogic.radiusPx(...) for pure calculation tests.
+- invalid/non-positive parameters return 0 => no circle.
+
+Evidence metadata:
+- marker_style = rule_diameter_circles_v7_no_center_dot_reference_ruler
+- marker_diameter_mode = minimum-allowed-rule-mm
+- marker_center_symbol = false
+- each feature result exposes marker_diameter_mm = rule_mm.
+
+Tests:
+- alpha27 marker diameter equals physical rule;
+- evidence scaling is respected;
+- invalid rules do not produce a marker.
+- full core suite: 86/86 PASS.
+- source audit: 24/24 PASS.
+
+Reproducibility:
+- alpha27 uses deterministic generator printcheck-build/prepare_alpha27.py on top of canonical alpha26 rather than a compressed patch transport.
+- temporary failed alpha27 patch-transport files were deleted from the branch and are not used by the canonical build.
+
+CI history:
+1. run 35492647265 / source 47808caaf76fb78ccbfdd6be2728bb2b682d9dbb
+   - failed in prepare_alpha27 before tests/compile.
+   - cause: generator incorrectly required the alpha26 marker-style string to be unique; canonical source has two legitimate occurrences (reused ROI and tight rerender).
+   - fixed by requiring exactly two occurrences and replacing both.
+2. run 35492721990 / source 60bfec680cbe9f7a40b6247d7c20990389650b81
+   - failed in prepare_alpha27 before tests/compile.
+   - cause: CoreTests insertion anchor depended on an exact newline/leading-space form.
+   - fixed by locating the unique System.out.println TOTAL marker independent of line endings.
+3. canonical successful run 35492770823 / source c902251bec095e98756537406485c263ffaf761b
+   - prepare source PASS
+   - source invariants PASS
+   - alpha27 audit 24/24 PASS
+   - core tests 86/86 PASS
+   - Android Gradle build PASS
+   - persistent signer verification PASS
+   - package/upload PASS.
+
+Canonical artifact:
+- artifact name: PrintCheck_Android_3.4.0-alpha27_FINAL_BUILD
+- artifact ID: 10599169903
+- artifact digest: sha256:c68b98a315cb746d912e720166445fba7bc3a41807850f039f4336364c4e08b1
+- artifact expires: 2026-09-27T05:53:58Z
+
+Independent downloaded-artifact verification:
+- APK SHA-256: 94844c23ccd2f3421aca7048fd64902a4efc7515f69d6adb82a56452194f7f62
+- source ZIP SHA-256: 8961ad7ec331762077118d838fc956da1113e4a3d91c02decd971e41aa5ef038
+- SHA file SHA-256: e1974e8c16c5378da720511d28659711ed225013e8340f8bc41f893f43bd9933
+- signer TXT SHA-256: 2c3e07a2474567ca66c91af647fb06010e04a82b2b96aa1f534b17eb8feb1854
+- APK ZIP integrity PASS
+- source ZIP integrity PASS
+- packaged source has no .p12/.keystore.
+- packaged build.gradle confirms:
+  applicationId ru.printcheck.android
+  versionCode 340027
+  versionName 3.4.0-alpha27
+- signer SHA-256:
+  82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+- packaged marker function:
+  * one drawCircle call;
+  * no center drawLine;
+  * no b.rgb center swatch;
+  * no fixed 18px radius;
+  * diameter sourced from MarkerSizeLogic and feature.ruleMm.
+
+Update compatibility:
+- same applicationId and persistent signer as alpha20-alpha26;
+- versionCode incremented to 340027;
+- intended to install directly over alpha26 without uninstall/data loss.
+
+Real-device acceptance:
+- rerun 7920509;
+- circles should have no center symbol;
+- compare circle diameter visually against the ruler: it should correspond to the current method's minimum allowed positive/negative/single element;
+- center remains on the actual narrow feature/gap/object from alpha26.
