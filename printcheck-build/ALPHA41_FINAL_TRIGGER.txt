@@ -1,0 +1,14 @@
+PrintCheck 3.4.0-alpha41 final build trigger
+Date: 2026-09-20
+
+Measurement visibility:
+- show detected artwork size directly in checklist;
+- show constructor application-field size directly in checklist;
+- size check shows artwork and field side-by-side;
+- selected application card shows both measurements;
+- detailed result labels use explicit wording;
+- PDF report uses the same explicit labels and × sign;
+- quick-check mode gets the same measurement details;
+- geometry calculations are unchanged; only already computed width_mm/height_mm are surfaced.
+
+Expected core tests: 135/135.
