@@ -1662,3 +1662,108 @@ Real-device acceptance:
 - circles should have no center symbol;
 - compare circle diameter visually against the ruler: it should correspond to the current method's minimum allowed positive/negative/single element;
 - center remains on the actual narrow feature/gap/object from alpha26.
+
+
+---
+
+## 2026-09-20 — alpha28: expandable result tree + compact brand/version
+
+Branch:
+- printcheck-build-3.4.0-alpha28
+
+User visual requirements:
+1. Put the version on the same line as the program name and make the version small.
+2. Rename the "Заказы" button to exactly "Заказы ожидающие проверку".
+3. Show results/reports as an expandable tree:
+   order number -> articles -> brief checklist per article -> detailed checklist per article.
+
+Implementation:
+
+### Header
+- "PrintCheck" remains the main 24sp title.
+- BuildConfig.VERSION_NAME is rendered as a separate 10sp bold/muted TextView on the SAME horizontal brand line.
+- The second line now contains only "безопасная проверка read-only".
+- auth button behavior from alpha24+ is unchanged.
+
+### Queue controls
+- button label is exactly "Заказы ожидающие проверку".
+- queue dialog title uses the same wording.
+- the long queue button now occupies full card width so the full label remains readable on a phone.
+- "Проверить все" is on its own full-width row immediately below.
+
+### Result tree
+New ResultView tree hierarchy:
+- order node (level 0)
+  - order PDF report
+  - article nodes (level 1)
+    - brief checklist (level 2)
+    - detailed checklist (level 2)
+  - unresolved-layout node if needed.
+
+Single-order behavior:
+- order node starts expanded;
+- article nodes start collapsed;
+- brief checklist is ready/expanded when its article is opened;
+- detailed checklist starts collapsed.
+
+Batch behavior:
+- summary remains above the tree;
+- every order starts collapsed;
+- opening an order reveals its article nodes.
+
+### Brief checklist
+Per article:
+- selected method/place/alignment/small-element brief line;
+- compact one-line checklist with status icon + check title + compact status label;
+- no long technical detail text;
+- article PDF report is available here.
+
+### Detailed checklist
+Contains the former full article detail UI:
+- selected application card;
+- problem summary;
+- evidence images;
+- technical requirements;
+- measurements;
+- full detailed check list;
+- files/template/reference pair;
+- auxiliary comparisons.
+
+### Lazy evidence loading
+Important phone-performance UI change:
+- detailed checklist content is populated only on its FIRST expansion;
+- large PNG/PDF preview jobs are therefore not created for every article in a batch before the user opens them;
+- this does not alter the actual preflight calculation, only result-screen rendering/load.
+
+### Retained technical behavior
+No geometry/preflight algorithm changes:
+- alpha26 intersection-safe per-color morphology retained;
+- alpha27 rule-sized hollow circles retained;
+- no center dot/crosshair retained;
+- reference ruler retained;
+- 720dpi / 4M high-res ROI performance pipeline retained;
+- applicationId and persistent signer unchanged.
+
+Local gates:
+- CoreTests: 86/86 PASS.
+- audit_alpha28.py: 27/27 PASS.
+- clean canonical alpha27 + alpha28 patch: PASS, no .rej.
+- re-applied audit/core: 27/27 and 86/86 PASS.
+
+Reproducibility:
+- patch bytes: 50183
+- patch SHA-256: a8d5c115247c2e8d563b743b0c9ff53bb0e721e56c8e224569da63353bf22ef1
+- gzip/base64 transport chars: 15964
+- transport SHA-256: fe4cc95bc69fb15233fcbeee779bdf360b1b6a9fdcd3e1004f9ce75ece3a7a6e
+- chunks:
+  pc340a28.b64.part00 blob e492a2c1583a98b45cc79f38eb1ce315b1a05de2
+  pc340a28.b64.part01 blob 24531b8826253e4a4a9ef70b25c2db69a4a6b90a
+  pc340a28.b64.part02 blob 4870c56ae3d54be9bdcce26532712e54e382e470
+- all Git blob SHAs verified against local git hash-object.
+- generator: printcheck-build/prepare_alpha28.py
+
+Version/update:
+- versionName 3.4.0-alpha28
+- versionCode 340028
+- applicationId ru.printcheck.android
+- persistent alpha signer must remain unchanged.
