@@ -1,0 +1,15 @@
+PrintCheck 3.4.0-alpha39 final build trigger
+Date: 2026-09-20
+
+Colour model preflight:
+- inspect colour spaces only inside confirmed artwork;
+- constructor/background/service objects are excluded from the result;
+- Pantone is identified as real spot Separation/DeviceN colour, not by visual RGB similarity;
+- CMYK methods reject RGB/Gray/wrong spot colour spaces;
+- CMYK+White methods accept process CMYK plus White spot;
+- AR1/AR2 accept either up to 2 Pantone C spots OR CMYK/CMYK+White;
+- H1-H3 accept Pantone C or Heraeus;
+- technology/catalog palettes without a strict PDF colour-model rule stay explicit manual checks;
+- same check is available in order workflow and Quick Check PDF.
+
+Expected core tests: 129/129.
