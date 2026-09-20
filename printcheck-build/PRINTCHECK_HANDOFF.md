@@ -2,8 +2,8 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha27
-Current development/build branch: printcheck-build-3.4.0-alpha27
+Current implementation line: Android 3.4.0-alpha28 (build in progress)
+Current development/build branch: printcheck-build-3.4.0-alpha28
 
 ## STRICT CONTINUITY RULE
 
@@ -895,3 +895,45 @@ Canonical build:
 - signer SHA-256 82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
 
 Alpha27 is update-compatible with alpha26.
+
+
+## ALPHA28 — EXPANDABLE RESULT TREE CONTRACT
+
+User-facing hierarchy:
+**order number -> article -> brief checklist -> detailed checklist**.
+
+UI requirements:
+- PrintCheck name and version are on one line;
+- version is small/muted;
+- queue button text is exactly "Заказы ожидающие проверку";
+- long queue button must remain readable on phone (full-width row).
+
+Tree behavior:
+- single checked order starts expanded;
+- articles start collapsed;
+- brief checklist is the first lightweight content under each article;
+- detailed checklist is separately expandable;
+- batch order nodes start collapsed;
+- order PDF report belongs inside the order node;
+- article PDF report belongs inside the article's brief checklist.
+
+Brief checklist:
+- compact statuses only;
+- no long check detail text;
+- method/place/alignment/small-elements summary included.
+
+Detailed checklist:
+- all evidence images, measurements, rules, full checks, files and comparisons.
+- must be populated lazily on first open so batch results do not eagerly allocate every preview.
+
+Do not regress alpha27 technical behavior:
+- marker diameter = physical rule;
+- no marker center dot/crosshair;
+- alpha26 intersection-safe same-color morphology;
+- reference-ruler calibration;
+- 720dpi/4M performance architecture.
+
+Version:
+- alpha28 versionCode 340028;
+- applicationId unchanged;
+- same persistent non-production alpha signer required.
