@@ -1767,3 +1767,25 @@ Version/update:
 - versionCode 340028
 - applicationId ru.printcheck.android
 - persistent alpha signer must remain unchanged.
+
+
+### Alpha28 final CI attempt 1 — Android Gravity compile fix
+
+- source commit: 5ec42ebcb73cb1ae2d17fe06fcdb7a9ca6e9ba2c
+- GitHub Actions run: 35494311974
+- prepare_alpha28: PASS
+- source invariants: PASS
+- audit_alpha28: 27/27 PASS
+- CoreTests: 86/86 PASS
+- Android compile: FAILED before signer/package.
+
+Compiler error:
+- MainActivity.java brand line used Gravity.BASELINE.
+- android.view.Gravity has no BASELINE constant.
+
+Repair:
+- keep title/version in the same horizontal brandLine;
+- use Gravity.CENTER_VERTICAL instead;
+- generator now enforces CENTER_VERTICAL and explicitly forbids Gravity.BASELINE.
+- no result-tree/preflight/marker logic changed.
+- repair commit: 0051fcc120b3a376b90841e8caa73893d1225573.
