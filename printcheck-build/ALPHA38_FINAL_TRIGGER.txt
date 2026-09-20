@@ -12,3 +12,4 @@ Corner/junction filtering for small elements:
 
 Regression target: article 17488, “Университета МИСИС”, especially Cyrillic И-style joins.
 Expected core tests: 117/117.
+Retry: validate decompressed patch SHA only.\n
