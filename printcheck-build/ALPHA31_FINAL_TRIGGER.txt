@@ -1,0 +1,4 @@
+PrintCheck 3.4.0-alpha31 final build trigger
+Date: 2026-09-20
+UI: brief checklist auto-sized labels and click-for-explanation dialogs.
+Retains alpha30 guard-field logic and all technical preflight behavior.
