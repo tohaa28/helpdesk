@@ -1,0 +1,8 @@
+PrintCheck 3.4.0-alpha34 final build trigger
+Date: 2026-09-20
+Feature: problem buttons open detailed explanation and contextual visual evidence.
+Small-element problems open small-element overlay with circles.
+Guard/position/size problems open focus evidence.
+Alignment problems open full overlay.
+Artwork detection problems open artwork evidence.
+Technical logic unchanged from alpha33/alpha32.
