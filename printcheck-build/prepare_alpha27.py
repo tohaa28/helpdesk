@@ -45,14 +45,13 @@ final class MarkerSizeLogic {
 }
 ''', encoding='utf-8')
 
-replace_once('app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java',
-             'centered_features_v6_intersection_safe_reference_ruler',
-             'rule_diameter_circles_v7_no_center_dot_reference_ruler')
 p = src27 / 'app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java'
 g = p.read_text(encoding='utf-8')
-if 'centered_features_v6_intersection_safe_reference_ruler' in g:
-    g = g.replace('centered_features_v6_intersection_safe_reference_ruler', 'rule_diameter_circles_v7_no_center_dot_reference_ruler')
-p.write_text(g, encoding='utf-8')
+old_style = 'centered_features_v6_intersection_safe_reference_ruler'
+new_style = 'rule_diameter_circles_v7_no_center_dot_reference_ruler'
+if g.count(old_style) != 2:
+    raise RuntimeError(f'alpha27 expected exactly 2 alpha26 marker style occurrences, found {g.count(old_style)}')
+p.write_text(g.replace(old_style, new_style), encoding='utf-8')
 
 replace_once('app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java',
              '.put("cross_color_negative_gaps_ignored",true).put("cross_color_intersections_excluded",true);',
