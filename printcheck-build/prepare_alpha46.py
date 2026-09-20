@@ -22,6 +22,10 @@ try: subprocess.run(['patch','-p1','--batch','--forward','-i',str(pp)],cwd=src46
 finally: pp.unlink(missing_ok=True)
 if list(src46.rglob('*.rej')): raise RuntimeError('alpha46 patch rejects')
 
+# Android's PrintDocumentAdapter callback constructors are package-private.
+# Use PdfDocument + WebView.draw for the normalized analysis PDF.
+shutil.copy2(pb/'alpha46_SvgPdfExporter.java',src46/'app/src/main/java/ru/printcheck/android/SvgPdfExporter.java')
+
 shutil.copy2(pb/'audit_alpha46.py',src46/'tests/audit_alpha46.py')
 
 b=(src46/'app/build.gradle').read_text()
@@ -46,7 +50,7 @@ checks={
  'mm metrics':'art_width_mm' in s and 'art_x_in_field_mm' in s,
  'fit center':'fitArt()' in s and 'centerArt()' in s,
  'manual field':'Править поле' in s and 'manual-required' in s,
- 'pdf exporter':'class SvgPdfExporter' in p and 'createPrintDocumentAdapter' in p,
+ 'pdf exporter':'class SvgPdfExporter' in p and 'PdfDocument' in p and 'web.draw(canvas)' in p,
  'normalized check':'exportBoth' in q and 'QuickCheckEngine.run' in q,
  'engine wording':'выбранное поле шаблона' in qe and 'Gifts' not in qe,
 }
