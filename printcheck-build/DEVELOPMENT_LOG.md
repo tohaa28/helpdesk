@@ -1900,3 +1900,50 @@ Version/update:
 - versionCode 340029
 - applicationId ru.printcheck.android
 - persistent alpha signer unchanged.
+
+
+### Alpha29 successful final signed Android build
+
+Canonical build:
+- versionName: 3.4.0-alpha29
+- versionCode: 340029
+- applicationId: ru.printcheck.android
+- source commit: 0870044ae89f075db6d7de64a3d19f74e30ca856
+- GitHub Actions run: 35507611527
+- job: 106069963490
+- status: success
+- artifact: PrintCheck_Android_3.4.0-alpha29_FINAL_BUILD
+- artifact ID: 10604612015
+- artifact digest: sha256:53e419e785d429ee4058351917b9ff86ec583f02d333ae932157c135e37ab716
+- artifact expires: 2026-09-27T11:23:18Z
+
+CI gates:
+- prepare_alpha29: PASS
+- source invariants: PASS
+- alpha29 audit: 30/30 PASS
+- core tests: 86/86 PASS
+- Android Gradle build: PASS
+- persistent signer verification: PASS
+- artifact upload: PASS
+
+Independent downloaded-artifact verification:
+- APK SHA-256: c1d3693ede92c4c4e512a2343bc9ab4843494db303272745d07b21cf1730858f
+- source ZIP SHA-256: a3dfcc6eb40b3f2e5cf6236a7208193545d83d1d0130c7efca613d769d5a44f0
+- SHA file SHA-256: c1d4711a1ca6d34164229fb197c3763732eb78340b21d7840d5df74ca2643dd6
+- signer TXT SHA-256: 2c3e07a2474567ca66c91af647fb06010e04a82b2b96aa1f534b17eb8feb1854
+- APK ZIP integrity: PASS
+- source ZIP integrity: PASS
+- packaged build.gradle confirms ru.printcheck.android / 340029 / 3.4.0-alpha29
+- packaged source contains no .p12/.keystore
+- packaged MainActivity confirms inline small version + read-only and exact queue wording
+- packaged ResultView confirms:
+  * order node trailing status removed;
+  * brief checks in two-column grid;
+  * found-artwork evidence in brief checklist;
+  * found-artwork loads on first article expansion;
+  * detailed checklist no longer duplicates found-artwork panel.
+- signer SHA-256:
+  82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Update compatibility:
+alpha29 retains the exact persistent alpha20-alpha28 signer and applicationId, with versionCode incremented to 340029, so it should install directly over alpha28 without uninstall/data loss.
