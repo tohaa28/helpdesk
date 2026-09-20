@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha28 (build in progress)
+Current implementation line: Android 3.4.0-alpha28
 Current development/build branch: printcheck-build-3.4.0-alpha28
 
 ## STRICT CONTINUITY RULE
@@ -937,3 +937,30 @@ Version:
 - alpha28 versionCode 340028;
 - applicationId unchanged;
 - same persistent non-production alpha signer required.
+
+
+## ALPHA28 CANONICAL SUCCESSFUL BUILD CHECKPOINT
+
+- versionName: 3.4.0-alpha28
+- versionCode: 340028
+- applicationId: ru.printcheck.android
+- source commit: 5f83c231ca78256f17e60fb1a80ec8fe2418c7b8
+- GitHub Actions run: 35494396666
+- job ID: 106034713262
+- artifact ID: 10600521672
+- artifact: PrintCheck_Android_3.4.0-alpha28_FINAL_BUILD
+- APK SHA-256: b910d4208513169ecadf8025ce335e9dde1bf1c94e5e3065e14ea9da2ca31bdb
+- source ZIP SHA-256: 71be0d3a78110905dbfd0766c8bc6e7cc2210f331420b2ffde99592bb0356b64
+- signer SHA-256:
+  82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Alpha28 is update-compatible with alpha27.
+
+UI contract:
+- PrintCheck + small version on one horizontal line;
+- queue button exact text: Заказы ожидающие проверку;
+- result tree: order -> article -> brief checklist -> detailed checklist;
+- batch orders collapsed initially;
+- detailed checklist lazy-loads evidence only on first open.
+
+Technical preflight remains alpha27/alpha26 unchanged.
