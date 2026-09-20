@@ -44,6 +44,15 @@ rejects = list(src28.rglob("*.rej"))
 if rejects:
     raise RuntimeError("alpha28 patch rejects: " + ", ".join(str(p.relative_to(src28)) for p in rejects))
 
+# Android Gravity has no BASELINE constant. Keep the title/version on one row and
+# center them vertically; this preserves the requested compact inline version.
+main_path = src28 / "app/src/main/java/ru/printcheck/android/MainActivity.java"
+main_text = main_path.read_text(encoding="utf-8")
+bad_gravity = "brandLine.setGravity(Gravity.BASELINE)"
+if main_text.count(bad_gravity) != 1:
+    raise RuntimeError(f"alpha28 expected one brand-line BASELINE anchor, found {main_text.count(bad_gravity)}")
+main_path.write_text(main_text.replace(bad_gravity, "brandLine.setGravity(Gravity.CENTER_VERTICAL)", 1), encoding="utf-8")
+
 build = (src28 / "app/build.gradle").read_text(encoding="utf-8")
 main = (src28 / "app/src/main/java/ru/printcheck/android/MainActivity.java").read_text(encoding="utf-8")
 result = (src28 / "app/src/main/java/ru/printcheck/android/ResultView.java").read_text(encoding="utf-8")
@@ -56,7 +65,7 @@ required = {
     "application id retained": "applicationId 'ru.printcheck.android'" in build,
     "persistent signer retained": "alphaPersistent" in build and "printcheck-alpha-test.p12" in build,
 
-    "brand line": "brandLine.setOrientation(LinearLayout.HORIZONTAL)" in main,
+    "brand line": "brandLine.setOrientation(LinearLayout.HORIZONTAL)" in main and "brandLine.setGravity(Gravity.CENTER_VERTICAL)" in main and "Gravity.BASELINE" not in main,
     "small inline version": "TextView version=text(BuildConfig.VERSION_NAME,10)" in main and "brandLine.addView(version)" in main,
     "queue button renamed": 'actionButton("Заказы ожидающие проверку"' in main,
     "queue dialog renamed": 'setTitle("Заказы ожидающие проверку · "+orders.size())' in main,
