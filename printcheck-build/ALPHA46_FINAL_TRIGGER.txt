@@ -1,0 +1,18 @@
+PrintCheck 3.4.0-alpha46 final build trigger
+Date: 2026-09-21
+
+New Quick Check workflow:
+- no Gifts browser / no constructor download;
+- user loads a template PDF or SVG with selected application fields;
+- user loads artwork SVG/PNG/JPG/WEBP;
+- interactive SVG editor calculates artwork width, height and X/Y in millimetres;
+- drag and resize artwork directly;
+- fit-to-field and center controls;
+- PDF templates use existing colour-highlighted field detection;
+- SVG templates detect highlighted rectangles and allow manual field correction;
+- multiple detected fields can be cycled;
+- ready SVG layout saves to Downloads/PrintCheck;
+- normalized template/layout PDF pair is generated for the existing QuickCheck engine;
+- browser-generated PDF is not treated as source of truth for CMYK/Pantone, so colour-model result is manual in this editor flow.
+
+Expected core tests: 135/135.
