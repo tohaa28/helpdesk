@@ -1,0 +1,7 @@
+alpha27_final=1
+reason=rule_diameter_markers_no_center_dot
+expected_version=3.4.0-alpha27
+expected_version_code=340027
+expected_application_id=ru.printcheck.android
+expected_generator_sha256=25e34a495360ef3c543a4c35de7f1a633eac5c297dd5975bfa804b2babb78847
+expected_signer_sha256=822540c7386d193fd3dec165620398572306a20b2640b8769181597766a45d11
