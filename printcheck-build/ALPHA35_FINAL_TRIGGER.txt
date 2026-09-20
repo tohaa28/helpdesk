@@ -10,4 +10,4 @@ Changes:
 - scan multi-page generated template for selected highlighted field.
 
 Expected core tests: 103/103.
-Retry: transport validation fixed.\nRetry: chunked patch transport enabled.\nRetry: fixed patch path stripping (-p3).\nRetry: verified GNU patch strip level -p4.\n
+Retry: transport validation fixed.\nRetry: chunked patch transport enabled.\nRetry: fixed patch path stripping (-p3).\nRetry: verified GNU patch strip level -p4.\nRetry: explicit android.webkit.CookieManager.\n
