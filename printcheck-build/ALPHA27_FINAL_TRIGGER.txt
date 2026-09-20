@@ -1,4 +1,4 @@
-alpha27_final=2
+alpha27_final=3
 reason=rule_diameter_markers_no_center_dot
 expected_version=3.4.0-alpha27
 expected_version_code=340027
