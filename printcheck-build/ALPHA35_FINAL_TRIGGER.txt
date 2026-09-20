@@ -1,0 +1,12 @@
+PrintCheck 3.4.0-alpha35 final build trigger
+Date: 2026-09-20
+
+Changes:
+- remove technical/service section from PDF reports;
+- approximate constructor colour vs product colour from order page;
+- second standalone quick-check window;
+- use real Gifts flow: article -> Add application -> method/place -> generated PDF;
+- upload user PDF and run quick technical preflight without an order;
+- scan multi-page generated template for selected highlighted field.
+
+Expected core tests: 103/103.
