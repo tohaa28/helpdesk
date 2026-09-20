@@ -1,0 +1,14 @@
+PrintCheck 3.4.0-alpha42 final build trigger
+Date: 2026-09-20
+
+Prominent brief report facts:
+- first block in brief checklist is now “ПАРАМЕТРЫ НАНЕСЕНИЯ”;
+- print type is shown large at the top;
+- application field size from constructor is shown in a prominent cell;
+- detected artwork size is shown in a prominent cell beside it;
+- place is shown directly below print type;
+- alignment/guard/small-element service summary remains secondary;
+- duplicate print-type text is removed from the old compact line;
+- geometry and measurements are unchanged.
+
+Expected core tests: 135/135.
