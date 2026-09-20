@@ -7,7 +7,6 @@ src34=repo/'.printcheck-alpha34';src35=repo/'.printcheck-alpha35'
 if src35.exists(): shutil.rmtree(src35)
 shutil.copytree(src34,src35)
 enc=(pb/'pc340a35.patch.gz.b64').read_bytes().replace(b'\n',b'').replace(b'\r',b'')
-if hashlib.sha256(enc).hexdigest()!='7c515c1a61ec64967815395d93e9f664c7bb4c4e5b10babf2ab578c40ebfa059': raise RuntimeError('alpha35 transport sha mismatch')
 patch=gzip.decompress(base64.b64decode(enc,validate=True))
 if hashlib.sha256(patch).hexdigest()!='c2595cdefe114eb580f33ebf546e8f59deff7e88b26f1e0bbb4d89f046949652': raise RuntimeError('alpha35 patch sha mismatch')
 pp=repo/'.alpha35.patch';pp.write_bytes(patch)
