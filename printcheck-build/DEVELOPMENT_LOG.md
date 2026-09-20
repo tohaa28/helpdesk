@@ -1789,3 +1789,52 @@ Repair:
 - generator now enforces CENTER_VERTICAL and explicitly forbids Gravity.BASELINE.
 - no result-tree/preflight/marker logic changed.
 - repair commit: 0051fcc120b3a376b90841e8caa73893d1225573.
+
+
+### Alpha28 successful final signed Android build
+
+Canonical build:
+- versionName: 3.4.0-alpha28
+- versionCode: 340028
+- applicationId: ru.printcheck.android
+- source commit: 5f83c231ca78256f17e60fb1a80ec8fe2418c7b8
+- GitHub Actions run: 35494396666
+- job: 106034713262
+- status: success
+- artifact: PrintCheck_Android_3.4.0-alpha28_FINAL_BUILD
+- artifact ID: 10600521672
+- artifact digest: sha256:ff36af5044d70bd7570b3d5d65e7f8ab87180078392d4fc850b989b930fa62a0
+- artifact expires: 2026-09-27T06:31:51Z
+
+CI gates:
+- prepare_alpha28: PASS
+- source invariants: PASS
+- alpha28 audit: 27/27 PASS
+- core tests: 86/86 PASS
+- Android Gradle build: PASS
+- persistent signer verification: PASS
+- artifact upload: PASS
+
+Independent downloaded-artifact verification:
+- APK SHA-256: b910d4208513169ecadf8025ce335e9dde1bf1c94e5e3065e14ea9da2ca31bdb
+- source ZIP SHA-256: 71be0d3a78110905dbfd0766c8bc6e7cc2210f331420b2ffde99592bb0356b64
+- SHA file SHA-256: 835e2ef9438bf6bc37d70efe201bd97a963ba6c82f4e59a28258ff0e6f211575
+- signer TXT SHA-256: 2c3e07a2474567ca66c91af647fb06010e04a82b2b96aa1f534b17eb8feb1854
+- APK ZIP integrity: PASS
+- source ZIP integrity: PASS
+- packaged build.gradle confirms ru.printcheck.android / 340028 / 3.4.0-alpha28
+- packaged source contains no .p12/.keystore
+- packaged MainActivity confirms inline small version and exact queue button wording
+- packaged ResultView confirms order -> article -> brief checklist -> detailed checklist tree and lazy detail loader
+- signer SHA-256:
+  82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Update compatibility:
+alpha28 retains the exact persistent alpha20-alpha27 signer and applicationId, with versionCode incremented to 340028, so it should install directly over alpha27 without uninstall/data loss.
+
+Real-device acceptance:
+- verify title line visually: PrintCheck + small alpha28 version on same line;
+- verify full queue label on phone;
+- verify tree hierarchy and arrow disclosure behavior;
+- verify batch orders start collapsed;
+- verify article details do not allocate/load evidence until detailed checklist is opened.
