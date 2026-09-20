@@ -41,6 +41,15 @@ ui=ui.replace('ss.append("\n").append(x);','ss.append("\\n").append(x);')
 ui=ui.replace('s=s.replace("; ",";\n");','s=s.replace("; ",";\\n");')
 ui_file.write_text(ui)
 
+# Normalize the two-paragraph batch-confirmation Java literal as well.
+main_file=src44/'app/src/main/java/ru/printcheck/android/MainActivity.java'
+main=main_file.read_text()
+main=main.replace(
+'Для каждого заказа будет создан отдельный PDF-отчёт в Downloads/PrintCheck.\n\nОшибка одного заказа не остановит остальные.',
+'Для каждого заказа будет создан отдельный PDF-отчёт в Downloads/PrintCheck.\\n\\nОшибка одного заказа не остановит остальные.'
+)
+main_file.write_text(main)
+
 # Finish the message-formatting sweep in ResultView as part of canonical generation.
 rv_file=src44/'app/src/main/java/ru/printcheck/android/ResultView.java'
 rv=rv_file.read_text()
