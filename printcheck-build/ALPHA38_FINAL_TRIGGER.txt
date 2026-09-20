@@ -1,0 +1,14 @@
+PrintCheck 3.4.0-alpha38 final build trigger
+Date: 2026-09-20
+
+Corner/junction filtering for small elements:
+- evaluate nearly constant width along the actual medial geodesic path;
+- do not classify a local corner minimum by itself as a defect;
+- inspect wider medial continuation beyond the sub-rule candidate;
+- one-sided widening means taper into a corner and is ignored;
+- sustained centered thin segments remain violations;
+- apply the same production logic to negative channels;
+- preserve same-colour-only and cross-colour barrier rules.
+
+Regression target: article 17488, “Университета МИСИС”, especially Cyrillic И-style joins.
+Expected core tests: 117/117.
