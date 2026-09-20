@@ -1,0 +1,15 @@
+PrintCheck 3.4.0-alpha37 final build trigger
+Date: 2026-09-20
+
+Small-element production persistence:
+- local minimum alone is not a defect;
+- positive thinness must persist along a medial path;
+- same-colour negative gaps between disconnected components use opposite-ray channel width;
+- open same-component gaps keep same-colour opposite-ray logic;
+- a similar narrow width must persist for about one rule width in physical length;
+- a core around the local minimum must itself have non-zero path length;
+- converging corners and V-notches are accepted;
+- long thin strokes and long narrow gaps remain violations;
+- cross-colour barriers remain excluded.
+
+Expected core tests: 112/112.
