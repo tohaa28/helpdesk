@@ -16,3 +16,5 @@ New Quick Check workflow:
 - browser-generated PDF is not treated as source of truth for CMYK/Pantone, so colour-model result is manual in this editor flow.
 
 Expected core tests: 135/135.
+
+Retry: chunked patch transport, decompressed patch SHA unchanged.
