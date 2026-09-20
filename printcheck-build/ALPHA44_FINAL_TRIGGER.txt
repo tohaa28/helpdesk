@@ -20,3 +20,5 @@ Expected core tests: 135/135.
 Retry: normalize UiMessage Java newline escapes and section return-type invariant.
 
 Retry 2: complete ResultView formatting and correct audit predicates.
+
+Retry 3: normalize batch-confirmation Java paragraph escapes.
