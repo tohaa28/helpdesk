@@ -16,3 +16,5 @@ Unified message formatting:
 - raw status.setText calls removed from MainActivity and QuickCheckActivity.
 
 Expected core tests: 135/135.
+
+Retry: normalize UiMessage Java newline escapes and section return-type invariant.
