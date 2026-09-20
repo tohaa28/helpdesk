@@ -1,0 +1,13 @@
+PrintCheck 3.4.0-alpha43 final build trigger
+Date: 2026-09-20
+
+Dynamic evidence-frame thickness:
+- application-field outline width scales from the rendered short side of the field;
+- artwork outline width scales from the rendered short side of the detected artwork;
+- small boxes use thin ~1 px outlines instead of hard 4-6 px minimums;
+- large boxes remain readable with capped widths;
+- field dash pattern follows the actual stroke width;
+- change applies to full overlay, focus overlay, artwork evidence, and small-element evidence;
+- geometry, box coordinates, and measurement logic are unchanged.
+
+Expected core tests: 135/135.
