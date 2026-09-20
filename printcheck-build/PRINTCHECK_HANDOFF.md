@@ -2,8 +2,8 @@
 
 Last updated: 2026-09-19
 Repository: tohaa28/helpdesk
-Current implementation line: Android 3.4.0-alpha26
-Current development/build branch: printcheck-build-3.4.0-alpha26
+Current implementation line: Android 3.4.0-alpha27
+Current development/build branch: printcheck-build-3.4.0-alpha27
 
 ## STRICT CONTINUITY RULE
 
@@ -847,3 +847,51 @@ Authoritative morphology:
 diff is seed only -> reconstruct full same-color solid -> exclusive color ownership -> exclude cross-color contacts -> distance/medial positive widths + same-color gaps + single objects -> centered evidence markers.
 
 Do not regress markers to bbox centers or diff-edge contours.
+
+
+## ALPHA27 — RULE-SIZED HOLLOW MARKER CONTRACT
+
+User-visible marker contract:
+- NO center dot;
+- NO color swatch in center;
+- NO crosshair;
+- marker is a hollow circle only;
+- OUTER circle diameter equals the minimum allowed physical size of the rule being visualized.
+
+Per check:
+- positive circle diameter = effective positive rule mm;
+- negative circle diameter = effective negative rule mm;
+- single-object circle diameter = minSingleElementMm.
+
+Scaling:
+- use the calibrated reference-ruler pixels/mm, never renderer DPI alone;
+- multiply by evidence output scale;
+- compensate stroke inward so the visible outer diameter remains the target rule size.
+
+Do not restore:
+- fixed 18px radius;
+- central dot/swatch;
+- central crosshair;
+- bbox-sized marker.
+
+Retained from alpha26:
+- centers remain the actual feature centers/midpoints/centroids;
+- cross-color intersections are excluded;
+- same-color technical morphology only;
+- diff is seed only, not measured geometry;
+- reference ruler precedes morphology;
+- 720dpi/4M performance architecture.
+
+Canonical build:
+- versionName 3.4.0-alpha27
+- versionCode 340027
+- applicationId ru.printcheck.android
+- source commit c902251bec095e98756537406485c263ffaf761b
+- GitHub Actions run 35492770823
+- job 106030431055
+- artifact ID 10599169903
+- APK SHA-256 94844c23ccd2f3421aca7048fd64902a4efc7515f69d6adb82a56452194f7f62
+- source ZIP SHA-256 8961ad7ec331762077118d838fc956da1113e4a3d91c02decd971e41aa5ef038
+- signer SHA-256 82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+
+Alpha27 is update-compatible with alpha26.
