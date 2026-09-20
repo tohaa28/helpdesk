@@ -41,6 +41,19 @@ ui=ui.replace('ss.append("\n").append(x);','ss.append("\\n").append(x);')
 ui=ui.replace('s=s.replace("; ",";\n");','s=s.replace("; ",";\\n");')
 ui_file.write_text(ui)
 
+# Finish the message-formatting sweep in ResultView as part of canonical generation.
+rv_file=src44/'app/src/main/java/ru/printcheck/android/ResultView.java'
+rv=rv_file.read_text()
+rv=rv.replace(
+'private static void styleSummary(Activity a,TextView details,String order,int total,int errors,int warnings,int manual,int ok){details.setText("Заказ №"+order+"\\n"+total+" нанесений · "+errors+" недопустимых · "+warnings+" с замечаниями · "+manual+" ручная проверка · "+ok+" без явных нарушений\\nГлавный критерий: техтребования именно выбранного нанесения каждой позиции.");details.setTextSize(14);details.setTypeface(Typeface.DEFAULT_BOLD);details.setTextColor(TEXT);details.setPadding(dp(a,14),dp(a,12),dp(a,14),dp(a,12));details.setBackground(rounded(Color.rgb(242,247,255),Color.rgb(204,218,239),12,a));}',
+'private static void styleSummary(Activity a,TextView details,String order,int total,int errors,int warnings,int manual,int ok){int tone=errors>0?UiMessage.ERROR:(warnings>0?UiMessage.WARNING:(manual>0?UiMessage.MANUAL:UiMessage.SUCCESS));UiMessage.apply(a,details,tone,"Заказ №"+order,total+" нанесений · "+errors+" недопустимых · "+warnings+" с замечаниями · "+manual+" ручная проверка · "+ok+" без явных нарушений\\n\\nГлавный критерий: техтребования именно выбранного нанесения каждой позиции.");}'
+)
+rv=rv.replace(
+'MAIN.post(()->Toast.makeText(a,"Не удалось открыть изображение: "+e.getMessage(),Toast.LENGTH_LONG).show());',
+'MAIN.post(()->UiMessage.toast(a,UiMessage.ERROR,"Не удалось открыть изображение",e.getMessage()));'
+)
+rv_file.write_text(rv)
+
 shutil.copy2(pb/'audit_alpha44.py',src44/'tests/audit_alpha44.py')
 
 b=(src44/'app/build.gradle').read_text()
