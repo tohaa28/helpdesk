@@ -31,6 +31,13 @@ finally:
 if list(src35.rglob('*.rej')):
     raise RuntimeError('alpha35 patch rejects')
 
+# java.net.* and android.webkit.* both expose CookieManager.
+# Quick-check needs WebView cookies so qualify the Android class explicitly.
+quick=src35/'app/src/main/java/ru/printcheck/android/QuickCheckActivity.java'
+qt=quick.read_text()
+qt=qt.replace('CookieManager.getInstance()', 'android.webkit.CookieManager.getInstance()')
+quick.write_text(qt)
+
 shutil.copy2(pb/'audit_alpha35.py',src35/'tests/audit_alpha35.py')
 
 b=(src35/'app/build.gradle').read_text()
@@ -58,6 +65,7 @@ checks={
  'pure color policy':'class ProductColorPolicy' in ppol,
  'pdf tech removed':'w.heading("Техническая информация")' not in pr and 'Версия алгоритма' not in pr,
  'alpha34 evidence':'Визуальное доказательство' in (src35/'app/src/main/java/ru/printcheck/android/ResultView.java').read_text(),
+ 'android cookie manager':'android.webkit.CookieManager.getInstance()' in q,
 }
 bad=[k for k,v in checks.items() if not v]
 if bad:
