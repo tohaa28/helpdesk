@@ -7,7 +7,6 @@ src37=repo/'.printcheck-alpha37'; src38=repo/'.printcheck-alpha38'
 if src38.exists(): shutil.rmtree(src38)
 shutil.copytree(src37,src38)
 enc=(pb/'pc340a38.patch.gz.b64').read_bytes().replace(b'\n',b'').replace(b'\r',b'')
-if hashlib.sha256(enc).hexdigest()!='f35b9dd63847fb884fb74a000da25d7548c641d69cb1e2e5729fea01165c19f': raise RuntimeError('alpha38 transport sha mismatch')
 patch=gzip.decompress(base64.b64decode(enc,validate=True))
 if hashlib.sha256(patch).hexdigest()!='b5f62bde9208899db3567423d1760c329b3b21b22580b668f40d1d4449e25ddf': raise RuntimeError('alpha38 patch sha mismatch')
 pp=repo/'.alpha38.patch'; pp.write_bytes(patch)
