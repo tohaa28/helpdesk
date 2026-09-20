@@ -9,7 +9,10 @@ src45=repo/'.printcheck-alpha45'; src46=repo/'.printcheck-alpha46'
 if src46.exists(): shutil.rmtree(src46)
 shutil.copytree(src45,src46)
 
-enc=(pb/'pc340a46.patch.gz.b64').read_bytes().replace(b'\n',b'').replace(b'\r',b'')
+parts=sorted((pb/'alpha46_patch').glob('part*.b64'))
+if len(parts)!=9:
+    raise RuntimeError('alpha46 patch chunks missing: expected 9, got '+str(len(parts)))
+enc=b''.join(p.read_bytes().replace(b'\n',b'').replace(b'\r',b'') for p in parts)
 patch=gzip.decompress(base64.b64decode(enc,validate=True))
 if hashlib.sha256(patch).hexdigest()!='4f55dfa20824652e13446439e8c2f7fa31cea8392700338b2d3ce3997e7347c4':
     raise RuntimeError('alpha46 patch sha mismatch')
