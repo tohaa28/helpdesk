@@ -1,0 +1,47 @@
+PrintCheck Android 3.4.0-alpha33 — canonical build manifest
+Date: 2026-09-20
+
+VERSION
+versionName=3.4.0-alpha33
+versionCode=340033
+applicationId=ru.printcheck.android
+branch=printcheck-build-3.4.0-alpha33
+
+BUILD
+source_commit=774b63dadbbec19f68d6f6253dd0de809e896dc9
+actions_run=35516184684
+job_id=106092411317
+artifact_name=PrintCheck_Android_3.4.0-alpha33_FINAL_BUILD
+artifact_id=10606339031
+artifact_digest=sha256:2076e421bd0a16938a2ad9accc832b3f7b83c46024ed5dcb9525b3f2f2afb50b
+artifact_expires=2026-09-27T14:22:02Z
+
+FILES
+apk_sha256=f18ad454b71dc4a1b9654d8268d461ac7506829be1b9afe7c4ccefe298493ab2
+source_zip_sha256=d014907a7090f776496c06b6bf6f11456cc3f577bfe5ae887b03d502e5ffa0b1
+
+SIGNING
+persistent_alpha_signer=true
+certificate_sha256=82:25:40:C7:38:6D:19:3F:D3:DE:C1:65:62:03:98:57:23:06:A2:0B:26:40:B8:76:91:81:59:77:66:A4:5D:11
+update_compatible_with_alpha32=true
+
+TEST_GATES
+source_generation=PASS
+source_invariants=PASS
+audit_alpha33=PASS
+core_tests=97/97_PASS
+android_build=PASS
+signer_verification=PASS
+artifact_upload=PASS
+
+UI
+ok_label=макет ок
+violation_label=макет не по тт
+status_badge_single_line=true
+
+RETAINED
+alpha32_technology_matrix=true
+alpha31_click_help=true
+alpha30_strict_guard=true
+alpha27_rule_diameter_markers=true
+alpha26_same_color_intersection_safe=true
