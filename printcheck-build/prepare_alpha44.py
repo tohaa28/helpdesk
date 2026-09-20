@@ -31,6 +31,16 @@ finally:
 if list(src44.rglob('*.rej')):
     raise RuntimeError('alpha44 patch rejects')
 
+# Normalize Java newline escapes. The source patch is transported through a generated
+# text diff; keep escaped newlines as Java string literals rather than literal LF
+# characters inside quoted strings.
+ui_file=src44/'app/src/main/java/ru/printcheck/android/UiMessage.java'
+ui=ui_file.read_text()
+ui=ui.replace('ss.append("\n\n");','ss.append("\\n\\n");')
+ui=ui.replace('ss.append("\n").append(x);','ss.append("\\n").append(x);')
+ui=ui.replace('s=s.replace("; ",";\n");','s=s.replace("; ",";\\n");')
+ui_file.write_text(ui)
+
 shutil.copy2(pb/'audit_alpha44.py',src44/'tests/audit_alpha44.py')
 
 b=(src44/'app/build.gradle').read_text()
@@ -47,7 +57,7 @@ checks={
  'tones':'SUCCESS' in u and 'WARNING' in u and 'ERROR' in u and 'MANUAL' in u and 'INFO' in u,
  'auto tone':'toneForStatus' in u and 'applyAuto' in u,
  'toast':'static void toast' in u,
- 'sections':'static View section' in u,
+ 'sections':'static TextView section' in u,
  'main progress':'showStatus(UiMessage.INFO,"Выполняется · "+fp+"%"' in m,
  'main dialogs':'UiMessage.dialogBody' in m,
  'main no raw status':'status.setText(' not in m,
