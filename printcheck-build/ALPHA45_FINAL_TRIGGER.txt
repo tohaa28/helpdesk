@@ -1,0 +1,12 @@
+PrintCheck 3.4.0-alpha45 final build trigger
+Date: 2026-09-21
+
+Fixed status-mark sizing:
+- status labels no longer use Android AutoSize;
+- one status font size everywhere: 8sp;
+- article status badges use fixed 116 x 27 dp geometry;
+- brief checklist status labels use fixed 18 dp height;
+- include-font-padding disabled for status marks;
+- alpha44 status colours and wording are retained.
+
+Expected core tests: 135/135.
