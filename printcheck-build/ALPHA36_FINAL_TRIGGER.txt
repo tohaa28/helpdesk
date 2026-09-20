@@ -1,0 +1,13 @@
+PrintCheck 3.4.0-alpha36 final build trigger
+Date: 2026-09-20
+
+Negative gap algorithm rewrite:
+- preserve enclosed same-colour counters;
+- preserve disconnected same-colour component gaps;
+- add open two-sided same-component channels using distance-ridge candidates + direct opposite-ray width;
+- other colours remain hard barriers;
+- stability filter rejects isolated raster/antialias coincidences;
+- marker center uses narrowest locus of the detected channel.
+
+Regression target: article 17488.30 / A2, text such as "научное общество", where alpha33 detected only 2 gaps.
+Expected core tests: 107/107.
