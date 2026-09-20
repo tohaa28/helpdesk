@@ -1,0 +1,18 @@
+PrintCheck 3.4.0-alpha44 final build trigger
+Date: 2026-09-20
+
+Unified message formatting:
+- common UiMessage component for status, cards, sections, dialogs and toasts;
+- green = success/OK;
+- red = error / not compliant;
+- orange = warning / manual review;
+- blue = informational/progress;
+- bold title, separate important conclusion, blank-line-separated details;
+- main workflow statuses reformatted;
+- authorization/order/progress/diagnostics messages reformatted;
+- Quick Check messages and action prompts reformatted;
+- detailed check dialog split into Status / What is checked / Result / Visual evidence;
+- report/batch/open-file errors reformatted;
+- raw status.setText calls removed from MainActivity and QuickCheckActivity.
+
+Expected core tests: 135/135.
