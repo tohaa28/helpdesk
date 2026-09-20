@@ -1,0 +1,5 @@
+PrintCheck 3.4.0-alpha32 final build trigger
+Date: 2026-09-20
+Feature: technology-specific checklist matrix based on Gifts requirements.
+UI: one violation label — "Не соответствует техтребованиям для нанесения".
+Core tests expected: 97/97.
