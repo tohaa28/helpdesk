@@ -1,1 +1,1 @@
-alpha54 clickable order report link, current gifts markup, product variant layout relation and guard scope; diagnostic 7920912
+trigger alpha54 final build after branch creation 2026-09-21T18:18Z
