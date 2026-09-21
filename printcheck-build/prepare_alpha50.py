@@ -21,7 +21,7 @@ if hashlib.sha256(patch).hexdigest()!='b866eaa07af457761bb4063ec850161d9e4716ac6
 pp=repo/'.alpha50.patch'
 pp.write_bytes(patch)
 try:
-    subprocess.run(['patch','-p1','--batch','--forward','-i',str(pp)],cwd=src50,check=True)
+    subprocess.run(['patch','-p4','--batch','--forward','-i',str(pp)],cwd=src50,check=True)
 finally:
     pp.unlink(missing_ok=True)
 
