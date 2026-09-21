@@ -1,0 +1,2 @@
+Build PrintCheck 3.4.0-alpha49 final
+Use visible template captions from «Шаблоны макетов» as authoritative names.
