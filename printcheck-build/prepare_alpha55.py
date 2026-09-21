@@ -41,6 +41,20 @@ try:
 finally:
     fix_pp.unlink(missing_ok=True)
 
+# Second CI correction: the coloured table legend swatch is evidence, not a field candidate.
+fix2_enc = (pb / 'alpha55_ci_fix2.b64').read_bytes().replace(b'\n', b'').replace(b'\r', b'')
+fix2_patch = gzip.decompress(base64.b64decode(fix2_enc, validate=True))
+fix2_expected = '3e8c614f65446298dfd02802e4d63b3a085c205009e7e093484abf8d681cc174'
+fix2_actual = hashlib.sha256(fix2_patch).hexdigest()
+if fix2_actual != fix2_expected:
+    raise RuntimeError(f'alpha55 ci fix2 sha mismatch: {fix2_actual}')
+fix2_pp = repo / '.alpha55-ci-fix2.patch'
+fix2_pp.write_bytes(fix2_patch)
+try:
+    subprocess.run(['patch', '-p1', '--batch', '--forward', '-i', str(fix2_pp)], cwd=src55, check=True)
+finally:
+    fix2_pp.unlink(missing_ok=True)
+
 if list(src55.rglob('*.rej')):
     raise RuntimeError('alpha55 patch rejects')
 
