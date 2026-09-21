@@ -1,2 +1,1 @@
-Build trigger for PrintCheck 3.4.0-alpha53.
-Position-aware selected application field binding; preserve persistent alpha signing identity.
+alpha53 semantic field binding, honest missing-evidence states and conditional rules; continuation 2026-09-21 b0bb1cda40c8708a

@@ -9,7 +9,7 @@ if src53.exists(): shutil.rmtree(src53)
 shutil.copytree(src52,src53)
 enc=(pb/'alpha53_patch.b64').read_bytes().replace(b'\n',b'').replace(b'\r',b'')
 patch=gzip.decompress(base64.b64decode(enc,validate=True))
-expected='e0a301ef038454eb70477a7c17bd4502ac8d981110c902d39c317fd3d3bb45e3'
+expected='b0bb1cda40c8708a289a0f6aac4258d47b3e1189fe1cb671d4c0b02a2730cd22'
 if hashlib.sha256(patch).hexdigest()!=expected: raise RuntimeError('alpha53 patch sha mismatch')
 pp=repo/'.alpha53.patch'; pp.write_bytes(patch)
 try: subprocess.run(['patch','-p1','--batch','--forward','-i',str(pp)],cwd=src53,check=True)
