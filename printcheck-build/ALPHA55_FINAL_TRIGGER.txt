@@ -1,1 +1,1 @@
-trigger alpha55 modular geometry regression build after CI compatibility correction
+trigger alpha55 modular geometry build after legend-swatch correction
