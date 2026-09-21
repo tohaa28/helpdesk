@@ -1,0 +1,202 @@
+diff -ruN '--exclude=build' '--exclude=.gradle' alpha47/PRINTCHECK_CANONICAL_STATE.md alpha48/PRINTCHECK_CANONICAL_STATE.md
+--- alpha47/PRINTCHECK_CANONICAL_STATE.md	1970-01-01 00:00:00.000000000 +0000
++++ alpha48/PRINTCHECK_CANONICAL_STATE.md	2026-09-21 10:26:34.950043728 +0000
+@@ -0,0 +1,72 @@
++# PrintCheck — canonical state for 3.4.0-alpha48
++
++This file is the in-source handoff. Do not simplify or reset the project when continuing development.
++
++## Product goal
++PrintCheck is a standalone Android application for a technical designer. It signs in to gifts.ru only through the site session, reads order data in read-only mode, downloads order layouts/templates, proves the selected application field, extracts the actual artwork, checks that artwork against the technical requirements of the selected application, and presents a designer-friendly evidence report.
++
++## Binding processing order
++1. Read order / item / selected application / place / printing method and technical requirements.
++2. Download the layout and every related template/reference while retaining original and local file names.
++3. Prove the selected field from a real constructor/template object. Order dimensions/name are verification/scoring only and must never create a synthetic field.
++4. Register constructor/template to layout. Deleted constructor fragments are allowed and are not artwork.
++5. Extract only the residual artwork inside the proved field.
++6. Calibrate physical scale from the real field before measuring artwork and small elements.
++7. Check the artwork only against the requirements of the selected application/printing method.
++8. When evidence is insufficient or ambiguous, return manual review instead of a false OK.
++
++## Geometry and artwork constraints
++- The constructor is auxiliary evidence; the selected application and its technical requirements are authoritative for what must be checked.
++- Partial removal of constructor/template content from a production layout is not an error.
++- Dotted/technical field frames are template geometry, not artwork.
++- Guard field is measured to all four real field edges. Exact threshold passes; smaller distance fails; outside-field distance is negative and fails.
++- Artwork dimensions and field dimensions are physical W×H in mm.
++- Evidence overlays use dynamic outline width so small applications are not obscured.
++
++## Small positive / negative elements
++- Analyze each stable visible color layer separately.
++- Positive = physical width of an object/stroke/letter of one color.
++- Negative = internal reversal/gap or distance between separate objects of the same color only.
++- Distances across different colors are never negative elements.
++- Single-object minimum is checked separately when the technology defines it.
++- Antialias shades belonging to one flat color are clustered into that color.
++- Full-color / unreliable separation becomes manual, never fake automatic morphology.
++- Corner/junction tapers are filtered; sustained thin runs and stable narrow channels remain violations.
++- Issue circles have no central dot/cross. Their physical diameter equals the corresponding minimum allowed element/gap size and the center is the detected problem center.
++
++## Preflight scope
++- Live fonts are forbidden only inside the actual artwork. Fonts in templates or outside the application field are ignored.
++- Gradients, transparency and effects inside artwork are forbidden/checked structurally.
++- Color model is checked per printing method. Pure CMYK black/white are universally allowed where established; colored CMYK/Pantone rules remain method-specific.
++- If the color model cannot be determined reliably (especially Quick Check SVG/PDF transport), require manual verification rather than inventing CMYK/Pantone data.
++
++## UI / evidence requirements
++- Header: PrintCheck + small version on one line; read-only indication retained.
++- Queue button: «Заказы ожидающие проверку».
++- Result tree: order → article → brief checklist → detailed checklist. Heavy evidence is lazy-loaded.
++- Key visual evidence is large and opens fullscreen with zoom.
++- All user-facing messages use one visual language: green success, red error, orange warning/manual, blue information; important text is separated into readable paragraphs.
++- Status marks use one fixed visual size: 8sp text, 116×27dp top badge, 18dp inline checklist status; no autosize for status labels.
++
++## Brief report requirements
++The brief report must put the important production facts at the top:
++- printing method;
++- place;
++- field W×H mm;
++- found artwork W×H mm;
++- original/downloaded/used file names for layout, selected application PDF, constructor/reference;
++- Quick Check source template, source artwork and generated ready_layout.svg.
++
++## Quick Check workflow
++Quick Check is not the old embedded-site flow. It is:
++1. Load a PDF/SVG template containing the chosen application field(s).
++2. Load artwork as SVG/PNG/JPG/WEBP.
++3. In the SVG editor choose/detect the field, inspect physical field size, place and scale artwork, and show artwork W×H plus X/Y in mm.
++4. Support fit/center, field switching and manual field rectangle correction.
++5. Save the production artifact as ready_layout.svg to Downloads/PrintCheck.
++6. Optionally run the same technical checks through normalized PDF transport while marking unreliable CMYK/Pantone as manual.
++
++## Current verified baseline inherited from alpha47
++- applicationId remains ru.printcheck.android and the persistent NON-PRODUCTION alpha signer must not change.
++- alpha47 final GitHub run 35587921299 passed audit, 135/135 core tests, Android build and signer verification.
++- alpha48 is a context/regression-lock build: no intended production-analysis algorithm change from alpha47.
+diff -ruN '--exclude=build' '--exclude=.gradle' alpha47/PROGRESS.md alpha48/PROGRESS.md
+--- alpha47/PROGRESS.md	2026-09-21 10:17:27.000000000 +0000
++++ alpha48/PROGRESS.md	2026-09-21 10:28:43.800349083 +0000
+@@ -1,4 +1,8 @@
+-# 3.4.0-alpha31
++# PrintCheck Android — progress (current: 3.4.0-alpha48)
++
++Каноническая точка продолжения: `PRINTCHECK_CANONICAL_STATE.md`. Старые записи ниже — история, а не текущая версия.
++
++## 3.4.0-alpha31
+ 
+ Цель: корректная физическая проверка мелких элементов только внутри одного цвета.
+ 
+@@ -115,3 +119,17 @@
+ - короткие статусы чек-листа имеют фиксированную высоту 18 dp;
+ - цветовая логика alpha44 сохранена.
+ 
++
++## 3.4.0-alpha46
++- Quick Check заменён на загрузку шаблона и нанесения с физическим SVG-редактором.
++- Поле/нанесение измеряются в мм; нанесение размещается и сохраняется как ready_layout.svg.
++
++## 3.4.0-alpha47
++- Краткий отчёт получил «ИСПОЛЬЗУЕМЫЕ ФАЙЛЫ» с реальными исходными/локальными именами.
++- Quick Check показывает имена шаблона, нанесения и готового SVG.
++- Финальный GitHub workflow 35587921299: success; audit/core/build/sign verification/package — PASS.
++
++## 3.4.0-alpha48
++- Создан канонический in-source handoff, чтобы не терять принятые правила между чатами/сборками.
++- Добавлен audit последних UI/отчётных/Quick Check инвариантов.
++- Производственная аналитика не меняется относительно alpha47.
+diff -ruN '--exclude=build' '--exclude=.gradle' alpha47/README_RU.md alpha48/README_RU.md
+--- alpha47/README_RU.md	2026-09-21 10:17:27.000000000 +0000
++++ alpha48/README_RU.md	2026-09-21 10:28:43.800097160 +0000
+@@ -1,4 +1,8 @@
+-# PrintCheck Android 3.4.0-alpha31
++# PrintCheck Android 3.4.0-alpha48
++
++> Текущее каноническое состояние проекта: `PRINTCHECK_CANONICAL_STATE.md`. Исторические разделы ниже сохранены без удаления.
++
++## История: 3.4.0-alpha31
+ 
+ ## Проверка мелких элементов строго по цветовым слоям
+ 
+@@ -106,3 +110,19 @@
+ - короткие статусы чек-листа имеют фиксированную высоту 18 dp;
+ - цветовая логика alpha44 сохранена.
+ 
++
++## 3.4.0-alpha46 — Quick Check SVG editor
++- Новый Quick Check: PDF/SVG-шаблон с выбранными полями + SVG/PNG/JPG/WEBP нанесение.
++- Физический SVG-редактор: поле, размер нанесения W×H, положение X/Y в мм, «Вписать», «По центру», ручная рамка и переключение поля.
++- Готовый производственный файл сохраняется как `ready_layout.svg` в Downloads/PrintCheck.
++- Контрольная PDF-пара используется только для техпроверки; ненадёжный CMYK/Pantone остаётся ручной проверкой.
++
++## 3.4.0-alpha47 — реальные имена файлов в кратком отчёте
++- Добавлен блок «ИСПОЛЬЗУЕМЫЕ ФАЙЛЫ».
++- Показывается исходные и локальные имена макета, PDF выбранного нанесения и конструктора/эталона.
++- Для Quick Check показываются исходный шаблон, исходное нанесение и `ready_layout.svg`.
++
++## 3.4.0-alpha48 — фиксация канонического состояния
++- Функциональная логика alpha47 сохранена без намеренных изменений.
++- В исходники добавлен `PRINTCHECK_CANONICAL_STATE.md`, фиксирующий обязательные правила проекта и последние принятые UI/Quick Check/отчётные требования.
++- Добавлен регрессионный audit alpha48, который не позволяет потерять последние реализованные требования при следующей сборке.
+diff -ruN '--exclude=build' '--exclude=.gradle' alpha47/app/build.gradle alpha48/app/build.gradle
+--- alpha47/app/build.gradle	2026-09-21 10:17:27.000000000 +0000
++++ alpha48/app/build.gradle	2026-09-21 10:26:34.804118456 +0000
+@@ -11,8 +11,8 @@
+         applicationId 'ru.printcheck.android'
+         minSdk 26
+         targetSdk 35
+-        versionCode 340047
+-        versionName '3.4.0-alpha47'
++        versionCode 340048
++        versionName '3.4.0-alpha48'
+     }
+ 
+ 
+diff -ruN '--exclude=build' '--exclude=.gradle' alpha47/app/src/main/java/ru/printcheck/android/QuickCheckActivity.java alpha48/app/src/main/java/ru/printcheck/android/QuickCheckActivity.java
+--- alpha47/app/src/main/java/ru/printcheck/android/QuickCheckActivity.java	2026-09-21 10:17:27.000000000 +0000
++++ alpha48/app/src/main/java/ru/printcheck/android/QuickCheckActivity.java	2026-09-21 10:26:34.804327676 +0000
+@@ -20,7 +20,7 @@
+ import java.util.*;
+ import java.util.concurrent.*;
+ 
+-/** Quick Check alpha46: user-supplied template + artwork + physical SVG placement editor. */
++/** Quick Check alpha48: user-supplied template + artwork + physical SVG placement editor. */
+ public class QuickCheckActivity extends Activity {
+     private static final int PICK_TEMPLATE=301,PICK_ARTWORK=302;
+     private EditText article; private Spinner method; private Button templateButton,artworkButton,editorButton,saveButton,checkButton,backButton;
+diff -ruN '--exclude=build' '--exclude=.gradle' alpha47/tests/audit_alpha48.py alpha48/tests/audit_alpha48.py
+--- alpha47/tests/audit_alpha48.py	1970-01-01 00:00:00.000000000 +0000
++++ alpha48/tests/audit_alpha48.py	2026-09-21 10:26:34.952908124 +0000
+@@ -0,0 +1,32 @@
++#!/usr/bin/env python3
++from pathlib import Path
++root=Path(__file__).resolve().parents[1]
++def r(x): return (root/x).read_text(encoding='utf-8')
++b=r('app/build.gradle')
++main=r('app/src/main/java/ru/printcheck/android/MainActivity.java')
++rv=r('app/src/main/java/ru/printcheck/android/ResultView.java')
++geo=r('app/src/main/java/ru/printcheck/android/GeometryAnalyzer.java')
++q=r('app/src/main/java/ru/printcheck/android/QuickCheckActivity.java')
++ui=r('app/src/main/java/ru/printcheck/android/UiMessage.java')
++state=r('PRINTCHECK_CANONICAL_STATE.md')
++checks={
++ 'version code':'versionCode 340048' in b,
++ 'version name':"versionName '3.4.0-alpha48'" in b,
++ 'application id':"applicationId 'ru.printcheck.android'" in b,
++ 'queue label':'Заказы ожидающие проверку' in main,
++ 'brief parameters':'ПАРАМЕТРЫ НАНЕСЕНИЯ' in rv and 'ПОЛЕ ПО КОНСТРУКТОРУ' in rv and 'НАЙДЕННОЕ НАНЕСЕНИЕ' in rv,
++ 'brief file names':'ИСПОЛЬЗУЕМЫЕ ФАЙЛЫ' in rv and 'Скачан / сохранён как:' in rv,
++ 'quick source names':'quick_editor_sources' in q and 'ШАБЛОН QUICK CHECK' in rv and 'ИСХОДНОЕ НАНЕСЕНИЕ' in rv and 'ГОТОВЫЙ МАКЕТ' in rv,
++ 'quick ready svg':'ready_layout.svg' in q,
++ 'status fixed sizing':'STATUS_TEXT_SP=8' in rv and 'STATUS_BADGE_WIDTH_DP=116' in rv and 'STATUS_BADGE_HEIGHT_DP=27' in rv and 'STATUS_INLINE_HEIGHT_DP=18' in rv,
++ 'dynamic evidence outlines':'overlayBoxStroke(' in geo and 'shortSide*ratio' in geo,
++ 'message visual language':'UiMessage' in main and 'SUCCESS' in ui and 'WARNING' in ui and 'ERROR' in ui and 'MANUAL' in ui,
++ 'canonical no synthetic field':'must never create a synthetic field' in state,
++ 'canonical same-colour negative':'same color only' in state,
++ 'canonical manual fallback':'manual review instead of a false OK' in state,
++ 'canonical quick workflow':'ready_layout.svg' in state and 'PDF/SVG template' in state,
++}
++for k,v in checks.items(): print(('PASS ' if v else 'FAIL ')+k)
++bad=[k for k,v in checks.items() if not v]
++print(f'TOTAL {len(checks)-len(bad)}/{len(checks)} PASS')
++if bad: raise SystemExit(1)
