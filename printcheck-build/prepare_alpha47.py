@@ -12,7 +12,10 @@ src47=repo/'.printcheck-alpha47'
 if src47.exists(): shutil.rmtree(src47)
 shutil.copytree(src46,src47)
 
-enc=(pb/'pc340a47.patch.gz.b64').read_bytes().replace(b'\n',b'').replace(b'\r',b'')
+parts=sorted((pb/'alpha47_patch').glob('part*.b64'))
+if len(parts)!=3:
+    raise RuntimeError('alpha47 patch chunks missing: expected 3, got '+str(len(parts)))
+enc=b''.join(p.read_bytes().replace(b'\n',b'').replace(b'\r',b'') for p in parts)
 patch=gzip.decompress(base64.b64decode(enc,validate=True))
 if hashlib.sha256(patch).hexdigest()!='2a299a0c94ec6dca716be6ced8d992d8e0f7e5eab5f04dbd77a3d78b15d2e673':
     raise RuntimeError('alpha47 patch sha mismatch')
