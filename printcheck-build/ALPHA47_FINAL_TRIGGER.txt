@@ -13,3 +13,5 @@ Short-report file names:
 Expected audits: alpha47 15/15; core 135/135.
 
 Retry: previous Android build failed only because Maven Central returned HTTP 403 while resolving Gradle dependencies; source/audits/tests unchanged.
+
+Retry 2: remove extra helper brace in ResultView and add structural audit check.
