@@ -11,3 +11,5 @@ Short-report file names:
 - PDF report mirrors the same file-name information.
 
 Expected audits: alpha47 15/15; core 135/135.
+
+Retry: previous Android build failed only because Maven Central returned HTTP 403 while resolving Gradle dependencies; source/audits/tests unchanged.
