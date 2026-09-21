@@ -41,10 +41,11 @@ try:
 finally:
     fix_pp.unlink(missing_ok=True)
 
-# Second CI correction: the coloured table legend swatch is evidence, not a field candidate.
+# Second CI correction remains inside the geometry module:
+# service colour swatches from the application table are evidence, not production-field candidates.
 fix2_enc = (pb / 'alpha55_ci_fix2.b64').read_bytes().replace(b'\n', b'').replace(b'\r', b'')
 fix2_patch = gzip.decompress(base64.b64decode(fix2_enc, validate=True))
-fix2_expected = '3e8c614f65446298dfd02802e4d63b3a085c205009e7e093484abf8d681cc174'
+fix2_expected = '2dbb5fb1ff4e0a4e0860b14b04404ce70e72e2158252c640c50de8eb2ba0f7f7'
 fix2_actual = hashlib.sha256(fix2_patch).hexdigest()
 if fix2_actual != fix2_expected:
     raise RuntimeError(f'alpha55 ci fix2 sha mismatch: {fix2_actual}')
