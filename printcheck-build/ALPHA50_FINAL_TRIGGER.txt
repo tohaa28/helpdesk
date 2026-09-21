@@ -1,0 +1,2 @@
+Build PrintCheck 3.4.0-alpha50 final
+Fix application detection for diagnostic order 7942237.
