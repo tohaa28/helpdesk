@@ -15,3 +15,5 @@ Expected audits: alpha47 15/15; core 135/135.
 Retry: previous Android build failed only because Maven Central returned HTTP 403 while resolving Gradle dependencies; source/audits/tests unchanged.
 
 Retry 2: remove extra helper brace in ResultView and add structural audit check.
+
+Retry 3: use 3-part chunked alpha47 patch transport; source patch SHA remains 2a299a0c94ec6dca716be6ced8d992d8e0f7e5eab5f04dbd77a3d78b15d2e673.
