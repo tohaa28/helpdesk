@@ -1,7 +1,7 @@
 name: Build PrintCheck 3.4.0-alpha54 FINAL signed APK
 on:
   push:
-    branches: [printcheck-build-3.4.0-alpha54-position-fields]
+    branches: [printcheck-build-3.4.0-alpha54-report-links]
     paths: ['printcheck-build/ALPHA54_FINAL_TRIGGER.txt']
   workflow_dispatch:
 concurrency:
@@ -29,7 +29,7 @@ jobs:
         with: {gradle-version: '8.13'}
       - name: Prepare alpha54
         run: python3 printcheck-build/prepare_alpha54.py .
-      - name: Alpha53 audit
+      - name: Alpha54 audit
         run: python3 .printcheck-alpha54/tests/audit_alpha54.py
       - name: Core tests
         run: bash .printcheck-alpha54/tests/run_core.sh
