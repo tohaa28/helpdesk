@@ -8,3 +8,5 @@ Brief report filenames:
 - show constructor/reference actually used;
 - when internal/local saved name differs, show "Скачан / сохранён как: ...";
 - Quick Check shows template source, artwork source and ready_layout.svg.
+
+Retry: chunked alpha47 patch transport.
