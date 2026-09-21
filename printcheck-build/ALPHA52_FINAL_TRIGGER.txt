@@ -1,1 +1,1 @@
-alpha52 behavior audit
+alpha52 final: native tests passed; real PDF guide DPI correction

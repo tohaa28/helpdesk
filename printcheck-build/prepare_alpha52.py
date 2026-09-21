@@ -7,7 +7,7 @@ src=repo/'.printcheck-alpha52'
 if src.exists(): shutil.rmtree(src)
 shutil.copytree(repo/'.printcheck-alpha51',src)
 patch=gzip.decompress(base64.b64decode((repo/'printcheck-build/alpha52_patch.b64').read_bytes(),validate=True))
-assert hashlib.sha256(patch).hexdigest()=='c9fcc0a204070e544e33e0c8c27f68e827ae032805b660d48b19bc6d6aa2ae78'
+assert hashlib.sha256(patch).hexdigest()=='afa830a44c30cadfcd57f140bf0230b7e2f7a922d402b38dedf70265cc8f164a'
 p=repo/'.alpha52.patch';p.write_bytes(patch)
 subprocess.run(['patch','-p1','--batch','--forward','-i',str(p)],cwd=src,check=True)
 p.unlink()
