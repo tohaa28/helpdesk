@@ -14,7 +14,7 @@ shutil.copytree(src46,src47)
 
 enc=(pb/'pc340a47.patch.gz.b64').read_bytes().replace(b'\n',b'').replace(b'\r',b'')
 patch=gzip.decompress(base64.b64decode(enc,validate=True))
-if hashlib.sha256(patch).hexdigest()!='8d88684423e566f81a969cb9d6ca830c201bf461fa0a98e2e69379130047b82d':
+if hashlib.sha256(patch).hexdigest()!='2a299a0c94ec6dca716be6ced8d992d8e0f7e5eab5f04dbd77a3d78b15d2e673':
     raise RuntimeError('alpha47 patch sha mismatch')
 
 pp=repo/'.alpha47.patch'
