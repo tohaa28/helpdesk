@@ -2,18 +2,13 @@ PrintCheck 3.4.0-alpha47 final build trigger
 Date: 2026-09-21
 
 Short-report file names:
-- add a compact "ИСПОЛЬЗОВАННЫЕ ФАЙЛЫ" block to each article brief report;
-- show original downloaded layout/display name;
-- show original selected-field template name;
-- if geometry actually used a separate constructor/reference PDF, show it as "Использован для геометрии";
-- suppress duplicate template/reference lines;
-- Quick Check shows source artwork file, source template file and saved ready SVG name;
-- PDF report mirrors the same file-name information.
+- add a compact "ИСПОЛЬЗУЕМЫЕ ФАЙЛЫ" block to every article brief report;
+- show the original source/display name of the layout actually used;
+- show the original selected-field template name actually used;
+- when a separate constructor/reference PDF was used for geometry, show it separately;
+- also show the actual local downloaded filename as "скачан как" when it differs from the original name;
+- suppress duplicate reference/template rows;
+- Quick Check shows the user-loaded template filename, artwork filename and ready_layout.svg;
+- PDF report mirrors original names and actual downloaded/local filenames.
 
 Expected audits: alpha47 15/15; core 135/135.
-
-Retry: previous Android build failed only because Maven Central returned HTTP 403 while resolving Gradle dependencies; source/audits/tests unchanged.
-
-Retry 2: remove extra helper brace in ResultView and add structural audit check.
-
-Retry 3: use 3-part chunked alpha47 patch transport; source patch SHA remains 2a299a0c94ec6dca716be6ced8d992d8e0f7e5eab5f04dbd77a3d78b15d2e673.
