@@ -33,9 +33,9 @@ jobs:
         shell: bash
         run: |
           grep -q "versionName '3.4.0-alpha47'" .printcheck-alpha47/app/build.gradle
-          grep -q 'ИСПОЛЬЗОВАННЫЕ ФАЙЛЫ' .printcheck-alpha47/app/src/main/java/ru/printcheck/android/ResultView.java
-          grep -q 'input_artwork_name' .printcheck-alpha47/app/src/main/java/ru/printcheck/android/QuickCheckActivity.java
-          grep -q 'geometry_reference_name' .printcheck-alpha47/app/src/main/java/ru/printcheck/android/MainActivity.java
+          grep -q 'ИСПОЛЬЗУЕМЫЕ ФАЙЛЫ' .printcheck-alpha47/app/src/main/java/ru/printcheck/android/ResultView.java
+          grep -q 'quick_input_artwork' .printcheck-alpha47/app/src/main/java/ru/printcheck/android/QuickCheckActivity.java
+          grep -q 'Скачан макет как' .printcheck-alpha47/app/src/main/java/ru/printcheck/android/PdfReportWriter.java
       - name: Alpha47 audit
         run: python3 .printcheck-alpha47/tests/audit_alpha47.py
       - name: Core tests
