@@ -1,1 +1,1 @@
-trigger alpha55 modular geometry build after legend-swatch correction
+trigger alpha55 modular geometry build with frozen binding and geometry swatch filter
