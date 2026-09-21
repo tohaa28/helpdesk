@@ -37,7 +37,7 @@ checks={
     'physical field anchor':'selected-field-anchor-physical-identity' in main and 'applicationFieldAnchorAllowed' in reg,
     'multi application rows':'application_labels' in http and 'application_variant_index' in http,
     'geometry summary primary':'Результат определения нанесения:' in main,
-    'product color nonblocking':'автоматическая вспомогательная оценка цвета' in main,
+    'product color nonblocking':'cok?"ok":"warning"' in main and 'сама по себе не отклоняет макет' in main,
 }
 bad=[k for k,v in checks.items() if not v]
 if bad: raise RuntimeError('alpha50 invariant failure: '+', '.join(bad))
