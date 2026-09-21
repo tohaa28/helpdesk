@@ -1,0 +1,10 @@
+PrintCheck 3.4.0-alpha47 final build trigger
+Date: 2026-09-21
+
+Brief report filenames:
+- add visible "ИСПОЛЬЗУЕМЫЕ ФАЙЛЫ" block per article;
+- show original/display name of layout;
+- show selected application PDF name;
+- show constructor/reference actually used;
+- when internal/local saved name differs, show "Скачан / сохранён как: ...";
+- Quick Check shows template source, artwork source and ready_layout.svg.
