@@ -1,0 +1,46 @@
+PrintCheck Android 3.4.0-alpha47 — canonical build manifest
+Date: 2026-09-21
+
+VERSION
+versionName=3.4.0-alpha47
+versionCode=340047
+applicationId=ru.printcheck.android
+branch=printcheck-build-3.4.0-alpha47-files
+
+BUILD
+source_commit=5ce7d868b55f0d42216cbffbb93c0fd135db045a
+actions_run=35587921299
+job_id=106295475603
+artifact_name=PrintCheck_Android_3.4.0-alpha47_FINAL_BUILD
+artifact_id=10633440821
+artifact_digest=sha256:03e75b068a344e496e72be60248962691d232cca4d917e1a1140e4af328c57dc
+artifact_expires=2026-09-28T10:18:37Z
+
+FILES
+apk_sha256=e2491f5d5ca7370d810de8c911f341a30523aa5100def0387a0972a0f056c747
+source_zip_sha256=011f57e31ccd5d0f59b3fb21d73534056a3e90ff72af78fd6d3a059f66a9493b
+
+SIGNING
+persistent_alpha_signer=true
+certificate_sha256=822540c7386d193fd3dec165620398572306a20b2640b8769181597766a45d11
+update_compatible_with_alpha46=true
+
+TEST_GATES
+source_generation=PASS
+audit_alpha47=PASS
+core_tests=135/135_PASS
+android_build=PASS
+signer_verification=PASS
+artifact_upload=PASS
+
+ALPHA47_BRIEF_REPORT_FILES
+visible_block=ИСПОЛЬЗУЕМЫЕ ФАЙЛЫ
+layout_original_name=true
+layout_local_saved_name=true
+selected_application_original_name=true
+selected_application_local_saved_name=true
+constructor_or_reference_used=true
+manifest_fallback=true
+quick_template_source=true
+quick_artwork_source=true
+quick_ready_svg=true
