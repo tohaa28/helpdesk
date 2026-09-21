@@ -1,0 +1,13 @@
+PrintCheck 3.4.0-alpha47 final build trigger
+Date: 2026-09-21
+
+Short-report file names:
+- add a compact "ИСПОЛЬЗОВАННЫЕ ФАЙЛЫ" block to each article brief report;
+- show original downloaded layout/display name;
+- show original selected-field template name;
+- if geometry actually used a separate constructor/reference PDF, show it as "Использован для геометрии";
+- suppress duplicate template/reference lines;
+- Quick Check shows source artwork file, source template file and saved ready SVG name;
+- PDF report mirrors the same file-name information.
+
+Expected audits: alpha47 15/15; core 135/135.
