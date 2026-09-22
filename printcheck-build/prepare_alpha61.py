@@ -12,7 +12,13 @@ if src61.exists():
     shutil.rmtree(src61)
 shutil.copytree(src60,src61)
 
-parts=[pb/f'alpha61_patch_{i:02d}.b64' for i in range(4)]
+parts=[
+    pb/'alpha61_patch_00.b64',
+    pb/'alpha61_patch_01.b64',
+    pb/'alpha61_patch_02a.b64',
+    pb/'alpha61_patch_02b.b64',
+    pb/'alpha61_patch_03.b64',
+]
 enc=b''.join(p.read_bytes().replace(b'\n',b'').replace(b'\r',b'') for p in parts)
 patch=gzip.decompress(base64.b64decode(enc,validate=True))
 expected='c1ef5e0e0fb36a47abb0f734256a0b63604ba54109591921965fda4d275794c9'
