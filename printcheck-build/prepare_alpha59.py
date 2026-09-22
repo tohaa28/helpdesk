@@ -5,7 +5,6 @@ import base64, gzip, hashlib, os, shutil, subprocess, sys
 repo = Path(sys.argv[1] if len(sys.argv) > 1 else '.').resolve()
 pb = repo / 'printcheck-build'
 
-# Reconstruct exact canonical alpha58 first.
 subprocess.run([sys.executable, str(pb / 'prepare_alpha58.py'), str(repo)], check=True)
 src58 = repo / '.printcheck-alpha58'
 src59 = repo / '.printcheck-alpha59'
@@ -20,7 +19,6 @@ expected = 'd5c2e643a4770396e978451f358606b6e3c970adf009d32b243fe2d8f3f3a6e3'
 actual = hashlib.sha256(patch).hexdigest()
 if actual != expected:
     raise RuntimeError(f'alpha59 patch sha mismatch: {actual}')
-
 pp = repo / '.alpha59.patch'
 pp.write_bytes(patch)
 try:
@@ -28,15 +26,15 @@ try:
 finally:
     pp.unlink(missing_ok=True)
 
-# CI compile correction: preserve integer alpha49/51 measurement API while
-# conservatively including fractional PDF white-object geometry.
-fix_enc = (pb / 'alpha59_ci_fix.b64').read_bytes().replace(b'\n', b'').replace(b'\r', b'')
+# CI correction: convert fractional white geometry outward into the frozen
+# integer alpha49/alpha51 measurement interface without shrinking its bbox.
+fix_enc = (pb / 'alpha59_ci_fix2.b64').read_bytes().replace(b'\n', b'').replace(b'\r', b'')
 fix_patch = gzip.decompress(base64.b64decode(fix_enc, validate=True))
-fix_expected = '35eadff2e7c527a1203c6e824fcf22b96dc46d4206d83dabc4e9289d4a40241e'
+fix_expected = '49a574280495e8ae38a2ddb0f5bfe6dc931be20a2f05f9da23439c5073cf0746'
 fix_actual = hashlib.sha256(fix_patch).hexdigest()
 if fix_actual != fix_expected:
-    raise RuntimeError(f'alpha59 ci fix sha mismatch: {fix_actual}')
-fix_pp = repo / '.alpha59-ci-fix.patch'
+    raise RuntimeError(f'alpha59 ci fix2 sha mismatch: {fix_actual}')
+fix_pp = repo / '.alpha59-ci-fix2.patch'
 fix_pp.write_bytes(fix_patch)
 try:
     subprocess.run(['patch', '-p1', '--batch', '--forward', '-i', str(fix_pp)], cwd=src59, check=True)
