@@ -207,7 +207,7 @@ class CatalogImportManager(
         private val RAW_MESSAGE_SECTION_RE = Regex(
             "(?m)^##\\s+\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2}(?:\\s+[+-]\\d{2}:\\d{2})?\\s+—\\s+"
         )
-        private val RAW_MESSAGE_META_RE = Regex("(?m)^\`message_id=\\d+\`\\s+·\\s+\`type=")
+        private val RAW_MESSAGE_META_RE = Regex("(?m)^`message_id=\\d+`\\s+·\\s+`type=")
     }
 }
 
