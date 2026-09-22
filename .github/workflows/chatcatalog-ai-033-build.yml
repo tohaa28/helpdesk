@@ -31,7 +31,7 @@ jobs:
           echo "7a779c84e5d5ca505ccbe2b2ec203cd9e6ea1bf7507da68d3d815083f040365d  /tmp/ChatCatalogAI-0.3.2-patch.zip" | sha256sum -c -
 
           cat .chatcatalog-patch-033/patch_*.b64 | tr -d '\r\n' | base64 -d > /tmp/ChatCatalogAI-0.3.3-patch.zip
-          echo "c08d18553f3c4f4e14a9ca7d4e1960b67e547dfa46712810a46a2fc43761eceb  /tmp/ChatCatalogAI-0.3.3-patch.zip" | sha256sum -c -
+          echo "4cfca3e232df93977507a93fa0087290c412133cff467ee12e52e2760f6952d0  /tmp/ChatCatalogAI-0.3.3-patch.zip" | sha256sum -c -
 
           mkdir -p /tmp/chatcatalog033
           unzip -q /tmp/ChatCatalogAI-0.3.0-src.zip -d /tmp/chatcatalog033
@@ -41,7 +41,7 @@ jobs:
 
           grep -q 'versionCode = 5' "$PROJECT/app/build.gradle.kts"
           grep -q 'versionName = "0.3.3"' "$PROJECT/app/build.gradle.kts"
-          grep -q 'inline_keyboard' "$PROJECT/app/src/main/java/ru/chatcatalog/ai/publish/ImportedCatalogRenderer.kt"
+          grep -q 'buildPublication' "$PROJECT/app/src/main/java/ru/chatcatalog/ai/publish/ImportedCatalogRenderer.kt"
           grep -q 'parseMode = "HTML"' "$PROJECT/app/src/main/java/ru/chatcatalog/ai/publish/CatalogPublisherClient.kt"
 
       - name: Set up JDK 17
