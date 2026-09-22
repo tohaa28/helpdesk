@@ -1,1 +1,1 @@
-trigger alpha59 white artwork size measurement build after compile correction\n
+trigger alpha59 final build after corrected white-bounds patch path\n
