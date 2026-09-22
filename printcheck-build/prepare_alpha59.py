@@ -26,20 +26,35 @@ try:
 finally:
     pp.unlink(missing_ok=True)
 
-# CI correction: convert fractional white geometry outward into the frozen
-# integer alpha49/alpha51 measurement interface without shrinking its bbox.
-fix_enc = (pb / 'alpha59_ci_fix2.b64').read_bytes().replace(b'\n', b'').replace(b'\r', b'')
-fix_patch = gzip.decompress(base64.b64decode(fix_enc, validate=True))
-fix_expected = '49a574280495e8ae38a2ddb0f5bfe6dc931be20a2f05f9da23439c5073cf0746'
-fix_actual = hashlib.sha256(fix_patch).hexdigest()
-if fix_actual != fix_expected:
-    raise RuntimeError(f'alpha59 ci fix2 sha mismatch: {fix_actual}')
-fix_pp = repo / '.alpha59-ci-fix2.patch'
-fix_pp.write_bytes(fix_patch)
+# CI correction 1: preserve the frozen integer alpha49/alpha51 measurement API
+# while conservatively including fractional white PDF geometry.
+fix2_enc = (pb / 'alpha59_ci_fix2.b64').read_bytes().replace(b'\n', b'').replace(b'\r', b'')
+fix2_patch = gzip.decompress(base64.b64decode(fix2_enc, validate=True))
+fix2_expected = '49a574280495e8ae38a2ddb0f5bfe6dc931be20a2f05f9da23439c5073cf0746'
+fix2_actual = hashlib.sha256(fix2_patch).hexdigest()
+if fix2_actual != fix2_expected:
+    raise RuntimeError(f'alpha59 ci fix2 sha mismatch: {fix2_actual}')
+fix2_pp = repo / '.alpha59-ci-fix2.patch'
+fix2_pp.write_bytes(fix2_patch)
 try:
-    subprocess.run(['patch', '-p1', '--batch', '--forward', '-i', str(fix_pp)], cwd=src59, check=True)
+    subprocess.run(['patch', '-p1', '--batch', '--forward', '-i', str(fix2_pp)], cwd=src59, check=True)
 finally:
-    fix_pp.unlink(missing_ok=True)
+    fix2_pp.unlink(missing_ok=True)
+
+# CI correction 2: a white fill has no stroke expansion; only an actually
+# painted white stroke contributes half its line width to the physical bbox.
+fix3_enc = (pb / 'alpha59_ci_fix3.b64').read_bytes().replace(b'\n', b'').replace(b'\r', b'')
+fix3_patch = gzip.decompress(base64.b64decode(fix3_enc, validate=True))
+fix3_expected = '9d86288ce38cb48066b67420bb6223e3a80228cf4763fdcdb824eaee54d44590'
+fix3_actual = hashlib.sha256(fix3_patch).hexdigest()
+if fix3_actual != fix3_expected:
+    raise RuntimeError(f'alpha59 ci fix3 sha mismatch: {fix3_actual}')
+fix3_pp = repo / '.alpha59-ci-fix3.patch'
+fix3_pp.write_bytes(fix3_patch)
+try:
+    subprocess.run(['patch', '-p1', '--batch', '--forward', '-i', str(fix3_pp)], cwd=src59, check=True)
+finally:
+    fix3_pp.unlink(missing_ok=True)
 
 rejects = list(src59.rglob('*.rej'))
 if rejects:
