@@ -1,0 +1,1 @@
+trigger alpha60 measurement-boundary isolation build\n
