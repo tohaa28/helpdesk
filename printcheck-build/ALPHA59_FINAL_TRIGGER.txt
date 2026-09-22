@@ -1,1 +1,1 @@
-trigger alpha59 final build after corrected white-bounds patch path\n
+trigger alpha59 final build after white fill bbox correction\n
