@@ -1,0 +1,58 @@
+name: Build ChatCatalog AI APK
+
+on:
+  push:
+    branches:
+      - chatcatalog-ai-apk-0.2.0
+    paths:
+      - ".github/workflows/chatcatalog-ai-build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reconstruct ChatCatalog source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .chatcatalog-build/chunk_*.b64 | tr -d '\r\n' | base64 -d > /tmp/ChatCatalogAI-0.2.0-src.zip
+          echo "aeac53dba69a51813b93c02289aa8f5f4ea92e3ed823f8f11f34fae2a0a787a1  /tmp/ChatCatalogAI-0.2.0-src.zip" | sha256sum -c -
+          mkdir -p /tmp/chatcatalog
+          unzip -q /tmp/ChatCatalogAI-0.2.0-src.zip -d /tmp/chatcatalog
+          test -f /tmp/chatcatalog/ChatCatalogAI-0.2.0/settings.gradle.kts
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle 8.13
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.13"
+
+      - name: Build debug APK
+        working-directory: /tmp/chatcatalog/ChatCatalogAI-0.2.0
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Rename APK
+        run: |
+          cp /tmp/chatcatalog/ChatCatalogAI-0.2.0/app/build/outputs/apk/debug/app-debug.apk /tmp/ChatCatalogAI-0.2.0-debug.apk
+          sha256sum /tmp/ChatCatalogAI-0.2.0-debug.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChatCatalogAI-0.2.0-debug-apk
+          path: /tmp/ChatCatalogAI-0.2.0-debug.apk
+          if-no-files-found: error
+          retention-days: 7
