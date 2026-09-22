@@ -30,8 +30,15 @@ jobs:
           cat             .chatcatalog-patch-032/patch_00.b64             .chatcatalog-patch-032/patch_01.b64             .chatcatalog-patch-032/patch_02.b64             .chatcatalog-patch-032/patch_03.b64             | tr -d '\r\n' | base64 -d > /tmp/ChatCatalogAI-0.3.2-patch.zip
           echo "7a779c84e5d5ca505ccbe2b2ec203cd9e6ea1bf7507da68d3d815083f040365d  /tmp/ChatCatalogAI-0.3.2-patch.zip" | sha256sum -c -
 
-          # 0.3.3 patch is split into ordered base64 parts (including patch_01a).
-          cat .chatcatalog-patch-033/patch_*.b64 | tr -d '\r\n' | base64 -d > /tmp/ChatCatalogAI-0.3.3-patch.zip
+          # Keep the split order explicit: shell collation can place patch_01a unexpectedly.
+          cat \
+            .chatcatalog-patch-033/patch_00.b64 \
+            .chatcatalog-patch-033/patch_01.b64 \
+            .chatcatalog-patch-033/patch_01a.b64 \
+            .chatcatalog-patch-033/patch_02.b64 \
+            .chatcatalog-patch-033/patch_03.b64 \
+            .chatcatalog-patch-033/patch_04.b64 \
+            | tr -d '\r\n' | base64 -d > /tmp/ChatCatalogAI-0.3.3-patch.zip
           echo "4cfca3e232df93977507a93fa0087290c412133cff467ee12e52e2760f6952d0  /tmp/ChatCatalogAI-0.3.3-patch.zip" | sha256sum -c -
 
           mkdir -p /tmp/chatcatalog033
