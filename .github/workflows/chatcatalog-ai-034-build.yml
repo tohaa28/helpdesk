@@ -1,4 +1,5 @@
 name: Build ChatCatalog AI 0.3.4
+# retry after patch integrity fix
 
 on:
   push:
