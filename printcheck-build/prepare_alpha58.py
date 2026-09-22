@@ -13,7 +13,8 @@ if src58.exists():
     shutil.rmtree(src58)
 shutil.copytree(src57, src58)
 
-parts = [pb / f'alpha58_patch_{i:02d}.b64' for i in range(4)]
+# alpha58 patch is split only for transport; concatenation is the original gzip/base64 stream.
+parts = [pb / f'alpha58_patch_{i:02d}.b64' for i in range(6)]
 enc = b''.join(p.read_bytes().replace(b'\n', b'').replace(b'\r', b'') for p in parts)
 patch = gzip.decompress(base64.b64decode(enc, validate=True))
 expected = '71e6f3ce7cb6165a73a6340161642d717efdd68e9d3778b238a564980226f03a'
