@@ -28,6 +28,24 @@ jobs:
           mkdir -p /tmp/chatcatalog
           unzip -q /tmp/ChatCatalogAI-0.2.0-src.zip -d /tmp/chatcatalog
           test -f /tmp/chatcatalog/ChatCatalogAI-0.2.0/settings.gradle.kts
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("/tmp/chatcatalog/ChatCatalogAI-0.2.0/app/build.gradle.kts")
+          s = p.read_text()
+          s = s.replace('''    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+''', '')
+          s += '''\n
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
+}
+'''
+          p.write_text(s)
+          PY
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
