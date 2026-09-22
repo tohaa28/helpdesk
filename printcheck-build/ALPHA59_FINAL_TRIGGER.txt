@@ -1,1 +1,1 @@
-trigger alpha59 white artwork size measurement build\n
+trigger alpha59 white artwork size measurement build after compile correction\n
