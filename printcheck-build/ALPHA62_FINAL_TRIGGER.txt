@@ -1,0 +1,1 @@
+trigger alpha62 background foreground-service build\n
